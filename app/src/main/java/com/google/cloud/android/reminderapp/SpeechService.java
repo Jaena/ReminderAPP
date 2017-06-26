@@ -77,7 +77,7 @@ public class SpeechService extends Service {
     public interface Listener {
 
         /**
-         * Called when a new piece of text was recognized by the Speech API.
+         * Calle d when a new piece of text was recognized by the Speech API.
          *
          * @param text    The text.
          * @param isFinal {@code true} when the API finished processing audio.
