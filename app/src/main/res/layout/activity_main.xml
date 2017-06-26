@@ -10,7 +10,7 @@
         android:id="@+id/text"
         android:padding="5dp"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="200dp"
         android:hint="이제 곧 인식된 글이 써질거에여!"
         />
 
