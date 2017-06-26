@@ -26,11 +26,15 @@ public class RegularExpression {
     int curMin=0;
     int curSec=0;
 
+    String dayOfWeek = null;
+
     int tempMin =0;
     String statement;
 
     public String Anaylis(String target){
-        statement = target;
+        statement = target; // 구글 서버에서 보내주는 문자값
+
+        System.out.println("정규식 : " + target);
 
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yy:MM:dd:hh:mm:ss");
@@ -48,28 +52,43 @@ public class RegularExpression {
 //        calMonth;
 //        calDay;
         //calHour = HourPattern();
+
+        dayOfWeek = dayOfWeekPattern();
         calMin = MinutePattern();
         calSec = SecondPattern();
 
         String curTime ="현재 시간: "+curMin+" 분 "+curSec+" 초\n";
-        String calTime = "알람 시간: "+calMin+" 분 "+calSec+" 초";
-
-
+        String calTime = "알람 시간: "+dayOfWeek+ " "+ calMin+" 분 "+calSec+" 초";
 
         reset();
         return curTime+ calTime;
+    }
+
+    public String dayOfWeekPattern()
+    {
+        Pattern pattern = Pattern.compile("[월]?[화]?[수]?[목]?[금]?[토]?[일]?+[요]+[일]");//여기에 정규표현식을 적습니다.
+        Matcher matcher = pattern.matcher(statement);
+        if(matcher.find())
+        {
+            String match = matcher.group(0);
+            System.out.println("요일 테스트 : " + match);
+            return match;
+        }
+        return null;
     }
 
     public int SecondPattern()
     {
         Pattern pattern = Pattern.compile("[1-9]\\d*+[초]");//여기에 정규표현식을 적습니다.
         Matcher matcher = pattern.matcher(statement);
+
         while(true){
             if (matcher.find()) {
                 String match = matcher.group(0);
+                System.out.println("정규식 짜른거" + match);
                 System.out.println(match + "\n");
                 String temp2[] = match.split("초");
-                System.out.println(temp2[0] + "\n");
+                System.out.println("초다"+temp2[0] + "\n");
                 int matchMin = Integer.parseInt(temp2[0]);
                 calSec = curSec + matchMin;
 
