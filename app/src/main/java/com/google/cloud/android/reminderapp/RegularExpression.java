@@ -37,7 +37,7 @@ public class RegularExpression {
     String statement;
 
     //분석하기
-    public String Anylis(String target){
+    public String Analysis(String target){
         statement = target; // 구글 서버에서 보내주는 문자값
 
         System.out.println("정규식 : " + target);

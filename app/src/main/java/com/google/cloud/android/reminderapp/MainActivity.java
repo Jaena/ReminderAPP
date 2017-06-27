@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             {
                 String returnedValue =(String)msg.obj;
                 mText.setText(returnedValue);
-                Toast.makeText(getApplicationContext(),regularExpression.Anylis(returnedValue),Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),regularExpression.Analysis(returnedValue),Toast.LENGTH_LONG).show();
             }
         };
     }
