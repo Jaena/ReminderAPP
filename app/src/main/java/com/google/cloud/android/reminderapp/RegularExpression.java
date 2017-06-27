@@ -12,26 +12,32 @@ import java.util.regex.Pattern;
  */
 
 public class RegularExpression {
-    int calSec = -1;
-    int calMin = -1;
-    int calHour= -1;
-    int calDay = -1;
-    int calMonth = -1;
-    int calYear = -1;
+    //추출해서 나온 값들
+        int calSec = -1;
+        int calMin = -1;
+        int calHour= -1;
+        int calDay = -1;
+        int calMonth = -1;
+        int calYear = -1;
 
-    int curYear = 0;
-    int curMonth = 0;
-    int curDay=0;
-    int curHour=0;
-    int curMin=0;
-    int curSec=0;
+    //현재 날짜를 넣어줄 값들
+        int curYear = 0;
+        int curMonth = 0;
+        int curDay=0;
+        int curHour=0;
+        int curMin=0;
+        int curSec=0;
 
+    //요일, 다양한 표현들 추출한 값들
     String dayOfWeek = null;
 
     int tempMin =0;
+
+    //구글에서 보내준 문자값을 넣어줄 변수 값
     String statement;
 
-    public String Anaylis(String target){
+    //분석하기
+    public String Anylis(String target){
         statement = target; // 구글 서버에서 보내주는 문자값
 
         System.out.println("정규식 : " + target);
@@ -76,6 +82,7 @@ public class RegularExpression {
         }
         return null;
     }
+
 
     public int SecondPattern()
     {
