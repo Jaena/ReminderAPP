@@ -29,7 +29,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,11 +52,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     // View references
     private TextView mText;
-    Button record;
-    Button play;
+    ImageView device;
+    ImageButton record;
+    ImageButton play;
 
     Handler handler;
 
+
+    boolean isEnd = false;
     int SampleRate = 16000;
     int BufferSize = 1024;
 
@@ -109,25 +113,29 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        device = (ImageView)findViewById(R.id.backgound);
         mText = (TextView) findViewById(R.id.text);
-        record = (Button)findViewById(R.id.start);
-        play = (Button)findViewById(R.id.play);
+        record = (ImageButton)findViewById(R.id.record);
+        play = (ImageButton)findViewById(R.id.play);
         db = new DataBase(MainActivity.this);
         mVoiceRecorder = new VoiceRecorder(this,mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
         regularExpression = new RegularExpression();
+        device.setEnabled(false);
+        mText.setVisibility(View.VISIBLE);
         record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if(!mVoiceRecorder.isRecording()) {
                     startVoiceRecorder();
-                    record.setText("STOP");
-                }
-                else
-                {
-                    stopVoiceRecorder();
-                    record.setText("RECORD");
+                    record.setEnabled(false);
+                    record.setVisibility(View.GONE);
+                    play.setEnabled(false);
+                    play.setVisibility(View.GONE);
+                    mText.setText("중지를 원하시면\n화면을 터치해주세요");
+                    mText.setVisibility(View.VISIBLE);
+                    device.setEnabled(true);
                 }
             }
         });
@@ -137,12 +145,43 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 if(!voicePlayer.isPlaying()) {
                     voicePlayer.startPlaying(SampleRate,BufferSize);
-                    play.setText("STOP");
+                    record.setEnabled(false);
+                    record.setVisibility(View.GONE);
+                    play.setEnabled(false);
+                    play.setVisibility(View.GONE);
+                    mText.setText("중지를 원하시면\n화면을 터치해주세요");
+                    mText.setVisibility(View.VISIBLE);
+                    device.setEnabled(true);
                 }
-                else
+            }
+        });
+
+        device.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mVoiceRecorder.isRecording()){
+                    stopVoiceRecorder();
+                }
+                if(voicePlayer.isPlaying())
                 {
                     voicePlayer.stopPlaying();
-                    play.setText("PLAYING");
+                    record.setEnabled(true);
+                    record.setVisibility(View.VISIBLE);
+                    play.setEnabled(true);
+                    play.setVisibility(View.VISIBLE);
+                    mText.setText("");
+                    mText.setVisibility(View.GONE);
+                    device.setEnabled(false);
+                }
+                if(isEnd)
+                {
+                    device.setEnabled(false);
+                    record.setEnabled(true);
+                    record.setVisibility(View.VISIBLE);
+                    play.setEnabled(true);
+                    play.setVisibility(View.VISIBLE);
+                    mText.setText("");
+                    isEnd = false;
                 }
             }
         });
@@ -154,8 +193,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 String returnedValue =(String)msg.obj;
                 mText.setText(returnedValue);
                 Toast.makeText(getApplicationContext(),regularExpression.Analysis(returnedValue),Toast.LENGTH_LONG).show();
+                isEnd = true;
             }
         };
+
+
     }
 
     @Override
@@ -240,12 +282,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private final SpeechService.Listener mSpeechServiceListener =
             new SpeechService.Listener() {
                 @Override
-                public void onSpeechRecognized(final String text, final boolean isFinal) {
+                public void onSpeechRecognized(final String text, final boolean isFinal){
                     if (mText != null) {
                         if (isFinal) {
-                            //끝 알람분석 시작 여기부터
-                            Message msg = handler.obtainMessage(1,text);
-                            handler.sendMessage(msg);
+                            Message message = handler.obtainMessage(1,text);
+                            handler.sendMessage(message);
                         }
                     }
                 }
