@@ -57,7 +57,7 @@ public class VoicePlayer {
 
         String fileName[] = db.getAllFileName();
         int playCount = fileName.length;
-        for(int i=playCount-1;i>=0;i--){
+        for(int i=0;i<playCount;i++){
             int count = 0;
             byte[] data = new byte[mBufferSize];
             try {
