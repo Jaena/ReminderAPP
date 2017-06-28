@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
  */
 
 public class RegularExpression {
-
     public HashMap<String, Integer> hMap;
     public HashMap<String, Integer> wMap;
     public int curYear, curMonth, curDay, curHour, curMinute;
@@ -22,7 +21,10 @@ public class RegularExpression {
     String calA = new String(); //calA : 오전 / 오후
     public String curDayOfWeek;
     public int[] days = new int[]{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    boolean isNextDay;
     boolean isThereTime2;
+    boolean isTime;
 
     // 내일|낼|명일|모레|글피|익일|명일
     public RegularExpression() {
@@ -35,6 +37,11 @@ public class RegularExpression {
 
         hMap.put("다음주", 1);
         hMap.put("다다음주", 2);
+
+        hMap.put("다음날", 1);
+        hMap.put("담날",1);
+        hMap.put("다다음날", 2);
+
         wMap.put("일요일", 1);
         wMap.put("월요일", 2);
         wMap.put("화요일", 3);
@@ -42,11 +49,11 @@ public class RegularExpression {
         wMap.put("목요일", 5);
         wMap.put("금요일", 6);
         wMap.put("토요일", 7);
-        isThereTime2 = false;
     }
 
     public String Analysis(String target){
-        isThereTime2 = false;
+        isNextDay = false;
+        isTime = false;
 
         Calendar cal = Calendar.getInstance();
         Date date = new Date();
@@ -94,6 +101,10 @@ public class RegularExpression {
         if(curA.equals("오전") && curHour == 12) {
             curHour = 0; //0시
         }
+        if(curA.equals("오후")) {
+            curHour += 12;
+        }
+
 
         calYear = curYear;
         calMonth = curMonth;
@@ -105,11 +116,8 @@ public class RegularExpression {
 
         String curTime = "현재 시간: "+ curYear + "년 " + curMonth + "월 "+ curDay + "일 " + curHour + "시 " + curMinute + "분 " + "\n";
         String calTime = "알람 시간: "+ calYear + "년 " + calMonth + "월 "+ calDay + "일 " + calHour + "시 " + calMinute + "분 ";
-        String calTime2 = new String();
-        if(isThereTime2)
-            calTime2 = "\n알람 시간: "+ calYear + "년 " + calMonth_1 + "월 "+ calDay_1 + "일 " + calHour_1 + "시 " + calMinute + "분 ";
 
-        return curTime + calTime + calTime2;
+        return curTime + calTime;
     }
 
     public boolean extractManager(String searchTarget) {
@@ -145,7 +153,10 @@ public class RegularExpression {
         searchTarget = searchTarget.replaceAll("정오", "오후12시");
 
         searchTarget = searchTarget.replaceAll("일주일", "1주");
-        searchTarget = searchTarget.replaceAll("날", ""); //금요일 날, 수요일 날.. 등등
+        searchTarget = searchTarget.replaceAll("요일날", "요일"); //금요일 날, 수요일 날.. 등등
+        searchTarget = searchTarget.replaceAll("담날", "다음날");
+        searchTarget = searchTarget.replaceAll("담주", "다음주");
+
 
         String regex = new String();
         while(true) {
@@ -226,14 +237,21 @@ public class RegularExpression {
             }
 
             regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9])분";
-            if(extract3(searchTarget, regex)) break;
+            if(extract3(searchTarget, regex)) {
+                isTime = true;
+                break;
+            }
 
             regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반";
-            if(extract4(searchTarget, regex)) break;
-
+            if(extract4(searchTarget, regex)) {
+                isTime = true;
+                break;
+            }
             regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시";
-            if(extract5(searchTarget, regex)) break;
-
+            if(extract5(searchTarget, regex)) {
+                isTime = true;
+                break;
+            }
             regex = "([0-9]+) ?분 ?(후|뒤|있다가)";
             if(extract6(searchTarget, regex)) {
                 isThereTime2 = false;
@@ -273,17 +291,25 @@ public class RegularExpression {
             break;
         }
 
-        regex = "오전|오후";
-        extract101(searchTarget, regex);
-
-        regex = "[내일|낼|명일|모레|내일모레|내일모래|낼모레|낼모래|모래|글피|익일|명일]+";
+        regex = "[다다음날|다음날|내일|낼|명일|모레|내일모레|내일모래|낼모레|낼모래|모래|글피|익일|명일]+";
         int ret = extract100(searchTarget, regex);
         if(ret > 0) {
+            System.out.println("DDDD" + isNextDay);
+            isNextDay = true;
             calDay += ret;
             int day_num = days[calMonth];
             calMonth += calDay == day_num ? 0 : calDay / day_num;
             calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
+
+            if(!isTime)
+            {
+                calHour = 8;
+                calMinute = 0;
+            }
         }
+
+        regex = "오전|오후";
+        extract101(searchTarget, regex);
 
         return true;
     }
@@ -521,6 +547,8 @@ public class RegularExpression {
             atTime(curYear, Integer.parseInt(temp[0].replaceAll(" ", "")), Integer.parseInt(temp[1].replaceAll(" ", "")), curHour, curMinute);
             if(curMonth >= Integer.parseInt(temp[0].replaceAll(" ", "")) && curDay > Integer.parseInt(temp[1].replaceAll(" ", "")))
                 calYear = curYear+1; // 이전을 얘기한다면
+
+            calHour = 8; calMinute = 0; //working time의 초기 시간으로 설정
         }
         return isExtracted;
     }
@@ -539,6 +567,8 @@ public class RegularExpression {
             atTime(curYear, Integer.parseInt(temp[0].replaceAll(" ", "")), 1, 0, 0); //그 달의 1일 0시 0분
             if(curMonth >= Integer.parseInt(temp[0].replaceAll(" ", "")))
                 calYear = curYear+1; // 이전을 얘기한다면
+
+            calHour = 8; calMinute = 0; //working time의 초기 시간으로 설정
         }
         return isExtracted;
     }
@@ -557,6 +587,8 @@ public class RegularExpression {
             atTime(curYear, curMonth, Integer.parseInt(temp[0].replaceAll(" ", "")), 0, 0); //그 달, 그 일의 0시 0분
             if(curDay >= Integer.parseInt(temp[0].replaceAll(" ", "")))
                 calMonth = curMonth+1; // 이전을 얘기한다면
+
+            calHour = 8; calMinute = 0; //working time의 초기 시간으로 설정
         }
         return isExtracted;
     }
@@ -577,10 +609,9 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    public int extract100(String searchTarget, String regex) { //[내일|낼|명일|모레|글피|익일|명일]+
+    public int extract100(String searchTarget, String regex) { //[다음날|다다음날|다다음날|내일|낼|명일|모레|글피|익일|명일]+
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
-//    	boolean isExtracted = false;
         int maxi = 0;
         while(matcher.find()) {
             String match = matcher.group(0);
@@ -589,12 +620,7 @@ public class RegularExpression {
             if(num == null) num = 0;
 
             if(maxi < num) maxi = num;
-            //addTime(maxi, 0, 0); - addTime은 curTime에 더하는 것이므로
-            //여기서 더해봤자 아무의미가 마지막에 추가적으로 더해주자.
-//    		isExtracted = true;
-            //System.out.println(matcher.group(0));
         }
-//    	return isExtracted;
         return maxi;
     }
 
@@ -607,9 +633,8 @@ public class RegularExpression {
         while (matcher.find()) {
             isExtracted = true;
             result = matcher.group(0).replaceAll(" ", "");
-            //System.out.println("extract12 : " + result);
             addTime(hMap.get(result) * 7, 0, 0);
-
+            calHour = 8; calMinute = 0; //working time의 초기 시간으로 설정
         }
         return isExtracted;
     }
@@ -641,6 +666,7 @@ public class RegularExpression {
             // System.out.println("주: " + week + " 요일 : " + dayofweek);
             int calweekday = (-1*(wMap.get(curDayOfWeek)-1)+(hMap.get(week)*7 + wMap.get(dayofweek)-1));
             addTime(calweekday,0,0);
+            calHour = 8; calMinute = 0; //working time의 초기 시간으로 설정
         }
         return isExtracted;
     }
@@ -656,16 +682,17 @@ public class RegularExpression {
             isExtracted = true;
             result = matcher.group(0).replaceAll(" ", "");
 
-            if(wMap.get(curDayOfWeek) < wMap.get(result)) {
+            if(wMap.get(curDayOfWeek) < wMap.get(result) && curHour < 8) {
                 int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(result) - 1));
                 //System.out.println("요일을 하고 있다 " + result );
                 addTime(calweekday, 0, 0);
             }
-            else if(wMap.get(curDayOfWeek) >= wMap.get(result))
+            else if(wMap.get(curDayOfWeek) >= wMap.get(result) && curHour >= 8)
             {
                 int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(result) - 1));
                 addTime(calweekday, 0, 0);
             }
+            calHour = 8; calMinute = 0; //working time의 초기 시간으로 설정
         }
         return isExtracted;
     }
@@ -676,68 +703,58 @@ public class RegularExpression {
         Matcher matcher = pattern.matcher(searchTarget);
         boolean isExtracted = false;
         String result = "";
-        String[] temp = new String[4];
-        while(matcher.find()) {
+        while(matcher.find()) { //같은 형식의 시간표현이 여러개인 경우 가장 마지막 시간 표현 사용
             isExtracted = true;
             result = matcher.group(0);
-            System.out.println(result);
         }
 
-        if(result.equals("오후")) {
+        if(result.equals("오후")) { //오후
             calA = "오후";
             if(calHour < 12)
                 calHour += 12;
+
+            if(calHour*60 + calMinute < curHour*60 + curMinute && !isNextDay) {
+                System.out.println("IS NEXT DAY : " + isNextDay);
+                calDay += 1;
+                int day_num = days[calMonth];
+                calMonth += calDay / day_num;
+                calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
+
+                calYear += calMonth / 12;
+                calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
+            }
         }
-        else if(result.equals("오전")) {
-            System.out.println("오전 check");
-            System.out.println("TEST : " +  calDay + " " + calHour + " " + calMinute);
+        else if(result.equals("오전")) { //오전
             calA = "오전";
+            if(calHour*60 + calMinute < curHour*60 + curMinute && !isNextDay) {
+                System.out.println("IS NEXT DAY : " + isNextDay);
+                calDay += 1;
+                int day_num = days[calMonth];
+                calMonth += calDay / day_num;
+                calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
+
+                calYear += calMonth / 12;
+                calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
+            }
         }
-        else { //오전, 오후가 입력되지 않았다면 - 오전, 오후 모두 설정
-            if(calHour <= 12) {
-                if((calHour == curHour) && (calMinute == curMinute))
-                    return false;
-
-                isThereTime2 = true;
-//                int calVal = calDay * 1440 + calHour * 60 + calMinute;
-//                int curVal = curDay * 1440 + curHour * 60 + curMinute;
-                int calVal = calHour * 60 + calMinute;
-                int curVal = curHour * 60 + curMinute;
-                if(calMonth*720+calDay > curMonth*720+curDay) {
-                    System.out.println("뭐야 : " + calMonth + calDay);
-                    calMonth_1 = calMonth;
-                    calDay_1 = calDay;
-                    calHour_1 = calHour + 12;
-                    return true;
+        else { //오전, 오후가 입력되지 않았다면, working time(8am - 8pm, 8 - 20) 범위내에서 처리
+            if(calHour < 12) { //12이상이면 오후로 정해진 것. 1 ~ 11은 오전/오후 둘 다 가능
+                calA = "오전";
+                if(calHour < 8) { //0 ~ 7
+                    calHour += 12;
+                    calA = "오후";
                 }
-                if(calVal <= curVal) { //알림 시간이 현재 시간보다 앞인 경우
-                    int add = 0;
-                    while(add * 60 <= curVal - calVal) {
-                        add += 12;
-                    }
-                    calHour += add;
-                    calHour_1 = calHour + 12;
+            }
 
-                    calDay += calHour / 24;
-                    calHour %= 24;
-                    int day_num = days[curMonth];
-                    calMonth += calDay == day_num ? 0 : calDay / day_num;
-                    calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
+            if(calHour*60 + calMinute < curHour*60 + curMinute && !isNextDay) {
+                System.out.println("IS NEXT DAY : " + isNextDay);
+                calDay += 1;
+                int day_num = days[calMonth];
+                calMonth += calDay / day_num;
+                calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
 
-                    calDay_1 = calDay + calHour_1 / 24;
-                    calHour_1 %= 24;
-
-                    calMonth_1 = calMonth + calDay_1 / day_num; //수정필요
-                    calDay_1 %= day_num; //수정필요
-                }
-                else { //calVal > curVal //알림 시간이 현재 시간보다 뒤인 경우
-                    calHour_1 = calHour + 12;
-                    //calDay_1 = curDay + calHour_1 / 24;
-                    //calHour_1 %= 24;
-
-                    //int day_num = days[curMonth];
-                    //calMonth_1 = curMonth + calDay_1 / day_num;
-                }
+                calYear += calMonth / 12;
+                calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
             }
         }
 
@@ -1115,11 +1132,6 @@ public class RegularExpression {
             calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
             calYear += calMonth / 12;
             calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
-
-            //System.out.println("test : " +result);
-
-
-            //System.out.println(matcher.group(0));
         }
         return isExtracted;
     }
