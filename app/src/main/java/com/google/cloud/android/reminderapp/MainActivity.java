@@ -18,6 +18,7 @@ package com.google.cloud.android.reminderapp;
 
 import android.Manifest;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
@@ -33,6 +34,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.tsengvn.typekit.TypekitContextWrapper;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -56,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ImageButton record;
     ImageButton play;
 
+    ImageView [] circles = new ImageView[5];
     Handler handler;
-
 
     boolean isEnd = false;
     int SampleRate = 16000;
@@ -109,61 +112,72 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
 
     };
+    int index=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        device = (ImageView)findViewById(R.id.backgound);
+        device = (ImageView) findViewById(R.id.backgound);
         mText = (TextView) findViewById(R.id.text);
-        record = (ImageButton)findViewById(R.id.record);
-        play = (ImageButton)findViewById(R.id.play);
+        record = (ImageButton) findViewById(R.id.record);
+        play = (ImageButton) findViewById(R.id.play);
         db = new DataBase(MainActivity.this);
-        mVoiceRecorder = new VoiceRecorder(this,mVoiceCallback);
+        mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
         regularExpression = new RegularExpression();
         device.setEnabled(false);
         mText.setVisibility(View.VISIBLE);
+
+        circles[0] = (ImageView) (findViewById(R.id.circle1));
+        circles[1] = (ImageView) (findViewById(R.id.circle2));
+        circles[2] = (ImageView) (findViewById(R.id.circle3));
+        circles[3] = (ImageView) (findViewById(R.id.circle4));
+        circles[4] = (ImageView) (findViewById(R.id.circle5));
+
         record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(!mVoiceRecorder.isRecording()) {
-                    startVoiceRecorder();
+                if (!mVoiceRecorder.isRecording()) {
                     record.setEnabled(false);
                     record.setVisibility(View.GONE);
                     play.setEnabled(false);
                     play.setVisibility(View.GONE);
-                    mText.setText("중지를 원하시면\n화면을 터치해주세요");
+                    mText.setText("녹음중 ");
                     mText.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
+//                    recordDisplay();
+//                    NoticeDisplay();
+                    startVoiceRecorder();
+                }
+            }
+        });
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!voicePlayer.isPlaying()) {
+                    record.setEnabled(false);
+                    record.setVisibility(View.GONE);
+                    play.setEnabled(false);
+                    play.setVisibility(View.GONE);
+                    mText.setText("재생중");
+                    mText.setVisibility(View.VISIBLE);
+                    device.setEnabled(true);
+//                    playDisplay();
+//                    NoticeDisplay();
+                    voicePlayer.startPlaying(SampleRate, BufferSize);
                 }
             }
         });
 
-        play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!voicePlayer.isPlaying()) {
-                    voicePlayer.startPlaying(SampleRate,BufferSize);
-                    record.setEnabled(false);
-                    record.setVisibility(View.GONE);
-                    play.setEnabled(false);
-                    play.setVisibility(View.GONE);
-                    mText.setText("중지를 원하시면\n화면을 터치해주세요");
-                    mText.setVisibility(View.VISIBLE);
-                    device.setEnabled(true);
-                }
-            }
-        });
 
         device.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mVoiceRecorder.isRecording()){
+                if (mVoiceRecorder.isRecording()) {
                     stopVoiceRecorder();
                 }
-                if(voicePlayer.isPlaying())
-                {
+                if (voicePlayer.isPlaying()) {
                     voicePlayer.stopPlaying();
                     record.setEnabled(true);
                     record.setVisibility(View.VISIBLE);
@@ -173,8 +187,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setVisibility(View.GONE);
                     device.setEnabled(false);
                 }
-                if(isEnd)
-                {
+                if (isEnd) {
                     device.setEnabled(false);
                     record.setEnabled(true);
                     record.setVisibility(View.VISIBLE);
@@ -186,19 +199,42 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             }
         });
 
-        handler = new Handler()
-        {
-            public void handleMessage(Message msg)
-            {
-                String returnedValue =(String)msg.obj;
-                mText.setText(returnedValue);
-                Toast.makeText(getApplicationContext(),regularExpression.Analysis(returnedValue),Toast.LENGTH_LONG).show();
+        handler = new Handler() {
+            public void handleMessage(Message msg) {
+                String returnedValue = (String) msg.obj;
+                mText.setText(regularExpression.Analysis(returnedValue));
+                Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                 isEnd = true;
             }
         };
 
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while(true) {
+//                    if(mVoiceRecorder.isRecording() || voicePlayer.isPlaying()){
+//                        try {
+//                            Thread.sleep(100);
+//                        } catch (InterruptedException e) {
+//                        }
+//                        circles[index].setVisibility(View.VISIBLE);
+//                        index++;
+//                        if (index == 5) {
+//                            for (int i = 0; i < 5; i++) {
+//                                circles[i].setVisibility(View.INVISIBLE);
+//                            }
+//                            index = 0;
+//                        }
+//                    }
+//
+//
+//
+//                }
+//            }
+//        });
 
     }
+
 
     @Override
     protected void onStart() {
@@ -258,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             FileInputStream fis = null;
             try {
                 String fileName = db.getLastFileName();
-                fis  = openFileInput(fileName);
+                fis = openFileInput(fileName);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -282,10 +318,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private final SpeechService.Listener mSpeechServiceListener =
             new SpeechService.Listener() {
                 @Override
-                public void onSpeechRecognized(final String text, final boolean isFinal){
+                public void onSpeechRecognized(final String text, final boolean isFinal) {
                     if (mText != null) {
                         if (isFinal) {
-                            Message message = handler.obtainMessage(1,text);
+                            Message message = handler.obtainMessage(1, text);
                             handler.sendMessage(message);
                         }
                     }
@@ -297,4 +333,90 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         return db;
     }
 
+
+    //font
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
+    }
+
+//    boolean RecRunning = true;
+//    void recordDisplay(){
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (RecRunning) {
+//                    while (mVoiceRecorder.isRecording() == true) {
+//                        TimerTask task = new TimerTask() {
+//                            @Override
+//                            public void run() {
+//                                mText.setText("중지시 화면 클릭");
+//                            }
+//                        };
+//                        Timer mTimer = new Timer();
+//                        mTimer.schedule(task, 1000);
+//                        mText.setText("녹음중");
+//                        if (mVoiceRecorder.isRecording() == false)
+//                            RecRunning = false;
+//                    }
+//                }
+//            }
+//        });
+//
+//        }
+//
+//    boolean playRunning =true;
+//    void playDisplay() {
+//
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while(playRunning) {
+//                    while (voicePlayer.isPlaying() == true) {
+//                        TimerTask task = new TimerTask() {
+//                            @Override
+//                            public void run() {
+//                                mText.setText("중지시 화면 클릭");
+//                            }
+//                        };
+//                        Timer mTimer = new Timer();
+//                        mTimer.schedule(task, 1000);
+//                        mText.setText("재생중");
+//                        if(!voicePlayer.isPlaying())
+//                            playRunning = false;
+//                    }
+//                }
+//            }
+//        });
+//
+//    }
+//
+//    boolean noticeRunning = true;
+//    void NoticeDisplay() {
+//        int duration = 100;
+//        runOnUiThread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                while (noticeRunning) {
+//                    while (mVoiceRecorder.isRecording() || voicePlayer.isPlaying()) {
+//                        try {
+//                            Thread.sleep(100);
+//                        } catch (InterruptedException e) {
+//                        }
+//                        circles[index].setVisibility(View.VISIBLE);
+//                        index++;
+//                        if (index == 5) {
+//                            for (int i = 0; i < 5; i++) {
+//                                circles[i].setVisibility(View.INVISIBLE);
+//                            }
+//                            index = 0;
+//                        }
+//                        if (!(mVoiceRecorder.isRecording() || voicePlayer.isPlaying()))
+//                            noticeRunning = false;
+//                    }
+//                }
+//            }
+//        });
+//    }
 }

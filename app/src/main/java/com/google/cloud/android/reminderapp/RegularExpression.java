@@ -114,10 +114,9 @@ public class RegularExpression {
 
         extractManager(target);
 
-        String curTime = "현재 시간: "+ curYear + "년 " + curMonth + "월 "+ curDay + "일 " + curHour + "시 " + curMinute + "분 " + "\n";
-        String calTime = "알람 시간: "+ calYear + "년 " + calMonth + "월 "+ calDay + "일 " + calHour + "시 " + calMinute + "분 ";
+        String calTime = calYear + "년 " + calMonth + "월 "+ calDay + "일 " + calHour + "시 " + calMinute + "분 ";
 
-        return curTime + calTime;
+        return calTime;
     }
 
     public boolean extractManager(String searchTarget) {

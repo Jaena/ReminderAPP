@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
+        android:name="com.google.cloud.android.reminderapp.CustomStartApp"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_scheme"
         android:icon="@mipmap/ic_launcher"

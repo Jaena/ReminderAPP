@@ -7,47 +7,125 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/backgound"
-        android:clickable="true"
+        android:id="@+id/device"
         android:layout_width="200dp"
-        android:layout_height="400dp"
+        android:layout_height="200dp"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:src="@drawable/background"/>
 
-    <TextView
-        android:id="@+id/text"
-        android:padding="5dp"
-        android:layout_width="160dp"
-        android:layout_height="200dp"
-        android:textSize="40dp"
-        android:text=""
-        android:textColor="#ffffffff"
-        android:layout_alignTop="@+id/record"
+
+    <ImageView
+        android:id="@+id/backgound"
+        android:clickable="true"
+        android:layout_width="132dp"
+        android:layout_height="130dp"
+        android:src="@drawable/display_off"
+        android:layout_alignTop="@+id/device"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp" />
+
+    <ImageView
+    android:id="@+id/circle1"
+    android:layout_width="13dp"
+    android:layout_height="13dp"
+    android:src="@drawable/circle"
+    android:scaleType="fitXY"
+    android:background="#00ff0000"
+        android:layout_marginBottom="20dp"
+        android:visibility="invisible"
+        android:layout_alignBottom="@+id/backgound"
+        android:layout_toStartOf="@+id/circle2" />
+
+    <ImageView
+        android:id="@+id/circle2"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:src="@drawable/circle"
+        android:scaleType="fitXY"
+        android:layout_marginLeft="5dp"
+        android:visibility="invisible"
+        android:background="#00ff0000"
+        android:layout_alignTop="@+id/circle1"
+        android:layout_toStartOf="@+id/circle3" />
+    <ImageButton
+        android:id="@+id/circle3"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:src="@drawable/circle"
+        android:layout_marginLeft="5dp"
+        android:scaleType="fitXY"
+        android:background="#00ff0000"
+        android:visibility="invisible"
+        android:layout_alignTop="@+id/circle2"
         android:layout_centerHorizontal="true" />
+    <ImageView
+        android:id="@+id/circle4"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:src="@drawable/circle"
+        android:layout_marginLeft="5dp"
+        android:scaleType="fitXY"
+        android:background="#00ff0000"
+        android:layout_alignTop="@+id/circle3"
+        android:visibility="invisible"
+        android:layout_toEndOf="@+id/record"
+        android:layout_marginStart="12dp" />
+
+    <ImageView
+        android:id="@+id/circle5"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:layout_marginLeft="5dp"
+        android:src="@drawable/circle"
+        android:scaleType="fitXY"
+        android:background="#00ff0000"
+        android:layout_alignTop="@+id/circle4"
+        android:visibility="invisible"
+        android:layout_alignEnd="@+id/backgound"
+        android:layout_marginEnd="19dp" />
 
     <ImageButton
         android:id="@+id/record"
         android:padding="5dp"
-        android:layout_width="130dp"
-        android:layout_height="130dp"
-        android:src="@drawable/rec_on"
+        android:layout_width="70dp"
+        android:layout_height="100dp"
+        android:src="@drawable/rec_button"
         android:scaleType="fitXY"
         android:background="#00ff0000"
-        android:layout_marginTop="50dp"
+        android:layout_alignBottom="@+id/backgound"
+        android:layout_alignStart="@+id/backgound"
+        android:layout_marginBottom="10dp"
+        android:layout_toStartOf="@+id/play"
         android:layout_alignTop="@+id/backgound"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginTop="12dp"
+        android:layout_alignEnd="@+id/circle3" />
 
     <ImageButton
         android:id="@+id/play"
         android:padding="5dp"
-        android:layout_width="130dp"
-        android:layout_height="130dp"
-        android:src="@drawable/play_on"
+        android:layout_width="70dp"
+        android:layout_height="100dp"
+        android:src="@drawable/play_button"
         android:scaleType="fitXY"
         android:background="#00ff0000"
-        android:layout_below="@+id/record"
-        android:layout_alignStart="@+id/record"
-        android:layout_marginTop="20dp" />
+        android:layout_alignTop="@+id/record"
+        android:layout_alignEnd="@+id/backgound"
+        android:layout_alignBottom="@+id/record" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/text"
+        android:padding="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:textSize="25dp"
+        android:text=""
+        android:textColor="#ffffffff"
+        android:layout_alignBottom="@+id/circle1"
+        android:layout_alignEnd="@+id/backgound"
+        android:layout_alignTop="@+id/record"
+        android:layout_alignStart="@+id/backgound" />
+
+
+    </RelativeLayout>
