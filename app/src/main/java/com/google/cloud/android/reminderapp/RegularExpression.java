@@ -178,20 +178,14 @@ public class RegularExpression {
             regex = "다? ?다음 ?주 ?(월|화|수|목|금|토|일) ?요 ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반"; // 다다음주 월요일 오전/오후 1시 반
             if (extract16(searchTarget, regex)) break;
 
-            regex = "다? ?다음 ?주 ?(월|화|수|목|금|토|일) ?요 ?일 ?([1-2]?[0-9]) ?시"; //다다음주 월요일 1시
+            regex = "다? ?다음 ?주 ?(월|화|수|목|금|토|일) ?요 ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시"; //다다음주 월요일 1시
             if (extract17(searchTarget, regex)) break;
 
-            regex = "다? ?다음 ?주 ?(월|화|수|목|금|토|일) ?요 ?일 ?오전 ?([1-2]?[0-9]) ?시"; //3 - 오전
-            if (extract17(searchTarget, regex)) break;
+            //잘 안쓸 것 같은 정규식
+            //regex = "다? ?다음 ?주 ?(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분"; // 다다음주 ~월 ~일 오전/오후/1시 30분
+            //if (extract24(searchTarget, regex)) break;
 
-            regex = "다? ?다음 ?주 ?(월|화|수|목|금|토|일) ?요 ?일 ?오후 ?([1-2]?[0-9]) ?시"; //3 - 오후
-            if (extract17(searchTarget, regex)) break;
-
-            regex = "다? ?다음 ?주 ?(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분";
-            if (extract24(searchTarget, regex)) break;
-
-
-            regex = "(월|화|수|목|금|토|일) ?요 ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분";
+            regex = "(월|화|수|목|금|토|일) ?요 ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분"; //월요일 오전/오후 1시 30분
             if (extract18(searchTarget, regex)) break;
 
             regex = "(월|화|수|목|금|토|일) ?요 ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반";
@@ -199,6 +193,7 @@ public class RegularExpression {
 
             regex = "(월|화|수|목|금|토|일) ?요 ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시";
             if (extract20(searchTarget, regex)) break;
+            /////여기까지 수정
 
             regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분 ?(월|화|수|목|금|토|일) ?요 ?일";
             if (extract21(searchTarget, regex)) break;
@@ -875,8 +870,10 @@ public class RegularExpression {
     public boolean extract101(String searchTarget, String regex) { //오전, 오후
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
         String result = "";
+
         while(matcher.find()) { //같은 형식의 시간표현이 여러개인 경우 가장 마지막 시간 표현 사용
             System.out.println("extract101");
             isExtracted = true;
@@ -999,17 +996,20 @@ public class RegularExpression {
     }
 
     public boolean extract16(String searchTarget, String regex) { //다/다음주 ~요일 ~시 반
-
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
+
         String result = "";
         String week = "";
         String dayofweek = "";
         String[] temp = new String[4];
+
         while (matcher.find()) {
-            System.out.println("In extract16");
             isExtracted = true;
+            System.out.println("In extract16");
+
             result = matcher.group(0).replaceAll(" ", "");
             result = result.replaceAll("오전", "");
             result = result.replaceAll("오후", "");
@@ -1023,7 +1023,8 @@ public class RegularExpression {
                 atTime(curYear, curMonth, curDay, Integer.parseInt(temp[0].replaceAll(" ", "")), 30);
 
                 //System.out.println("test : "+ Integer.parseInt(temp[0].replaceAll(" ", "")) + " " + Integer.parseInt(temp[1].replaceAll(" ", "")));
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = hMap.get(week)*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
             }
 
@@ -1036,7 +1037,8 @@ public class RegularExpression {
                 atTime(curYear, curMonth, curDay, Integer.parseInt(temp[0].replaceAll(" ", "")), 30);
 
                 //System.out.println("test : "+ Integer.parseInt(temp[0].replaceAll(" ", "")) + " " + Integer.parseInt(temp[1].replaceAll(" ", "")));
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = hMap.get(week)*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
             }
 
@@ -1053,13 +1055,15 @@ public class RegularExpression {
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
+
         String result = "";
         String week = "";
         String dayofweek = "";
         String[] temp = new String[4];
+
         while (matcher.find()) {
-            isNextDay  = true;
             System.out.println("In extract17");
             // System.out.println("In matcher.find()");
             isExtracted = true;
@@ -1076,7 +1080,8 @@ public class RegularExpression {
                 atTime(curYear, curMonth, curDay, Integer.parseInt(temp[0].replaceAll(" ", "")), 0);
 
                 //System.out.println("test : "+ Integer.parseInt(temp[0].replaceAll(" ", "")) + " " + Integer.parseInt(temp[1].replaceAll(" ", "")));
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = hMap.get(week)*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
             }
 
@@ -1089,7 +1094,8 @@ public class RegularExpression {
                 atTime(curYear, curMonth, curDay, Integer.parseInt(temp[0].replaceAll(" ", "")), 0);
 
                 //System.out.println("test : "+ Integer.parseInt(temp[0].replaceAll(" ", "")) + " " + Integer.parseInt(temp[1].replaceAll(" ", "")));
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = hMap.get(week)*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
             }
 
@@ -1107,14 +1113,17 @@ public class RegularExpression {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
         boolean isExtracted = false;
+
         String result = "";
         String week = "";
         String dayofweek = "";
         String[] temp = new String[4];
+
         while (matcher.find()) {
             System.out.println("In extract18");
             // System.out.println("In matcher.find()");
             isExtracted = true;
+
             result = matcher.group(0).replaceAll(" ", "");
             result = result.replaceAll("오전","");
             result = result.replaceAll("오후","");
@@ -1122,18 +1131,29 @@ public class RegularExpression {
             dayofweek = result.substring(0, 3);
             result = result.substring(3);
             temp = result.split("시|분");
+
             atTime(curYear, curMonth, curDay, Integer.parseInt(temp[0].replaceAll(" ", "")), Integer.parseInt(temp[1].replaceAll(" ", "")));
             System.out.println("test : "+ Integer.parseInt(temp[0].replaceAll(" ", "")) + " " + Integer.parseInt(temp[1].replaceAll(" ", "")));
 
-            if (wMap.get(curDayOfWeek) <= wMap.get(dayofweek) && curHour < calHour && curMinute < calMinute)  {
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(dayofweek) - 1));
+            //시간바꿔주기 위한것
+            regex = "오전|오후";
+            extract101(searchTarget, regex);
+
+            if (wMap.get(curDayOfWeek) <= wMap.get(dayofweek) && curHour*60 + curMinute <= calHour*60 + calMinute)  {
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = 0*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 //System.out.println("요일을 하고 있다 " + result );
+                System.out.println("test : " + calweekday + " " + curHour + " " + calHour);
                 calDay += calweekday;
-            } else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek) && curHour >= calHour && curMinute >= calMinute ) {
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(dayofweek) - 1));
+
+            } else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek)) {
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = 1*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
+                //System.out.println("test : " + calweekday + " " + curHour + " " + calHour);
                 calDay += calweekday;
             }
 
+            //System.out.println("test333 : " +  curHour + " " + calHour);
             int day_num = days[curMonth];
             calMonth += calDay / day_num;
             calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
@@ -1141,8 +1161,6 @@ public class RegularExpression {
             calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
 
             //System.out.println("test : " +result);
-
-
             //System.out.println(matcher.group(0));
         }
         return isExtracted;
@@ -1152,15 +1170,20 @@ public class RegularExpression {
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
+
         String result = "";
         String week = "";
         String dayofweek = "";
         String[] temp = new String[4];
+
         while (matcher.find()) {
+
             isNextDay  = true;
-            System.out.println("In extract19");
+            System.out.println("extract19");
             // System.out.println("In matcher.find()");
+
             isExtracted = true;
             result = matcher.group(0).replaceAll(" ", "");
             result = result.replaceAll("오전","");
@@ -1169,15 +1192,18 @@ public class RegularExpression {
             dayofweek = result.substring(0, 3);
             result = result.substring(3);
             temp = result.split("시");
+
             atTime(curYear, curMonth, curDay, Integer.parseInt(temp[0].replaceAll(" ", "")),30);
             System.out.println("test : "+ Integer.parseInt(temp[0].replaceAll(" ", "")) + " " + 30);
 
-            if (wMap.get(curDayOfWeek) <= wMap.get(dayofweek) && curHour < calHour)  {
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(dayofweek) - 1));
-                //System.out.println("요일을 하고 있다 " + result );
+            if (wMap.get(curDayOfWeek) <= wMap.get(dayofweek) && curHour <= calHour)  {
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = 0*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
-            } else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek) && curHour >= calHour ) {
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(dayofweek) - 1));
+
+            } else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek)) {
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = 1*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
             }
 
@@ -1188,8 +1214,6 @@ public class RegularExpression {
             calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
 
             //System.out.println("test : " +result);
-
-
             //System.out.println(matcher.group(0));
         }
         return isExtracted;
@@ -1199,19 +1223,25 @@ public class RegularExpression {
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
+
         String result = "";
         String week = "";
         String dayofweek = "";
         String[] temp = new String[4];
+
         while (matcher.find()) {
-            System.out.println("In extract20");
+            System.out.println("extract20");
             // System.out.println("In matcher.find()");
+
             isNextDay  = true;
             isExtracted = true;
+
             result = matcher.group(0).replaceAll(" ", "");
             result = result.replaceAll("오전","");
             result = result.replaceAll("오후","");
+
             dayofweek = result.substring(0, 3);
             result = result.substring(3);
             temp = result.split("시");
@@ -1223,12 +1253,14 @@ public class RegularExpression {
             regex = "오전|오후";
             extract101(searchTarget, regex);
 
-            if (wMap.get(curDayOfWeek) <= wMap.get(dayofweek) && curHour < calHour)  {
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(dayofweek) - 1));
-                //System.out.println("요일을 하고 있다 " + result );
+            if (wMap.get(curDayOfWeek) <= wMap.get(dayofweek) && curHour <= calHour)  {
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = 0*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
-            } else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek) && curHour >= calHour ) {
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(dayofweek) - 1));
+
+            } else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek)) {
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = 1*7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
             }
 
@@ -1239,8 +1271,6 @@ public class RegularExpression {
             calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
 
             //System.out.println("test : " +result);
-
-
             //System.out.println(matcher.group(0));
         }
         return isExtracted;
