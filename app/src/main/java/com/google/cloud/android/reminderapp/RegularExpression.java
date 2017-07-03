@@ -203,27 +203,27 @@ public class RegularExpression {
             regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?(월|화|수|목|금|토|일) ?요 ?일"; //오전/오후 1시 월요일
             if (extract23(searchTarget, regex)) break;
 
-            //여기까지 수정
-            regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분";
+
+            regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분"; // 7월 5일 오전/오후 1시 30분
             if(extract24(searchTarget, regex)) break;
 
-            regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반";
+            regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반"; // 7월 5일 오전/오후 1시 반
             if(extract28(searchTarget, regex)) break;
 
-            regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시";
+            regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시"; // 7월 5일 오전/오후 1시
             //regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?([1-2]?[0-9]) ?시";
             if(extract25(searchTarget, regex)) break;
 
             regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일";
             if(extract8(searchTarget, regex)) break;
 
-            regex = "([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분";
+            regex = "([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분"; // 7일 오전/오후 1시 30분
             if(extract26(searchTarget, regex)) break;
 
-            regex = "([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반";
+            regex = "([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반";  //7일 오전/오후 1시 반
             if(extract29(searchTarget, regex)) break;
 
-            regex = "([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시";
+            regex = "([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시"; //7일 오전/오후 1시
             if(extract27(searchTarget, regex)) break;
 
             regex = "([0-9]+) ?시간 ?([0-9]+) ?분 ?(후|뒤|있다가)";
@@ -319,15 +319,16 @@ public class RegularExpression {
     public boolean extract24(String searchTarget, String regex) { //월 일 시 분
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
         String result = "";
         String[] temp = new String[4];
         while(matcher.find()) {
             System.out.println("extract24");
 
-
             isNextDay  = true;
             isExtracted = true;
+
             result = matcher.group(0);
 //            temp = result.trim().split("시간|분");
 //            addTime(0, Integer.parseInt(temp[0].trim()), Integer.parseInt(temp[1].trim()));
@@ -340,6 +341,7 @@ public class RegularExpression {
             calDay = Integer.parseInt(temp[1]);
             calHour = Integer.parseInt(temp[2]);
             calMinute = Integer.parseInt(temp[3]);
+
             //시간바꿔주기 위한것
             regex = "오전|오후";
             extract101(searchTarget, regex);
@@ -349,16 +351,17 @@ public class RegularExpression {
             else
                 atTime(curYear,Integer.parseInt(temp[0]),Integer.parseInt(temp[1]),Integer.parseInt(temp[2]),Integer.parseInt(temp[3]));
         }
-
         return isExtracted;
     }
 
     public boolean extract25(String searchTarget, String regex) { //월 일 시
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
         String result = "";
         String[] temp = new String[4];
+
         while(matcher.find()) {
             System.out.println("extract25");
 
@@ -392,13 +395,17 @@ public class RegularExpression {
     public boolean extract26(String searchTarget, String regex) { //일 시 분
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
         String result = "";
         String[] temp = new String[4];
+
         while(matcher.find()) {
             System.out.println("extract26");
+
             isNextDay  = true;
             isExtracted = true;
+
             result = matcher.group(0);
 //            temp = result.trim().split("시간|분");
 //            addTime(0, Integer.parseInt(temp[0].trim()), Integer.parseInt(temp[1].trim()));
@@ -427,13 +434,17 @@ public class RegularExpression {
     public boolean extract27(String searchTarget, String regex) { //일 시
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
+
         String result = "";
         String[] temp = new String[4];
         while(matcher.find()) {
             System.out.println("extract27");
+
             isNextDay  = true;
             isExtracted = true;
+
             result = matcher.group(0);
 //            temp = result.trim().split("시간|분");
 //            addTime(0, Integer.parseInt(temp[0].trim()), Integer.parseInt(temp[1].trim()));
@@ -462,15 +473,17 @@ public class RegularExpression {
     public boolean extract28(String searchTarget, String regex) { //월 일 시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
         String result = "";
         String[] temp = new String[4];
+
         while(matcher.find()) {
             System.out.println("extract28");
 
-
             isNextDay  = true;
             isExtracted = true;
+
             result = matcher.group(0);
 //            temp = result.trim().split("시간|분");
 //            addTime(0, Integer.parseInt(temp[0].trim()), Integer.parseInt(temp[1].trim()));
@@ -500,12 +513,13 @@ public class RegularExpression {
     public boolean extract29(String searchTarget, String regex) { //일 시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
+
         String result = "";
         String[] temp = new String[4];
         while(matcher.find()) {
             System.out.println("extract29");
-
 
             isNextDay  = true;
             isExtracted = true;
