@@ -319,6 +319,15 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             new SpeechService.Listener() {
                 @Override
                 public void onSpeechRecognized(final String text, final boolean isFinal) {
+                    /*
+                    if(mText ==null)
+                    {
+                        if (!isFinal) {
+                            Message message = handler.obtainMessage(1, "음성 인식을 실패하였습니다");
+                            handler.sendMessage(message);
+                        }
+                    }
+                    */
                     if (mText != null) {
                         if (isFinal) {
                             Message message = handler.obtainMessage(1, text);
