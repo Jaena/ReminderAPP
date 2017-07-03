@@ -214,8 +214,11 @@ public class RegularExpression {
             //regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일 ?([1-2]?[0-9]) ?시";
             if(extract25(searchTarget, regex)) break;
 
-            regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일";
+            regex = "(1?[0-9]) ?월 ?([1-3]?[0-9]) ?일"; // 7월 4일
             if(extract8(searchTarget, regex)) break;
+
+            regex = "(1?[0-9]) ?월"; // 8월
+            if(extract9(searchTarget, regex)) break;
 
             regex = "([1-3]?[0-9]) ?일 ?(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9]) ?분"; // 7일 오전/오후 1시 30분
             if(extract26(searchTarget, regex)) break;
@@ -265,9 +268,6 @@ public class RegularExpression {
                 isThereTime2 = false;
                 return true; //break;
             }
-
-            regex = "(1?[0-9]) ?월";
-            if(extract9(searchTarget, regex)) break;
 
             regex = "(^| )([0-9]+) ?일 ?(후|뒤|있다가)";
             if(extract11(searchTarget, regex)) {
@@ -701,9 +701,11 @@ public class RegularExpression {
     public boolean extract8(String searchTarget, String regex) { //~월 ~일
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
         String result = "";
         String[] temp = new String[4];
+
         while(matcher.find()) {
             System.out.println("extract8");
             isExtracted = true;
