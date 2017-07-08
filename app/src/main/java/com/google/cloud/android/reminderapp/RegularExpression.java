@@ -88,7 +88,7 @@ public class RegularExpression {
         cal.set(Calendar.MONTH, curMonth);
         cal.set(Calendar.DATE, curDay);
 
-        switch (cal.get(Calendar.DAY_OF_WEEK) - 1) {
+        switch (cal.get(Calendar.DAY_OF_WEEK)-1) {
             case 1:
                 curDayOfWeek = "일요일";
                 break;
@@ -107,7 +107,7 @@ public class RegularExpression {
             case 6:
                 curDayOfWeek = "금요일";
                 break;
-            case 7:
+            case 0:
                 curDayOfWeek = "토요일";
                 break;
         }
@@ -280,21 +280,21 @@ public class RegularExpression {
                 return true; //break;
             }
 
-            regex = "(^| )([0-9]+) ?일 ?(후|뒤|있다가)";
+            regex = "(^| )([0-9]+) ?일 ?(후|뒤|있다가)"; // 5일 뒤에
             if (extract11(searchTarget, regex)) {
                 return true; //break;
             }
 
-            regex = "([1-3]?[0-9]) ?일";
+            regex = "([1-3]?[0-9]) ?일"; // 3일 미팅
             if (extract10(searchTarget, regex)) break;
 
-            regex = "다? ?다음 ?주 ?(월|화|수|목|금|토|일) ?요 ?일";
+            regex = "다? ?다음 ?주 ?(월|화|수|목|금|토|일) ?요 ?일"; //다음주 토요일
             if (extract13(searchTarget, regex)) break;
 
-            regex = "(월|화|수|목|금|토|일) ?요 ?일";
+            regex = "(월|화|수|목|금|토|일) ?요 ?일"; //토요일
             if (extract14(searchTarget, regex)) break;
 
-            regex = "(다? ?다음 ?주)";
+            regex = "(다? ?다음 ?주)"; //다음주
             if (extract12(searchTarget, regex)) break;
 
             break;
@@ -859,17 +859,20 @@ public class RegularExpression {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
         //System.out.println("dddd");
+
         boolean isExtracted = false;
         String result = "";
         String week = "";
         String dayofweek = "";
         String[] temp = new String[4];
+
         while (matcher.find()) {
             System.out.println("extract13");
             isNextDay = true;
             isExtracted = true;
             result = matcher.group(0).replaceAll(" ", "");
             //System.out.println("요일 "+result);
+
             if (result.length() == 7) {
                 week = result.substring(0, 4); //다다음주
                 dayofweek = result.substring(4); //월~일요일
@@ -878,9 +881,10 @@ public class RegularExpression {
                 dayofweek = result.substring(3); //월~일요일
             }
 
-            // System.out.println("주: " + week + " 요일 : " + dayofweek);
-            int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (hMap.get(week) * 7 + wMap.get(dayofweek) - 1));
-            addTime(calweekday, 0, 0);
+            System.out.println("주: " + week + " 요일 : " + dayofweek + " 더해야할 일수 : ");
+            int calweekday = hMap.get(week) * 7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
+            calDay += calweekday;
+
             calHour = 8;
             calMinute = 0; //working time의 초기 시간으로 설정
         }
@@ -1001,6 +1005,7 @@ public class RegularExpression {
 
         while (matcher.find()) {
             isExtracted = true;
+            isNextDay = true;
             System.out.println("extract15");
 
             result = matcher.group(0).replaceAll(" ", "");
@@ -1056,6 +1061,7 @@ public class RegularExpression {
 
         while (matcher.find()) {
             isExtracted = true;
+            isNextDay = true;
             System.out.println("In extract16");
 
             result = matcher.group(0).replaceAll(" ", "");
@@ -1112,6 +1118,7 @@ public class RegularExpression {
         while (matcher.find()) {
             System.out.println("In extract17");
             // System.out.println("In matcher.find()");
+            isNextDay = true;
             isExtracted = true;
             result = matcher.group(0).replaceAll(" ", "");
             result = result.replaceAll("오전", "");
