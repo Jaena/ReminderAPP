@@ -43,6 +43,7 @@ import com.google.cloud.speech.v1.StreamingRecognitionConfig;
 import com.google.cloud.speech.v1.StreamingRecognitionResult;
 import com.google.cloud.speech.v1.StreamingRecognizeRequest;
 import com.google.cloud.speech.v1.StreamingRecognizeResponse;
+import com.google.instrumentation.stats.Tag;
 import com.google.protobuf.ByteString;
 
 import java.io.IOException;
@@ -82,6 +83,7 @@ public class SpeechService extends Service {
          * @param text    The text.
          * @param isFinal {@code true} when the API finished processing audio.
          */
+
         void onSpeechRecognized(String text, boolean isFinal);
 
     }
@@ -122,6 +124,9 @@ public class SpeechService extends Service {
                     text = alternative.getTranscript();
                 }
             }
+
+            System.out.println("dddddd");
+
             if (text != null) {
                 for (Listener listener : mListeners) {
                     listener.onSpeechRecognized(text, isFinal);
@@ -153,9 +158,22 @@ public class SpeechService extends Service {
                     text = alternative.getTranscript();
                 }
             }
+
+            System.out.println("dddddd2 " + text);
+
             if (text != null) {
                 for (Listener listener : mListeners) {
                     listener.onSpeechRecognized(text, true);
+                }
+            }
+
+            //추가
+
+            else if(text == null)
+            {
+                System.out.println("dddddd3 " + mListeners);
+                for (Listener listener : mListeners) {
+                    listener.onSpeechRecognized("", false);
                 }
             }
         }

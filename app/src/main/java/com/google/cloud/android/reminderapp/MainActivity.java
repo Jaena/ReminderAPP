@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ImageButton record;
     ImageButton play;
 
-    ImageView [] circles = new ImageView[5];
+    ImageView[] circles = new ImageView[5];
     Handler handler;
 
     boolean isEnd = false;
@@ -112,7 +112,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
 
     };
-    int index=0;
+    int index = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         device.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                System.out.println("과연 : " + mVoiceRecorder.isRecording());
                 if (mVoiceRecorder.isRecording()) {
                     stopVoiceRecorder();
                 }
@@ -202,9 +204,22 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         handler = new Handler() {
             public void handleMessage(Message msg) {
                 String returnedValue = (String) msg.obj;
-                mText.setText(regularExpression.Analysis(returnedValue));
-                Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
-                isEnd = true;
+                String extractValue = new String();
+
+                //아무말 없이 취소했을 경우
+                if(returnedValue.equals(""))
+                {
+                    //mText.setText("터치해주세요");
+                    Toast.makeText(getApplicationContext(),"아무말도 안하셨습니다", Toast.LENGTH_LONG).show();
+                    isEnd = true;
+                    device.callOnClick();
+                }
+                //말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
+                else {
+                    mText.setText(regularExpression.Analysis(returnedValue));
+                    Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
+                    isEnd = true;
+                }
             }
         };
 
@@ -319,20 +334,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             new SpeechService.Listener() {
                 @Override
                 public void onSpeechRecognized(final String text, final boolean isFinal) {
-                    /*
-                    if(mText ==null)
-                    {
-                        if (!isFinal) {
-                            Message message = handler.obtainMessage(1, "음성 인식을 실패하였습니다");
-                            handler.sendMessage(message);
-                        }
-                    }
-                    */
+
+                    System.out.println("과연4 : " + mText);
+
                     if (mText != null) {
-                        if (isFinal) {
-                            Message message = handler.obtainMessage(1, text);
-                            handler.sendMessage(message);
-                        }
+                        //if (isFinal) {
+                        Message message = handler.obtainMessage(1, text);
+                        handler.sendMessage(message);
+                        //}
                     }
                 }
             };
