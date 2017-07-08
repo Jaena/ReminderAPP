@@ -25,7 +25,6 @@ public class RegularExpression {
     public int[] days = new int[]{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     boolean isNextDay;
-    boolean isThereTime2;
     boolean isTime;
 
     // 내일|낼|명일|모레|글피|익일|명일
@@ -249,7 +248,6 @@ public class RegularExpression {
 
             regex = "([0-9]+) ?시 ?간? ?만? ?(후|뒤|있다가)"; // 5시간 있다가 알려줘
             if (extract2(searchTarget, regex)) {
-                isThereTime2 = false;
                 return true; //break;
             }
 
@@ -271,19 +269,16 @@ public class RegularExpression {
             }
             regex = "([0-9]+) ?분 ?(후|뒤|있다가)";
             if (extract6(searchTarget, regex)) {
-                isThereTime2 = false;
                 return true; //break;
             }
 
             regex = "(^| )([0-9]+) ?주 ?(후|뒤|있다가)";
             if (extract7(searchTarget, regex)) {
-                isThereTime2 = false;
                 return true; //break;
             }
 
             regex = "(^| )([0-9]+) ?일 ?(후|뒤|있다가)";
             if (extract11(searchTarget, regex)) {
-                isThereTime2 = false;
                 return true; //break;
             }
 
