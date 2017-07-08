@@ -24,8 +24,8 @@ public class RegularExpression {
     public String curDayOfWeek;
     public int[] days = new int[]{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    boolean isNextDay;
-    boolean isTime;
+    boolean isNextDay; //다음날로 넘어가게 하는 함수인지 확인
+    boolean isTime; //시간을 말한 정규식인지 확인
 
     // 내일|낼|명일|모레|글피|익일|명일
     public RegularExpression() {
@@ -251,23 +251,20 @@ public class RegularExpression {
                 return true; //break;
             }
 
-            regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9])분";
+            regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?([1-5]?[0-9])분"; //오전/오후 1시 30분
             if (extract3(searchTarget, regex)) {
-                isTime = true;
                 break;
             }
 
-            regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반";
+            regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시 ?반"; //오전 오후 1시 반
             if (extract4(searchTarget, regex)) {
-                isTime = true;
                 break;
             }
-            regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시";
+            regex = "(오 ?전|오 ?후)? ?([1-2]?[0-9]) ?시"; //오전 오후 1시
             if (extract5(searchTarget, regex)) {
-                isTime = true;
                 break;
             }
-            regex = "([0-9]+) ?분 ?(후|뒤|있다가)";
+            regex = "([0-9]+) ?분 ?(후|뒤|있다가)"; // 5분뒤에
             if (extract6(searchTarget, regex)) {
                 return true; //break;
             }
@@ -297,7 +294,7 @@ public class RegularExpression {
             break;
         }
 
-        regex = "[오늘|다다음날|다음날|내일|낼|명일|모레|내일모레|내일모래|낼모레|낼모래|모래|글피|익일|명일]+";
+        regex = "[다다음날|다음날|내일|낼|명일|모레|내일모레|내일모래|낼모레|낼모래|모래|글피|익일|명일]+";
         int ret = extract100(searchTarget, regex);
         if (ret > 0) {
             System.out.println("DDDD" + isNextDay);
@@ -311,10 +308,13 @@ public class RegularExpression {
                 calHour = 8;
                 calMinute = 0;
             }
-        } else if (ret == 0) {
-            isNextDay = true;
         }
 
+        //오늘이라고 말할 경우
+        regex = "(오늘)+";
+        extract102(searchTarget, regex);
+
+        //오전 오후를 식별해주는 정규식
         regex = "오전|오후";
         extract101(searchTarget, regex);
 
@@ -633,19 +633,20 @@ public class RegularExpression {
         String[] temp = new String[4];
         while (matcher.find()) {
             System.out.println("extract3");
-            System.out.println("In matcher.find()");
             isExtracted = true;
+            isTime = true;
             result = matcher.group(0);
             result = result.replaceAll("오전", "");
             result = result.replaceAll("오후", "");
             temp = result.split("시|분");
+
             //atTime(curYear, curMonth, curDay, Integer.parseInt(temp[0].trim()), Integer.parseInt(temp[1].trim()));
             atTime(curYear, curMonth, curDay, Integer.parseInt(temp[0].replaceAll(" ", "")), Integer.parseInt(temp[1].replaceAll(" ", "")));
         }
         return isExtracted;
     }
 
-    public boolean extract4(String searchTarget, String regex) { //~시반
+    public boolean extract4(String searchTarget, String regex) { //~시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
         boolean isExtracted = false;
@@ -654,6 +655,7 @@ public class RegularExpression {
         while (matcher.find()) {
             System.out.println("extract4");
             isExtracted = true;
+            isTime = true;
             result = matcher.group(0);
             result = result.replaceAll("오전", "");
             result = result.replaceAll("오후", "");
@@ -673,6 +675,7 @@ public class RegularExpression {
         while (matcher.find()) {
             System.out.println("extract5");
             isExtracted = true;
+            isTime = true;
             result = matcher.group(0);
             result = result.replaceAll("오전", "");
             result = result.replaceAll("오후", "");
@@ -692,6 +695,7 @@ public class RegularExpression {
         while (matcher.find()) {
             System.out.println("extract6");
             isExtracted = true;
+            isTime = true;
             result = matcher.group(0);
             temp = result.split("분");
             //addTime(0, 0, Integer.parseInt(temp[0].trim()));
@@ -954,6 +958,9 @@ public class RegularExpression {
 
                 }
             }
+
+            System.out.println("test : " + calYear + " " + calMonth + " " + calDay + " " + calHour + " " + calMinute + !isNextDay);
+            System.out.println("test : " + curYear + " " + curMonth + " " + curDay + " " + curHour + " " + curMinute + !isNextDay);
 
             if (calHour * 60 + calMinute <= curHour * 60 + curMinute && !isNextDay && (calYear * 365 + calMonth * 30 + calDay) <= (curYear * 365 + curMonth * 30 + curDay)) {
                 System.out.println("extract201 : " + calMonth + " " + calDay + " " + calHour + " " + calMinute);
@@ -1460,6 +1467,19 @@ public class RegularExpression {
             //System.out.println(matcher.group(0));
         }
         return isExtracted;
+    }
+
+    public boolean extract102(String searchTarget, String regex) { //오늘
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(searchTarget);
+
+        while (matcher.find()) {
+            System.out.println("extract102");
+            // System.out.println("In matcher.find()");
+            isNextDay = true;
+        }
+        return true;
     }
 
     public void addTime(int d, int h, int m) {
