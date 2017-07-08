@@ -181,6 +181,12 @@ public class RegularExpression {
         searchTarget = searchTarget.replaceAll("이다가", "있다가");
         searchTarget = searchTarget.replaceAll("이따", "있다가");
 
+        searchTarget = searchTarget.replaceAll("일주", "1주");
+        searchTarget = searchTarget.replaceAll("이주", "2주");
+        searchTarget = searchTarget.replaceAll("삼주", "3주");
+        searchTarget = searchTarget.replaceAll("사주", "4주");
+        searchTarget = searchTarget.replaceAll("오주", "5주");
+
         String regex = new String();
         while (true) {
 
@@ -269,7 +275,7 @@ public class RegularExpression {
                 return true; //break;
             }
 
-            regex = "(^| )([0-9]+) ?주 ?(후|뒤|있다가)";
+            regex = "(^| )([0-9]+) ?주 ?(후|뒤|있다가)"; //3주뒤에
             if (extract7(searchTarget, regex)) {
                 return true; //break;
             }
@@ -297,7 +303,7 @@ public class RegularExpression {
         regex = "[다다음날|다음날|내일|낼|명일|모레|내일모레|내일모래|낼모레|낼모래|모래|글피|익일|명일]+";
         int ret = extract100(searchTarget, regex);
         if (ret > 0) {
-            System.out.println("DDDD" + isNextDay);
+            //System.out.println("DDDD" + isNextDay);
             isNextDay = true;
             calDay += ret;
             int day_num = days[calMonth];
@@ -707,9 +713,11 @@ public class RegularExpression {
     public boolean extract7(String searchTarget, String regex) { //~주 후
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
+
         boolean isExtracted = false;
         String result = "";
         String[] temp = new String[4];
+
         while (matcher.find()) {
             System.out.println("extract7");
             isExtracted = true;
