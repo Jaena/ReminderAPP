@@ -903,17 +903,25 @@ public class RegularExpression {
             System.out.println("extract14");
             isExtracted = true;
             result = matcher.group(0).replaceAll(" ", "");
+            String dayofweek = result;
 
-            if (wMap.get(curDayOfWeek) < wMap.get(result) && curHour < 8) {
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(result) - 1));
-                //System.out.println("요일을 하고 있다 " + result );
-                addTime(calweekday, 0, 0);
-            } else if (wMap.get(curDayOfWeek) >= wMap.get(result) && curHour >= 8) {
-                int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(result) - 1));
-                addTime(calweekday, 0, 0);
-            }
             calHour = 8;
             calMinute = 0; //working time의 초기 시간으로 설정
+
+            if (wMap.get(curDayOfWeek) < wMap.get(dayofweek)) {
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = 0 * 7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
+                System.out.println("요일을 하고 있다 " + result );
+                //System.out.println("test : " + calweekday + " " + curHour + " " + calHour);
+                calDay += calweekday;
+
+            } else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek)) {
+                //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(dayofweek) - 1));
+                int calweekday = 1 * 7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
+                System.out.println("test22 : " + calweekday + " " + curHour + " " + calHour);
+                calDay += calweekday;
+            }
+
         }
         return isExtracted;
     }
