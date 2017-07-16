@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by jaena on 2017-06-26.
- */
-
+/*
+* 이 클래스는 음성 파일에서 추출한 텍스트로부터 30개 이상의 정규식을 이용하여 시간표현을 추출한다.
+  시간표현추출은 각 extract 메소드에 의해서 추출된다.
+*/
 public class RegularExpression {
     public HashMap<String, Integer> hMap;
     public HashMap<String, Integer> wMap;
@@ -28,6 +28,7 @@ public class RegularExpression {
     boolean isTime; //시간을 말한 정규식인지 확인
 
     // 내일|낼|명일|모레|글피|익일|명일
+
     public RegularExpression() {
         hMap = new HashMap<String, Integer>();
         wMap = new HashMap<String, Integer>();
@@ -61,6 +62,11 @@ public class RegularExpression {
         wMap.put("토요일", 7);
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값
+    * output : 텍스트에서 추출한 시간표현
+    * 이 메소드는 현재 시간 값들을 초기화시켜준다.
+    */
     public String Analysis(String target) {
         isNextDay = false;
         isTime = false;
@@ -139,7 +145,11 @@ public class RegularExpression {
         //추출한 표현값 리턴
         return calTime;
     }
-
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 음성 파일에서 추출한 텍스트로부터 정규식을 이용하여 시간표현을 추출한다.
+    */
     public boolean extractManager(String searchTarget) {
         searchTarget = searchTarget.replaceAll(" ", "");
         searchTarget = searchTarget.replaceAll("새벽", "오전");
@@ -156,6 +166,8 @@ public class RegularExpression {
 
         searchTarget = searchTarget.replaceAll("세시", "3시");
         searchTarget = searchTarget.replaceAll("네시", "4시");
+        searchTarget = searchTarget.replaceAll("넷이", "4시");
+
         searchTarget = searchTarget.replaceAll("메시", "4시");
         searchTarget = searchTarget.replaceAll("다섯시", "5시");
 
@@ -180,6 +192,8 @@ public class RegularExpression {
         searchTarget = searchTarget.replaceAll("이따가", "있다가");
         searchTarget = searchTarget.replaceAll("이다가", "있다가");
         searchTarget = searchTarget.replaceAll("이따", "있다가");
+        searchTarget = searchTarget.replaceAll("있따", "있다가");
+
 
         searchTarget = searchTarget.replaceAll("일주", "1주");
         searchTarget = searchTarget.replaceAll("이주", "2주");
@@ -327,6 +341,11 @@ public class RegularExpression {
         return true;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 월 일 시 분에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract24(String searchTarget, String regex) { //월 일 시 분
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -365,6 +384,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 월 일 시에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract25(String searchTarget, String regex) { //월 일 시
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -403,6 +427,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 일 시 분에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract26(String searchTarget, String regex) { //일 시 분
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -442,6 +471,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 일 시 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract27(String searchTarget, String regex) { //일 시
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -481,6 +515,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 월 일 시 반에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract28(String searchTarget, String regex) { //월 일 시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -521,6 +560,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 일 시 반에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract29(String searchTarget, String regex) { //일 시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -560,6 +604,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시간 ~분 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract1(String searchTarget, String regex) { //~시간 ~분 후|뒤|있다가
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -587,7 +636,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
-
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시간 ~반 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract30(String searchTarget, String regex) { //~시간 ~반 후|뒤|있다가
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -610,7 +663,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
-
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시간 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract2(String searchTarget, String regex) { //~시간 후
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -631,6 +688,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시 ~분에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract3(String searchTarget, String regex) { //~시 ~분
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -652,6 +714,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시 반 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract4(String searchTarget, String regex) { //~시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -672,6 +739,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract5(String searchTarget, String regex) { //~시
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -692,6 +764,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~분 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract6(String searchTarget, String regex) { //~분 후|뒤|있다가
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -710,6 +787,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~주 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract7(String searchTarget, String regex) { //~주 후
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -729,6 +811,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~월 ~일 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract8(String searchTarget, String regex) { //~월 ~일
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -760,6 +847,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~월에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract9(String searchTarget, String regex) { //~월
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -782,6 +874,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~일 에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract10(String searchTarget, String regex) { //~일
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -804,6 +901,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~일 에 후|뒤|있다가| 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract11(String searchTarget, String regex) { //~일 후(뒤)
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -821,6 +923,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+   * output : 정규식을 통해 추출되었는지에 대한 여부
+   * 이 메소드는 시간표현 오늘|다음날|다다음날|내일|낼|명일|모레|글피|익일|명일|'대한 정보가 있을 시 추출한 시간 표현 값에 추가적인 연산을 해준다.
+   */
     public int extract100(String searchTarget, String regex) { //[오늘|다음날|다다음날|다다음날|내일|낼|명일|모레|글피|익일|명일]+
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -837,6 +944,11 @@ public class RegularExpression {
         return maxi;
     }
 
+    /*
+   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+   * output : 정규식을 통해 추출되었는지에 대한 여부
+   * 이 메소드는 시간표현 다음주 또는 다다음주에 대한 정보가 있을 시 추출한 시간 표현 값에 추가적인 연산을 해준다.
+   */
     public boolean extract12(String searchTarget, String regex) { //다음주, 다다음주
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -854,6 +966,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+   * output : 정규식을 통해 추출되었는지에 대한 여부
+   * 이 메소드는 시간표현 다음주 또는 다다음주 와 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
+   */
     public boolean extract13(String searchTarget, String regex) { //다음주, 다다음주 월,화~일요일
         //System.out.println("ddd " + searchTarget);
         Pattern pattern = Pattern.compile(regex);
@@ -891,6 +1008,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+   * output : 정규식을 통해 추출되었는지에 대한 여부
+   * 이 메소드는 시간표현 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
+   */
     public boolean extract14(String searchTarget, String regex) { //일요일,월요일. 혹시 현재 화요일인데 월요일이라고하면 다음주가됨
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -926,7 +1048,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
-
+    /*
+   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+   * output : 정규식을 통해 추출되었는지에 대한 여부
+   * 이 메소드는 오전, 오후, 오전 오후 표현이 없는 경우에 추출된 시간표현에 추가적인 연산을 해준다.
+   */
     public boolean extract101(String searchTarget, String regex) { //오전, 오후
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -999,6 +1125,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 다음주, 다다음주, ~요일 ~시 ~분에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract15(String searchTarget, String regex) { //다/다음주 ~요일 오전/오후 ~요일 ~시 ~분
 
         Pattern pattern = Pattern.compile(regex);
@@ -1056,6 +1187,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 다음주, 다다음주, ~요일 ~시 ~반에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract16(String searchTarget, String regex) { //다/다음주 ~요일 ~시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -1111,6 +1247,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 다음주, 다다음주, ~요일 ~시에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract17(String searchTarget, String regex) { //다/다음주 ~요일 ~시
 
         Pattern pattern = Pattern.compile(regex);
@@ -1167,6 +1308,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~요일 ~시 ~분에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract18(String searchTarget, String regex) { //~요일 ~시 ~분
 
         Pattern pattern = Pattern.compile(regex);
@@ -1225,6 +1371,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~요일 ~시 ~반에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract19(String searchTarget, String regex) { //~요일 ~시 ~반
 
         Pattern pattern = Pattern.compile(regex);
@@ -1278,6 +1429,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~요일 ~시에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract20(String searchTarget, String regex) { //~요일 ~시
 
         Pattern pattern = Pattern.compile(regex);
@@ -1316,8 +1472,9 @@ public class RegularExpression {
                 //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (0 * 7 + wMap.get(dayofweek) - 1));
                 int calweekday = 0 * 7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
+            }
 
-            } else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek)) {
+            else if (wMap.get(curDayOfWeek) >= wMap.get(dayofweek)) {
                 //int calweekday = (-1 * (wMap.get(curDayOfWeek) - 1) + (1 * 7 + wMap.get(dayofweek) - 1));
                 int calweekday = 1 * 7 + (wMap.get(dayofweek) - (wMap.get(curDayOfWeek)));
                 calDay += calweekday;
@@ -1335,6 +1492,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시 ~분 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract21(String searchTarget, String regex) { // ~시 ~분 ~요일
 
         Pattern pattern = Pattern.compile(regex);
@@ -1389,6 +1551,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시 ~반 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract22(String searchTarget, String regex) { // ~시 ~반 ~요일
 
         Pattern pattern = Pattern.compile(regex);
@@ -1439,6 +1606,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 ~시 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
+    */
     public boolean extract23(String searchTarget, String regex) { // ~시 ~요일
 
         Pattern pattern = Pattern.compile(regex);
@@ -1492,6 +1664,11 @@ public class RegularExpression {
         return isExtracted;
     }
 
+    /*
+    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
+    * output : 정규식을 통해 추출되었는지에 대한 여부
+    * 이 메소드는 시간표현 오늘 대한 정보가 있을 시 isNextDay 설정값을 변경해준다.
+    */
     public boolean extract102(String searchTarget, String regex) { //오늘
 
         Pattern pattern = Pattern.compile(regex);
@@ -1505,6 +1682,11 @@ public class RegularExpression {
         return true;
     }
 
+    /*
+    * input : 정규식을 통해 추출된 일, 시, 분 값
+    * output : none
+    * 이 메소드는 추출한 시간표현에 설정한 값이 변화해야하는 값일 경우 아래의 메소드 시간표현의 연산을 적용시킨다.
+    */
     public void addTime(int d, int h, int m) {
         System.out.println(d + " " + h + " " + m);
 
@@ -1528,6 +1710,11 @@ public class RegularExpression {
         if (calHour >= 12) calA = "오후";
     }
 
+    /*
+    * input : 정규식을 통해 추출된 년, 월, 일, 시, 분 값
+    * output : none
+    * 이 메소드는 추출한 시간표현이 정해져있을시 이 메소드의 시간표현의 연산을 적용시킨다.
+    */
     public void atTime(int y, int M, int d, int h, int m) {
         System.out.println("hour : " + h + " " + "minute : " + m);
         calYear = y;
