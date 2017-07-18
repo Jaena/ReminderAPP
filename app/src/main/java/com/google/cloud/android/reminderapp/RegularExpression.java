@@ -7,9 +7,10 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
-* 이 클래스는 음성 파일에서 추출한 텍스트로부터 30개 이상의 정규식을 이용하여 시간표현을 추출한다.
-  시간표현추출은 각 extract 메소드에 의해서 추출된다.
+/**
+ * This class extracts a time expression from text extracted from a voice file by using regular expressions.
+ * Time expression extract is extracted by each extract method.
+ * Called in the main activity to extract the time expression after speaking voice recording.
 */
 public class RegularExpression {
     public HashMap<String, Integer> hMap;
@@ -62,10 +63,11 @@ public class RegularExpression {
         wMap.put("토요일", 7);
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값
-    * output : 텍스트에서 추출한 시간표현
-    * 이 메소드는 현재 시간 값들을 초기화시켜준다.
+    /**
+     * This method initializes the current time values.
+     *
+     * @param target A string value that converts the user's voice to text.
+     * @return String Time expression extracted from text
     */
     public String Analysis(String target) {
         isNextDay = false;
@@ -145,11 +147,13 @@ public class RegularExpression {
         //추출한 표현값 리턴
         return calTime;
     }
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 음성 파일에서 추출한 텍스트로부터 정규식을 이용하여 시간표현을 추출한다.
-    */
+
+    /**
+     * This method extracts a time expression from a text file extracted from a voice file by using a regular expression.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extractManager(String searchTarget) {
         searchTarget = searchTarget.replaceAll(" ", "");
         searchTarget = searchTarget.replaceAll("새벽", "오전");
@@ -341,11 +345,13 @@ public class RegularExpression {
         return true;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 월 일 시 분에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about the Months, days, hours and minutes.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract24(String searchTarget, String regex) { //월 일 시 분
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -384,11 +390,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 월 일 시에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about the Months, days and hours.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract25(String searchTarget, String regex) { //월 일 시
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -427,11 +435,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 일 시 분에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about the days, hours and minutes.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract26(String searchTarget, String regex) { //일 시 분
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -471,11 +481,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 일 시 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about the days and hours.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract27(String searchTarget, String regex) { //일 시
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -520,6 +532,14 @@ public class RegularExpression {
     * output : 정규식을 통해 추출되었는지에 대한 여부
     * 이 메소드는 시간표현 월 일 시 반에 대한 정보가 있을 시 시간 표현을 추출한다.
     */
+
+    /**
+     * This method extracts the time representation when there is information about the months, days ,hours and half of hour.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract28(String searchTarget, String regex) { //월 일 시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -560,11 +580,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 일 시 반에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about the days ,hours and half of hour.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract29(String searchTarget, String regex) { //일 시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -604,11 +626,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시간 ~분 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the hours, minutes, and "후|뒤|있다가".
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract1(String searchTarget, String regex) { //~시간 ~분 후|뒤|있다가
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -636,11 +661,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시간 ~반 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the hours, a half of hour and "후|뒤|있다가".
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract30(String searchTarget, String regex) { //~시간 ~반 후|뒤|있다가
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -663,11 +691,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시간 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the hours and "후|뒤|있다가".
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract2(String searchTarget, String regex) { //~시간 후
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -688,11 +719,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시 ~분에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about hours and minutes.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract3(String searchTarget, String regex) { //~시 ~분
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -714,11 +747,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시 반 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about hours and half of hour.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract4(String searchTarget, String regex) { //~시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -739,11 +774,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about hours.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract5(String searchTarget, String regex) { //~시
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -764,11 +801,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~분 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the minutes and "후|뒤|있다가".
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract6(String searchTarget, String regex) { //~분 후|뒤|있다가
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -787,11 +827,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~주 후|뒤|있다가| 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about weeks and "후|뒤|있다가".
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract7(String searchTarget, String regex) { //~주 후
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -811,11 +854,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~월 ~일 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about the months and days.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract8(String searchTarget, String regex) { //~월 ~일
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -847,11 +892,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~월에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about the months.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract9(String searchTarget, String regex) { //~월
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -874,11 +921,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~일 에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts the time representation when there is information about the days.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract10(String searchTarget, String regex) { //~일
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -901,11 +950,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~일 에 후|뒤|있다가| 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the day and "후|뒤|있다가".
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract11(String searchTarget, String regex) { //~일 후(뒤)
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -923,11 +975,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-   * output : 정규식을 통해 추출되었는지에 대한 여부
-   * 이 메소드는 시간표현 오늘|다음날|다다음날|내일|낼|명일|모레|글피|익일|명일|'대한 정보가 있을 시 추출한 시간 표현 값에 추가적인 연산을 해준다.
-   */
+    /**
+     * This method extracts a time representation when there is information about the "오늘|다음날|다다음날|다다다음날|내일|명일|모레|글피|익일|명일" and "후|뒤|있다가".
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public int extract100(String searchTarget, String regex) { //[오늘|다음날|다다음날|다다음날|내일|낼|명일|모레|글피|익일|명일]+
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -944,11 +999,14 @@ public class RegularExpression {
         return maxi;
     }
 
-    /*
-   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-   * output : 정규식을 통해 추출되었는지에 대한 여부
-   * 이 메소드는 시간표현 다음주 또는 다다음주에 대한 정보가 있을 시 추출한 시간 표현 값에 추가적인 연산을 해준다.
-   */
+    /**
+     * This method extracts a time representation when there is information about the "다음주" and "다다음주".
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract12(String searchTarget, String regex) { //다음주, 다다음주
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -966,11 +1024,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-   * output : 정규식을 통해 추출되었는지에 대한 여부
-   * 이 메소드는 시간표현 다음주 또는 다다음주 와 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
-   */
+    /**
+     * This method extracts a time representation when there is information about the "다음주", "다다음주" and day of week.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract13(String searchTarget, String regex) { //다음주, 다다음주 월,화~일요일
         //System.out.println("ddd " + searchTarget);
         Pattern pattern = Pattern.compile(regex);
@@ -1008,11 +1069,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-   * output : 정규식을 통해 추출되었는지에 대한 여부
-   * 이 메소드는 시간표현 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
-   */
+    /**
+     * This method extracts a time representation when there is information about the day of week.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract14(String searchTarget, String regex) { //일요일,월요일. 혹시 현재 화요일인데 월요일이라고하면 다음주가됨
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -1048,11 +1112,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-   * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-   * output : 정규식을 통해 추출되었는지에 대한 여부
-   * 이 메소드는 오전, 오후, 오전 오후 표현이 없는 경우에 추출된 시간표현에 추가적인 연산을 해준다.
-   */
+    /**
+     * This method extracts a time representation when there is information about "오전" and "오후" and no information.
+     * Calculate the time and set it (Work time(08:00 ~ 20:00)).
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract101(String searchTarget, String regex) { //오전, 오후
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -1125,11 +1192,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 다음주, 다다음주, ~요일 ~시 ~분에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the "다음주", "다다음주", day of week, hours and minutes.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract15(String searchTarget, String regex) { //다/다음주 ~요일 오전/오후 ~요일 ~시 ~분
 
         Pattern pattern = Pattern.compile(regex);
@@ -1187,11 +1257,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 다음주, 다다음주, ~요일 ~시 ~반에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the "다음주", "다다음주", day of week, hours and a half of hour.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract16(String searchTarget, String regex) { //다/다음주 ~요일 ~시 반
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(searchTarget);
@@ -1247,11 +1320,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 다음주, 다다음주, ~요일 ~시에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the "다음주", "다다음주", day of week and hours.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract17(String searchTarget, String regex) { //다/다음주 ~요일 ~시
 
         Pattern pattern = Pattern.compile(regex);
@@ -1308,11 +1384,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~요일 ~시 ~분에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the day of week, hours and minutes.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract18(String searchTarget, String regex) { //~요일 ~시 ~분
 
         Pattern pattern = Pattern.compile(regex);
@@ -1371,11 +1450,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~요일 ~시 ~반에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the day of week, hours and a half or hour
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract19(String searchTarget, String regex) { //~요일 ~시 ~반
 
         Pattern pattern = Pattern.compile(regex);
@@ -1429,11 +1511,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~요일 ~시에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the day of week and hours.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract20(String searchTarget, String regex) { //~요일 ~시
 
         Pattern pattern = Pattern.compile(regex);
@@ -1492,11 +1577,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시 ~분 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the hours, minutes and day of week.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract21(String searchTarget, String regex) { // ~시 ~분 ~요일
 
         Pattern pattern = Pattern.compile(regex);
@@ -1551,11 +1639,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시 ~반 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the hours, a half of hour and day of week.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract22(String searchTarget, String regex) { // ~시 ~반 ~요일
 
         Pattern pattern = Pattern.compile(regex);
@@ -1606,11 +1697,14 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 ~시 ~요일에 대한 정보가 있을 시 시간 표현을 추출한다.
-    */
+    /**
+     * This method extracts a time representation when there is information about the hours and day of week.
+     * Calculate the time and set it.
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract23(String searchTarget, String regex) { // ~시 ~요일
 
         Pattern pattern = Pattern.compile(regex);
@@ -1664,11 +1758,13 @@ public class RegularExpression {
         return isExtracted;
     }
 
-    /*
-    * input : 사용자의 음성을 텍스트로 변환한 문자열 값 과 정규식표현
-    * output : 정규식을 통해 추출되었는지에 대한 여부
-    * 이 메소드는 시간표현 오늘 대한 정보가 있을 시 isNextDay 설정값을 변경해준다.
-    */
+    /**
+     * This method extracts a time representation when there is information about "오늘".
+     *
+     * @param searchTarget A string value that converts the user's voice to text.
+     * @param regex Regular expression
+     * @return boolean Whether it was extracted through regular expressions.
+     */
     public boolean extract102(String searchTarget, String regex) { //오늘
 
         Pattern pattern = Pattern.compile(regex);
@@ -1682,11 +1778,14 @@ public class RegularExpression {
         return true;
     }
 
-    /*
-    * input : 정규식을 통해 추출된 일, 시, 분 값
-    * output : none
-    * 이 메소드는 추출한 시간표현에 설정한 값이 변화해야하는 값일 경우 아래의 메소드 시간표현의 연산을 적용시킨다.
-    */
+    /**
+     * This method applies the operation of the following method time representation when the time set value is a value to be changed.
+     * Calculate the time and set it.
+     *
+     * @param d Day
+     * @param h Hour
+     * @param m Month
+     */
     public void addTime(int d, int h, int m) {
         System.out.println(d + " " + h + " " + m);
 
@@ -1710,11 +1809,15 @@ public class RegularExpression {
         if (calHour >= 12) calA = "오후";
     }
 
-    /*
-    * input : 정규식을 통해 추출된 년, 월, 일, 시, 분 값
-    * output : none
-    * 이 메소드는 추출한 시간표현이 정해져있을시 이 메소드의 시간표현의 연산을 적용시킨다.
-    */
+    /**
+     * This method sets the time for the desired year, month, hour, and minute.
+     *
+     * @param y
+     * @param M
+     * @param d
+     * @param h
+     * @param m
+     */
     public void atTime(int y, int M, int d, int h, int m) {
         System.out.println("hour : " + h + " " + "minute : " + m);
         calYear = y;

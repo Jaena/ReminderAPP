@@ -10,10 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-/**
- * Created by jaena on 2017-06-26.
- */
-
 public class VoicePlayer {
 
     private static final int CHANNEL = AudioFormat.CHANNEL_OUT_MONO;

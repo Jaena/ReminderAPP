@@ -6,10 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-/**
- * Created by jaena on 2017-06-26.
- */
-
 public class DataBase {
     SQLiteDatabase db;
     MySQLiteOpenHelper helper;
