@@ -10,6 +10,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * This class receives the recorded file name from DB and plays the file.
+ */
+
 public class VoicePlayer {
 
     private static final int CHANNEL = AudioFormat.CHANNEL_OUT_MONO;
@@ -23,14 +27,28 @@ public class VoicePlayer {
     private Thread mPlayingThread = null;
     int playCount;
 
+    /**
+     * Constructor of the VoicePlayer class.
+     * Get context and db instance from MainActivity class.
+     *
+     * @param c    context(the information of this program)
+     */
     VoicePlayer(Context c)
     {
         context = c;
         db = MainActivity.getDBInstance();
     }
+
+    /**
+     * Called to call the playWaveFile method on a thread for playing audio files.
+     * This method creates a new thread and plays the playWaveFile method on the thread.
+     *
+     * @param SampleRate    sample rate expressed in Hertz.
+     * @param mBufferSize    total size of the buffer where audio data is written to during the recording.
+     */
     public void startPlaying(final int SampleRate, final int mBufferSize) {
         int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
-        audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SampleRate, CHANNEL, ENCODING, minBufferSize, AudioTrack.MODE_STREAM);
+        //audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SampleRate, CHANNEL, ENCODING, minBufferSize, AudioTrack.MODE_STREAM); // 어차피 playWaveFile에 있으니 없애도 될듯.
         playing = true;
         mPlayingThread = new Thread(new Runnable() {
 
@@ -42,11 +60,25 @@ public class VoicePlayer {
         mPlayingThread.start();
     }
 
+    /**
+     * Called to stop playing audio files.
+     * This method stops playing audio by initializing variable playing to false.
+     */
     public void stopPlaying()
     {
         playing = false;
     }
 
+    /**
+     * Called to playback audio files.
+     * This method creates an AudioTrack instance using the sample rate used when recording and playbacks the data from the audio file by the buffer size.
+     *
+     * @param SampleRate    sample rate expressed in Hertz.
+     * @param mBufferSize    total size of the buffer where audio data is written to during the recording
+     *
+     * @exception FileNotFoundException
+     * @exeption IOException
+     */
     public void playWaveFile(int SampleRate,int mBufferSize) {
 
         String fileName[] = db.getAllFileName();
@@ -75,6 +107,13 @@ public class VoicePlayer {
             }
         }
     }
+
+    /**
+     * Called to check whether audio is being played now.
+     * This method returns whether audio is being played now.
+     *
+     * @return boolean    whether audio is being played now.
+     */
     public boolean isPlaying()
     {
         return playing;
