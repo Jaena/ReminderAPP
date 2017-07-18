@@ -280,6 +280,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
 
+    /**
+     * Called to check permmision
+     * if permission is not checked, show permmision dialog again.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -295,7 +299,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
     }
 
-
+    /**
+     * Called to start recorder.
+     */
     private void startVoiceRecorder() {
 //        if (mVoiceRecorder != null) {
 //            mVoiceRecorder.stopRecording();
@@ -303,6 +309,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         mVoiceRecorder.startRecording();
     }
 
+    /**
+     * Called to stop voice recorder class and send to Speech service
+     */
     private void stopVoiceRecorder() {
         if (mVoiceRecorder != null) {
             mVoiceRecorder.stopRecording();
@@ -317,6 +326,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
     }
 
+    /**
+     * Called to show and confirm the permission.
+     */
     private void showPermissionMessageDialog() {
         MessageDialogFragment
                 .newInstance(getString(R.string.permission_message))
@@ -324,12 +336,22 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
 
+    /**
+     * Called to request permissions again.
+     */
     @Override
     public void onMessageDialogDismissed() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
                 REQUEST_RECORD_AUDIO_PERMISSION);
     }
 
+
+    /**
+     * Called to get string in Google Speech Server.
+     *
+     * @param text converted Voice to text.
+     * @param isFinal tells analysis is over or not.
+     */
     private final SpeechService.Listener mSpeechServiceListener =
             new SpeechService.Listener() {
                 @Override
@@ -352,7 +374,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
 
-    //font
+    /**
+     * Called to change font in Activity.
+     */
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(TypekitContextWrapper.wrap(newBase));

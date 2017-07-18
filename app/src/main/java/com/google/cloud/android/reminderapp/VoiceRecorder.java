@@ -28,8 +28,6 @@ public class VoiceRecorder {
     private final int mBufferSize = 1024;
     private final int mBytesPerElement = 2;
 
-    // 설정할 수 있는 sampleRate, AudioFormat, channelConfig 값들을 정의
-    // 위의 값들 중 실제 녹음 및 재생 시 선택된 설정값들을 저장
     private int mSampleRate;
     private short mAudioFormat;
     private short mChannelConfig;
@@ -41,9 +39,23 @@ public class VoiceRecorder {
     boolean mIsRecording = false;           // 녹음 중인지에 대한 상태값
 
     DataBase db;
+    Context context;
 
-    // 녹음한 파일을 저장할 경로
-    // 녹음을 수행할 Thread를 생성하여 녹음을 수행하는 함수
+    /**
+     * @breif Called when enter class first
+     * @detail get context, callback and db instance in main class.
+     */
+    public VoiceRecorder(Context c, @NonNull Callback callback)
+    {
+        context =c;
+        mCallback = callback;
+        db = MainActivity.getDBInstance();
+    }
+
+    /**
+     * Called when the recording starts.
+     * Setting Audio format, channel and make a Thread to record file.
+     */
     public void startRecording() {
         mRecorder = null;
         mRecorder = findAudioRecord();
@@ -57,13 +69,6 @@ public class VoiceRecorder {
             }
         }, "AudioRecorder Thread");
         mRecordingThread.start();
-    }
-    Context context;
-    public VoiceRecorder(Context c, @NonNull Callback callback)
-    {
-        context =c;
-        mCallback = callback;
-        db = MainActivity.getDBInstance();
     }
 
     public static abstract class Callback {
@@ -90,7 +95,11 @@ public class VoiceRecorder {
         }
     }
 
-    // 녹음을 하기 위한 sampleRate, audioFormat, channelConfig 값들을 설정
+    /**
+     * Called to set sample rate, size of buffer, format, channel and AudioRecord object.
+     *
+     * @return recorder AudioRecord object recorder need to record file.
+     */
     private AudioRecord findAudioRecord() {
         try {
             int rate = 16000;
@@ -113,7 +122,13 @@ public class VoiceRecorder {
         return null;                     // 적당한 설정값들을 찾지 못한 경우 Recorder를 찾지 못하고 null 반환
     }
 
-    // 실제 녹음한 data를 file에 쓰는 함수
+    /**
+     * Called to write audio file.
+     * the format of audio file is pcm.
+     *
+     * @exception FileNotFoundException
+     * @exception IOException
+     */
     private void writeAudioDataToFile() {
 
         short sData[] = new short[mBufferSize];
@@ -126,7 +141,6 @@ public class VoiceRecorder {
         try {
             fos = context.openFileOutput(fileName,context.MODE_PRIVATE);
             while (mIsRecording) {
-                int size=mRecorder.read(sData, 0, mBufferSize);
                 byte bData[] = short2byte(sData);
                 fos.write(bData, 0, mBufferSize * mBytesPerElement);
             }
@@ -137,8 +151,11 @@ public class VoiceRecorder {
             e.printStackTrace();
         }
     }
-
-    // short array형태의 data를 byte array형태로 변환하여 반환하는 함수
+    /**
+     * Called to converts short array data to byte array
+     *
+     * @return bytes which is converted short array to bytes data
+     */
     private byte[] short2byte(short[] sData) {
         int shortArrsize = sData.length;
         byte[] bytes = new byte[shortArrsize * 2];
@@ -150,7 +167,13 @@ public class VoiceRecorder {
         return bytes;
     }
 
-    // 녹음을 중지하는 함수
+    /**
+     * Called to finish recording and send to google speech services by mCallback.
+     * using mCallback in mainActivity because of use same Speech object in main.
+     *
+     * @return bytes which is converted short array to bytes data
+     */
+
     public void stopRecording() {
         if (mRecorder != null) {
             mIsRecording = false;
@@ -160,15 +183,22 @@ public class VoiceRecorder {
         }
     }
 
+    /**
+     * Called to get sample rate.
+     *
+     * @return sample rate  it needs in VoicePlayer class.
+     **/
+
     public int getSampleRate() {
         return mRecorder.getSampleRate();
     }
-    public int getmBufferSize()
-    {
-        return mBufferSize;
-    }
 
 
+    /**
+     * Called to know is recording or not in the other class.
+     *
+     * @return is recording or not.
+     **/
     public boolean isRecording()
     {
         return mIsRecording;

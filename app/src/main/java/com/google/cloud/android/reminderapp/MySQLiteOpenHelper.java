@@ -12,13 +12,11 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     public MySQLiteOpenHelper(Context context, String name,
                               SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
-        // TODO Auto-generated constructor stub
 
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // TODO Auto-generated method stub
         String sql = "create table record (fileName text, alarmTime text);";//아이디 지우고  ㅇㅇ 저장할 것 만들고
         db.execSQL(sql);
     }

@@ -8,6 +8,11 @@ import com.tsengvn.typekit.Typekit;
  * Created by jaena on 2017-06-29.
  */
 
+/**
+ * It starts first among any other class to change font.
+ * it get a font in asset folder.
+ */
+
 public class CustomStartApp extends Application{
     @Override
     public void onCreate() {
