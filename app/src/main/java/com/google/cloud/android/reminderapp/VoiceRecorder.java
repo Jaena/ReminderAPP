@@ -6,7 +6,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.support.annotation.NonNull;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,8 +20,8 @@ import java.util.Date;
  * {@link AudioFormat#CHANNEL_IN_MONO}. This class will automatically pick the right sample rate
  * for the device. Use {@link #getSampleRate()} to get the selected value.</p>
  */
-public class VoiceRecorder {
 
+public class VoiceRecorder {
 
     private final int mBufferSize = 1024;
     private final int mBytesPerElement = 2;
@@ -41,8 +40,8 @@ public class VoiceRecorder {
     Context context;
 
     /**
-     * @breif Called when enter class first
-     * @detail get context, callback and db instance in main class.
+     * Called when enter class first
+     * get context, callback and db instance in main class.
      */
     public VoiceRecorder(Context c, @NonNull Callback callback)
     {
@@ -128,6 +127,7 @@ public class VoiceRecorder {
      * @exception FileNotFoundException
      * @exception IOException
      */
+
     private void writeAudioDataToFile() {
 
         short sData[] = new short[mBufferSize];
