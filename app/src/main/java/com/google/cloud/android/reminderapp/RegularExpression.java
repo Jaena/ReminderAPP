@@ -981,7 +981,7 @@ public class RegularExpression {
      *
      * @param searchTarget A string value that converts the user's voice to text.
      * @param regex Regular expression
-     * @return boolean Whether it was extracted through regular expressions.
+     * @return int Maximum number of days of the extracted time expression.
      */
     public int extract100(String searchTarget, String regex) { //[오늘|다음날|다다음날|다다음날|내일|낼|명일|모레|글피|익일|명일]+
         Pattern pattern = Pattern.compile(regex);
