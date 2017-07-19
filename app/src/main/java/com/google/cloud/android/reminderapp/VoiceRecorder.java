@@ -5,6 +5,7 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+
 import android.support.annotation.NonNull;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -34,7 +35,7 @@ public class VoiceRecorder {
 
     private AudioRecord mRecorder = null;
     private Thread mRecordingThread = null;
-    boolean mIsRecording = false;           // 녹음 중인지에 대한 상태값
+    boolean mIsRecording = false;
 
     DataBase db;
     Context context;
@@ -136,6 +137,7 @@ public class VoiceRecorder {
         SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd hh:mm:ss");
         String tempTime = sdf.format(date);
         String fileName = tempTime + ".pcm";
+        //TODO 음성파일도 데이터베이스에 저장되도록 개선 필요
         db.insert(fileName);
         try {
             fos = context.openFileOutput(fileName,context.MODE_PRIVATE);
