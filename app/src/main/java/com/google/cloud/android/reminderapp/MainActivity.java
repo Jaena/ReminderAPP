@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     int SampleRate = 16000;
     int BufferSize = 1024;
 
-    RegularExpression regularExpression;
+    TimeAnalysis timeAnalysis;
 
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 1; //추가
     boolean isButtonPushed = false; //추가
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         db = new DataBase(MainActivity.this);
         mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
-        regularExpression = new RegularExpression();
+        timeAnalysis = new TimeAnalysis();
         device.setEnabled(false);
         mText.setVisibility(View.VISIBLE);
 
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
                 //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
                 else {
-                    mText.setText(regularExpression.Analysis(returnedValue));
+                    mText.setText(timeAnalysis.Analysis(returnedValue));
                     Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     isEnd = true;
                 }

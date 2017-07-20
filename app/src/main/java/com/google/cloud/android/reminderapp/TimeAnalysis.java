@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * 정규식을 이용하여 음성 파일에서 추출한 텍스트로부터 시간 표현을 추출한다.
  * 시간표현은 Analysis 메소드 안에서 각 extract 메소드를 이용하여 추출하게 된다.
 */
-public class RegularExpression {
+public class TimeAnalysis {
     public HashMap<String, Integer> hMap;
     public HashMap<String, Integer> wMap;
 
@@ -30,7 +30,7 @@ public class RegularExpression {
 
     // 내일|낼|명일|모레|글피|익일|명일
 
-    public RegularExpression() {
+    public TimeAnalysis() {
         hMap = new HashMap<String, Integer>();
         wMap = new HashMap<String, Integer>();
         hMap.put("오늘", 0);
