@@ -319,7 +319,7 @@ public class SpeechService extends Service {
                     RecognizeRequest.newBuilder()
                             .setConfig(RecognitionConfig.newBuilder()
                                     .setEncoding(RecognitionConfig.AudioEncoding.LINEAR16)
-                                    .setLanguageCode("ko-KR")//.setLanguageCode("en-US") //en-US 에서 ko-KR로 변경
+                                    .setLanguageCode("ko-KR")
                                     .setSampleRateHertz(16000)
                                     .build())
                             .setAudio(RecognitionAudio.newBuilder()

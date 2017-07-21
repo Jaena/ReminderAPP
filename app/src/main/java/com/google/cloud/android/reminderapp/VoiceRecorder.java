@@ -31,8 +31,8 @@ public class VoiceRecorder {
     private short mAudioFormat;
     private short mChannelConfig;
 
-    private final Callback mCallback;
-
+//   private final Callback mCallback;
+//
     private AudioRecord mRecorder = null;
     private Thread mRecordingThread = null;
     boolean mIsRecording = false;
@@ -41,19 +41,19 @@ public class VoiceRecorder {
     Context context;
 
     /**
-     * Called when enter class first
-     * get context, callback and db instance in main class.
+     * 디비와 레코딩 설정 등 Context가 필요한 부분을 위해 context를 Main으로 부터 받아오고
+     * 디비 변수를 Main으로 부터 받아온다.
      */
     public VoiceRecorder(Context c, @NonNull Callback callback)
     {
         context =c;
-        mCallback = callback;
-        db = MainActivity.getDBInstance();
+//        mCallback = callback;
+      db = MainActivity.getDBInstance();
     }
 
     /**
-     * Called when the recording starts.
-     * Setting Audio format, channel and make a Thread to record file.
+     * 녹음을 시작할 때 불려지며
+     * 녹음을 시작하고 WriteAudioDataToFile 함수로 가 녹음파일을 즉시 저장한다.
      */
     public void startRecording() {
         mRecorder = null;
@@ -71,33 +71,33 @@ public class VoiceRecorder {
     }
 
     public static abstract class Callback {
-
-        /**
-         * Called when the recorder starts hearing voice.
-         */
-        public void onVoiceStart() {
-        }
-
-        /**
-         * Called when the recorder is hearing voice.
-         *
-         * @param data The audio data in {@link AudioFormat#ENCODING_PCM_16BIT}.
-         * @param size The size of the actual data in {@code data}.
-         */
-        public void onVoice(byte[] data, int size) {
-        }
-
-        /**
-         * Called when the recorder stops hearing voice.
-         */
-        public void onVoiceEnd() {
-        }
+//
+//        /**
+//         * Called when the recorder starts hearing voice.
+//         */
+//        public void onVoiceStart() {
+//        }
+//
+//        /**
+//         * Called when the recorder is hearing voice.
+//         *
+//         * @param data The audio data in {@link AudioFormat#ENCODING_PCM_16BIT}.
+//         * @param size The size of the actual data in {@code data}.
+//         */
+//        public void onVoice(byte[] data, int size) {
+//        }
+//
+//        /**
+//         * Called when the recorder stops hearing voice.
+//         */
+//        public void onVoiceEnd() {
+//        }
     }
 
     /**
-     * Called to set sample rate, size of buffer, format, channel and AudioRecord object.
+     * 샘플 레이트, 버퍼의 크기, 오디오의 포맷, 채널 그리고 오디오 레코드 객체를 세팅하기 위해 불려진다.
      *
-     * @return recorder AudioRecord object recorder need to record file.
+     * @return 위의 사항을 세팅한 AudioRecord 객체를 리턴한다.
      */
     private AudioRecord findAudioRecord() {
         try {
@@ -122,10 +122,10 @@ public class VoiceRecorder {
     }
 
     /**
-     * Called to write audio file.
-     * the format of audio file is pcm.
+     * 음성을 녹음 파일로 저장시켜주는 일을 한다.
+     * 이곳에서 파일이 다 저장되기 전에 DB에 파일 이름이 들어간다.
      *
-     * @exception FileNotFoundException
+     * @exception FileNotFoundException 저장된 파일을 찾지 못할 수 있으므로 발생 가능하다.
      * @exception IOException
      */
 
@@ -153,9 +153,9 @@ public class VoiceRecorder {
         }
     }
     /**
-     * Called to converts short array data to byte array
+     * short 어레이를 바이트 어레이로 고치기 위해 필요하다.
      *
-     * @return bytes which is converted short array to bytes data
+     * @return 바이트 어레이로 고친 값이 리턴된다.
      */
     private byte[] short2byte(short[] sData) {
         int shortArrsize = sData.length;
@@ -169,25 +169,26 @@ public class VoiceRecorder {
     }
 
     /**
-     * Called to finish recording and send to google speech services by mCallback.
-     * using mCallback in mainActivity because of use same Speech object in main.
+     * 녹음을 멈추고 녹음 중 상태 값을 false로 변경한다.
      *
-     * @return bytes which is converted short array to bytes data
      */
 
     public void stopRecording() {
         if (mRecorder != null) {
             mIsRecording = false;
             mRecorder.stop();
-            mCallback.onVoiceEnd();
-            mRecorder.release();
+//            mCallback.onVoiceEnd();
+         mRecorder.release();
         }
     }
 
     /**
-     * Called to get sample rate.
+     * 샘플레이트를 main에서 가져오기 위해 사용된다.
+     * 메인에서 샘플 값은 보이스 플레이어 클래스에서 재생 SampleRate로 사용되며
+     * 녹음과 재생의 샘플 값이 일치하지 않는 경우
+     * 재생될 때 빠르게, 느리게 들리거나 음원 파일이 손상된 것 처럼 들린다.
      *
-     * @return sample rate  it needs in VoicePlayer class.
+     * @return int로 된 샘플 값을 리턴한다.
      **/
 
     public int getSampleRate() {
@@ -196,9 +197,9 @@ public class VoiceRecorder {
 
 
     /**
-     * Called to know is recording or not in the other class.
+     * 다른 클래스(ex) MainActivity) 에서 레코딩 중인지 여부를 알기 위해 사용된다.
      *
-     * @return is recording or not.
+     * @return 레코딩 상황인지 아닌지를 boolean 변수로 리턴한다.
      **/
     public boolean isRecording()
     {
