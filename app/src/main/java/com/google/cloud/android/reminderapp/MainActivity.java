@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     int SampleRate = 16000;
     int BufferSize = 1024;
 
-    TimeAnalysis analysisTime;
+    TimeAnalysis timeAnalysis;
 
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 1; //추가
     boolean isButtonPushed = false; //추가
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         db = new DataBase(MainActivity.this);
         mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
-        analysisTime = new TimeAnalysis();
+        timeAnalysis = new TimeAnalysis();
         device.setEnabled(false);
         mText.setVisibility(View.VISIBLE);
 
@@ -184,8 +184,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         device.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("과연 : " + mVoiceRecorder.isRecording());
+                System.out.println("MainActivity에서 mVoiceRecorder.isRecording 확인 : " + mVoiceRecorder.isRecording());
                 if (mVoiceRecorder.isRecording()) {
+                    System.out.println("stop Voice Recorder");
                     stopVoiceRecorder();
                 }
                 if (voicePlayer.isPlaying()) {
@@ -225,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
                 //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
                 else {
-                    mText.setText(analysisTime.Analysis(returnedValue));
+                    mText.setText(timeAnalysis.Analysis(returnedValue));
                     Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     isEnd = true;
                 }
@@ -329,6 +330,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
      */
     private void stopVoiceRecorder() {
         if (mVoiceRecorder != null) {
+            System.out.println("녹음을 중지하자.");
             mVoiceRecorder.stopRecording();
             FileInputStream fis = null;
             try {
@@ -337,7 +339,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+            System.out.println("녹음 완료 후, 구글 STT서버로 보내기");
             mSpeechService.recognizeInputStream(fis);
+            System.out.println("구글 STT서버로 잘 보내진건가...?");
         }
     }
 
