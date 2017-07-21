@@ -55,7 +55,7 @@ public class VoicePlayer {
         mPlayingThread.start();
     }
 
-    //TODO 변수 playing을 isplaying으로 바꾸기 - 피어리뷰에도 적기
+    //TODO 변수 playing을 mIsplaying으로 바꾸기 - 피어리뷰에도 적기
     /**
      * 이 메소드는 변수 playing을 false로 설정하여 재생을 중지한다.
      */
@@ -75,7 +75,7 @@ public class VoicePlayer {
      * @exeption IOException
      */
     public void playWaveFile(int SampleRate,int mBufferSize) {
-
+        System.out.println("재생 시작");
         String fileName[] = db.getAllFileName();
         playCount = fileName.length;
         int i;

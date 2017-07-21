@@ -56,6 +56,7 @@ public class VoiceRecorder {
      * Setting Audio format, channel and make a Thread to record file.
      */
     public void startRecording() {
+        System.out.println("녹음 시작");
         mRecorder = null;
         mRecorder = findAudioRecord();
         mRecorder.startRecording();
@@ -142,6 +143,7 @@ public class VoiceRecorder {
         try {
             fos = context.openFileOutput(fileName,context.MODE_PRIVATE);
             while (mIsRecording) {
+                int size = mRecorder.read(sData, 0, mBufferSize); //7월 18일 commit에서 빠져서 녹음이 안됐음. 다시 추가.
                 byte bData[] = short2byte(sData);
                 fos.write(bData, 0, mBufferSize * mBytesPerElement);
             }

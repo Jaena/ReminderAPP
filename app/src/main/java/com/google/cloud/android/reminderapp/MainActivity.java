@@ -175,8 +175,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         device.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("과연 : " + mVoiceRecorder.isRecording());
+                System.out.println("MainActivity에서 mVoiceRecorder.isRecording 확인 : " + mVoiceRecorder.isRecording());
                 if (mVoiceRecorder.isRecording()) {
+                    System.out.println("stop Voice Recorder");
                     stopVoiceRecorder();
                 }
                 if (voicePlayer.isPlaying()) {
@@ -314,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
      */
     private void stopVoiceRecorder() {
         if (mVoiceRecorder != null) {
+            System.out.println("녹음을 중지하자.");
             mVoiceRecorder.stopRecording();
             FileInputStream fis = null;
             try {
@@ -322,7 +324,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+            System.out.println("녹음 완료 후, 구글 STT서버로 보내기");
             mSpeechService.recognizeInputStream(fis);
+            System.out.println("구글 STT서버로 잘 보내진건가...?");
         }
     }
 
