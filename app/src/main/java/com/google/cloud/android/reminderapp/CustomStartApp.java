@@ -5,8 +5,10 @@ import android.app.Application;
 import com.tsengvn.typekit.Typekit;
 
 /**
- * It starts first among any other class to change font.
- * it get a font in asset folder.
+ * 다른 모든 클래스보다 먼저 시작하여 글꼴을 변경한다.
+ * Fragment는 이 방식을 사용할 수 없는 것으로 알고 있으며
+ * Activity일 경우 attatchBaseContext라는 메소드를 통해 글꼴을 적용할 수 있다.
+ * 글꼴은 asset파일에 저장 하면 이용할 수 있다.
  */
 
 public class CustomStartApp extends Application{

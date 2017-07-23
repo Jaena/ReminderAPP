@@ -71,31 +71,36 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 1; //추가
     boolean isButtonPushed = false; //추가
 
+
+
+/**
+* @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
+* */
     private final VoiceRecorder.Callback mVoiceCallback = new VoiceRecorder.Callback() {
-
-        @Override
-        public void onVoiceStart() {
-            //showStatus(true);
-            if (mSpeechService != null) {
-                mSpeechService.startRecognizing(mVoiceRecorder.getSampleRate());
-            }
-        }
-
-        @Override
-        public void onVoice(byte[] data, int size) {
-            if (mSpeechService != null) {
-                mSpeechService.recognize(data, size);
-            }
-        }
-
-        @Override
-        public void onVoiceEnd() {
-            //showStatus(false);
-            if (mSpeechService != null) {
-                mSpeechService.finishRecognizing();
-            }
-        }
-
+//
+//        @Override
+//        public void onVoiceStart() {
+//            //showStatus(true);
+//            if (mSpeechService != null) {
+//                mSpeechService.startRecognizing(mVoiceRecorder.getSampleRate());
+//            }
+//        }
+//
+//        @Override
+//        public void onVoice(byte[] data, int size) {
+//            if (mSpeechService != null) {
+//                mSpeechService.recognize(data, size);
+//            }
+//        }
+//
+//        @Override
+//        public void onVoiceEnd() {
+//            //showStatus(false);
+//            if (mSpeechService != null) {
+//                mSpeechService.finishRecognizing();
+//            }
+//        }
+//
     };
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -114,6 +119,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     };
     int index = 0;
 
+    /**
+    * 텍스트, 버튼 등 UI 요소의 클릭 등을 관리하고
+     * 핸들러를 통해 Service Search Listener로 부터 받아온 텍스트를 TimeAnalysis로 보내어 분석한다.
+    * */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -252,7 +261,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     }
 
-
+    /**
+     * MainActivity가 시작할 때, 녹음에 대한 Permission이 있는지 확인하고
+     * Permission이 제대로 되어있지 않을 경우 다시 Permission을 받는다.
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -271,6 +283,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
     }
 
+    /**
+     * MainActivity가 멈출 때, SpeechService를 종료한다.
+     */
     @Override
     protected void onStop() {
         // Stop Cloud Speech API
@@ -283,8 +298,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
 
     /**
-     * Called to check permmision
-     * if permission is not checked, show permmision dialog again.
+     * Permission을 체크한다. Permission 되어있지 않을 경우 다이얼로그를 통해
+     * 유저에게 이를 알린다.
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -302,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
     /**
-     * Called to start recorder.
+     * 보이스 레코더를 호출하기 위해 사용되는 메소드이다.
      */
     private void startVoiceRecorder() {
 //        if (mVoiceRecorder != null) {
@@ -312,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
     /**
-     * Called to stop voice recorder class and send to Speech service
+     * 음성 녹음을 멈춘뒤, 스피치 서비스를 통해 구글 STT 서버로 파일을 전송시킨다.
      */
     private void stopVoiceRecorder() {
         if (mVoiceRecorder != null) {
@@ -332,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
     /**
-     * Called to show and confirm the permission.
+     * 녹음과 관련된 Permission을 유저에게 확인받기 위해 다이얼로그를 띄운다.
      */
     private void showPermissionMessageDialog() {
         MessageDialogFragment
@@ -342,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
 
     /**
-     * Called to request permissions again.
+     * 다이얼로그가 무시되었을 경우 다시 다이얼로그를 띄운다.
      */
     @Override
     public void onMessageDialogDismissed() {
@@ -352,10 +367,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
 
     /**
-     * Called to get string in Google Speech Server.
+     * 구글 STT 서버로 부터 분석된 텍스트를 받아 onCreate에 있는 handler로 전송시킨다.
      *
-     * @param text converted Voice to text.
-     * @param isFinal tells analysis is over or not.
+     * @param text 파일의 음성을 텍스트로 변경한 값
+     * @param isFinal 구글 STT 서버로부터 텍스트를 받았는지 아닌지 확인하는 값
      */
     private final SpeechService.Listener mSpeechServiceListener =
             new SpeechService.Listener() {
@@ -373,14 +388,17 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
             };
 
-
+/**
+ * DBInstance를 다른 Class에서도 사용할 수 있도록 하기 위해 사용한다.
+ * */
     public static DataBase getDBInstance() {
         return db;
     }
 
 
     /**
-     * Called to change font in Activity.
+     * 액티비티의 글꼴을 바꾸기 위해 불러지는 함수이다.
+     * CustomStartApp과 연결되어 있다.
      */
 
     @Override
