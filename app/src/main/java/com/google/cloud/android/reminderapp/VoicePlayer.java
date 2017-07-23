@@ -20,7 +20,7 @@ public class VoicePlayer {
     private static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
     Context context;
-    boolean playing  = false;
+    boolean mIsPlaying  = false;
     DataBase db;
 
     AudioTrack audioTrack;
@@ -33,7 +33,7 @@ public class VoicePlayer {
         db = MainActivity.getDBInstance();
     }
 
-    //TODO : 피어리뷰에 적어야 할 것들 minBufferSize - 사용되지 않는 변수 제거, 불필요한 AudioTrack인스턴스 생성
+    //TODO : 피어리뷰에 적어야 할 것들 minBufferSize - 사용되지 않는 변수 제거, 불필요한 AudioTrack인스턴스 생성 없도록 개선 필요
     /**
      * 이 메소드는 새로운 thread를 생성하여 playWaveFile 메소드를 실행한다.
      * 음성 파일을 재생하기 위해 호출된다.
@@ -42,9 +42,9 @@ public class VoicePlayer {
      * @param mBufferSize    재생 시 음성 파일에서 한 번에 읽어오는 음성 데이터의 최대 크기
      */
     public void startPlaying(final int SampleRate, final int mBufferSize) {
-        int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
-        //audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SampleRate, CHANNEL, ENCODING, minBufferSize, AudioTrack.MODE_STREAM); // 어차피 playWaveFile에 있으니 없애도 될듯.
-        playing = true;
+       // int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
+
+        mIsPlaying = true;
         mPlayingThread = new Thread(new Runnable() {
 
             @Override
@@ -55,13 +55,13 @@ public class VoicePlayer {
         mPlayingThread.start();
     }
 
-    //TODO 변수 playing을 mIsplaying으로 바꾸기 - 피어리뷰에도 적기
+    //TODO 변수 playing을 mIsplaying으로 바꾸기
     /**
      * 이 메소드는 변수 playing을 false로 설정하여 재생을 중지한다.
      */
     public void stopPlaying()
     {
-        playing = false;
+        mIsPlaying = false;
     }
 
     /**
@@ -88,7 +88,7 @@ public class VoicePlayer {
                 int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
                 audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SampleRate, CHANNEL, ENCODING, minBufferSize, AudioTrack.MODE_STREAM);
                 audioTrack.play();
-                while (((count = dis.read(data, 0, mBufferSize)) > -1)&&playing) {
+                while (((count = dis.read(data, 0, mBufferSize)) > -1)&&mIsPlaying) {
                     audioTrack.write(data, 0, count);
                 }
                 audioTrack.stop();
@@ -110,6 +110,6 @@ public class VoicePlayer {
      */
     public boolean isPlaying()
     {
-        return playing;
+        return mIsPlaying;
     }
 }

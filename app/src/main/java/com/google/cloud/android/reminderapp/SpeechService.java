@@ -315,6 +315,7 @@ public class SpeechService extends Service {
      */
     public void recognizeInputStream(InputStream stream) {
         try {
+            //TODO 음성을 녹음한 후, 음성파일을 STT서버로 보낼 때 불안정한 네트워크 연결 상태에 대한 처리 필요
             mApi.recognize(
                     RecognizeRequest.newBuilder()
                             .setConfig(RecognitionConfig.newBuilder()

@@ -167,10 +167,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 //                    playDisplay();
 //                    NoticeDisplay();
                     voicePlayer.startPlaying(SampleRate, BufferSize);
+                    //TODO 모든 파일의 재생이 완료된 후, 시작 화면으로 전환되도록 개선 필요
                 }
             }
         });
-
 
         device.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
             }
         });
-
+        //TODO 음성 정보가 없는 경우(아무 말도 하지 않을 때, 녹음이 되지 않는 경우 등)와 시간 인식이 불가능한 음성정보에 대해서 따로 처리하는 코드가 없고, 현재 시간으로 처리됨. 각각에 대해 따로 처리하여 사용자에게 알려주도로 개선 필요
         handler = new Handler() {
             public void handleMessage(Message msg) {
                 String returnedValue = (String) msg.obj;
@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
                 //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
                 else {
+                    //TODO 계산된 예정 시간 정보도 데이터베이스에 함께 저장되도록 개선 필요
                     mText.setText(timeAnalysis.Analysis(returnedValue));
                     Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     isEnd = true;

@@ -129,7 +129,7 @@ public class VoiceRecorder {
      * @exception FileNotFoundException
      * @exception IOException
      */
-
+    //TODO 음성 녹음이 시작된 후, 중지 버튼을 누르지 않으면 음성 녹음이 끝나지 않는 문제 개선 필요
     private void writeAudioDataToFile() {
 
         short sData[] = new short[mBufferSize];
@@ -138,7 +138,7 @@ public class VoiceRecorder {
         SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd hh:mm:ss");
         String tempTime = sdf.format(date);
         String fileName = tempTime + ".pcm";
-        //TODO 음성파일도 데이터베이스에 저장되도록 개선 필요
+
         db.insert(fileName);
         try {
             fos = context.openFileOutput(fileName,context.MODE_PRIVATE);

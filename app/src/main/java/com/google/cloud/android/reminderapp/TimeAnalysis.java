@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+//TODO 모든 경우에 대한 regular expression으로 시간표현을 추출하는 방식으로는 버그 발생 시 원인 파악이 힘들고, 새로운 표현 추가 시 기존 표현과 충돌 위험있음. 체계적인 정리 혹은 알고리즘 개선 필요
 /**
  * 이 클래스는 음성 녹음 후에 시간 표현을 추출하기 위하여 main activity에서 불러진다.
  * 정규식을 이용하여 음성 파일에서 추출한 텍스트로부터 시간 표현을 추출한다.
@@ -141,8 +141,8 @@ public class TimeAnalysis {
         //정규식 표현식에서 계산 값 추출
         extractManager(target);
 
-        String calTime = calYear + "년 " + calMonth + "월 " + calDay + "일 " + calHour + "시 " + calMinute + "분 ";
-
+        //String calTime = calYear + "년 " + calMonth + "월 " + calDay + "일 " + calHour + "시 " + calMinute + "분 ";
+        String calTime = calYear + ":" + calMonth + ":" + calDay + ":" + calHour + ":" + calMinute ;
         //추출한 표현값 리턴
         return calTime;
     }
