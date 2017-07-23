@@ -15,7 +15,7 @@
         android:src="@drawable/background"/>
 
 
-    <ImageView
+    <ImageSwitcher
         android:id="@+id/backgound"
         android:clickable="true"
         android:layout_width="132dp"

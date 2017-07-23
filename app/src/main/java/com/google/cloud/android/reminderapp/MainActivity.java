@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -30,10 +32,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.tsengvn.typekit.TypekitContextWrapper;
 
@@ -47,17 +52,21 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     private static final String STATE_RESULTS = "results";
 
+    Handler mHandler = new Handler();
     static DataBase db;
     private SpeechService mSpeechService;
 
     private VoiceRecorder mVoiceRecorder;
     VoicePlayer voicePlayer;
 
+    boolean running;
     // View references
     private TextView mText;
-    ImageView device;
+    ImageSwitcher device;
     ImageButton record;
     ImageButton play;
+
+    RecordingSwtich rec = new RecordingSwtich();
 
     ImageView[] circles = new ImageView[5];
     Handler handler;
@@ -65,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     boolean isEnd = false;
     int SampleRate = 16000;
     int BufferSize = 1024;
+    private SoundPool sound;
+    private int soundbeep;
 
     TimeAnalysis timeAnalysis;
 
@@ -127,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        device = (ImageView) findViewById(R.id.backgound);
+        device = (ImageSwitcher) findViewById(R.id.backgound);
         mText = (TextView) findViewById(R.id.text);
         record = (ImageButton) findViewById(R.id.record);
         play = (ImageButton) findViewById(R.id.play);
@@ -143,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         circles[2] = (ImageView) (findViewById(R.id.circle3));
         circles[3] = (ImageView) (findViewById(R.id.circle4));
         circles[4] = (ImageView) (findViewById(R.id.circle5));
+        sound = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        soundbeep = sound.load(getApplicationContext(), R.raw.rec_start, 1);
 
         record.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +169,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setText("녹음중 ");
                     mText.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
+                    rec.start();
+                    sound.play(soundbeep, 1f, 1f, 0, 0, 1);
 //                    recordDisplay();
 //                    NoticeDisplay();
                     startVoiceRecorder();
@@ -170,9 +185,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     record.setVisibility(View.GONE);
                     play.setEnabled(false);
                     play.setVisibility(View.GONE);
+                    rec.start();
                     mText.setText("재생중");
                     mText.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
+
 //                    playDisplay();
 //                    NoticeDisplay();
                     voicePlayer.startPlaying(SampleRate, BufferSize);
@@ -187,6 +204,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 System.out.println("MainActivity에서 mVoiceRecorder.isRecording 확인 : " + mVoiceRecorder.isRecording());
                 if (mVoiceRecorder.isRecording()) {
                     System.out.println("stop Voice Recorder");
+                    sound.play(soundbeep, 1f, 1f, 0, 0, 1);
+                    running = false;
                     stopVoiceRecorder();
                 }
                 if (voicePlayer.isPlaying()) {
@@ -195,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     record.setVisibility(View.VISIBLE);
                     play.setEnabled(true);
                     play.setVisibility(View.VISIBLE);
+                    running = false;
                     mText.setText("");
                     mText.setVisibility(View.GONE);
                     device.setEnabled(false);
@@ -233,6 +253,17 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
             }
         };
+
+       device.setFactory(new ViewSwitcher.ViewFactory()
+        {
+            public View makeView() {
+                ImageView imageView = new ImageView(getApplicationContext());
+                imageView.setBackgroundColor(0x00000000);
+                imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                imageView.setLayoutParams(new ImageSwitcher.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                return imageView;
+            }
+        });
 
 //        runOnUiThread(new Runnable() {
 //            @Override
@@ -485,4 +516,36 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 //            }
 //        });
 //    }
+class RecordingSwtich extends Thread {
+
+    int m_duration;
+    final int image_m_Id[] = {R.drawable.display_off,R.drawable.display_off1,R.drawable.display_off2,R.drawable.display_off3,R.drawable.display_off4,R.drawable.display_off5,R.drawable.display_off};
+    int m_currentIndex = 0;
+
+    @Override
+    public void run() {
+        running = true;
+        while (running) {
+            synchronized (this) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        device.setImageResource(image_m_Id[m_currentIndex]);
+                    }
+                });
+                m_currentIndex++;
+                if (m_currentIndex == image_m_Id.length) {
+                    m_currentIndex = 0;
+                }
+                try {
+                    m_duration = 600;
+                    Thread.sleep(m_duration);
+                } catch (InterruptedException e) {
+                }
+            }
+        }   //while end
+
+    }
+}
+
 }
