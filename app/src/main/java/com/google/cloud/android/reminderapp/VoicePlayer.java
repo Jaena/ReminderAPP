@@ -4,6 +4,10 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Handler;
+import android.os.Message;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -82,7 +86,13 @@ public class VoicePlayer {
         for(i=playCount-1;i>=0;i--){
             int count = 0;
             byte[] data = new byte[mBufferSize];
+
+            Message message = MainActivity.vhandler.obtainMessage(1, fileName[i]);
+            MainActivity.vhandler.sendMessage(message);
+
+
             try {
+                //Toast.makeText(context.getApplicationContext(),"현재 재생중인 파일 " + fileName[i] +"",Toast.LENGTH_SHORT).show();
                 FileInputStream fis = context.openFileInput(fileName[i]);
                 DataInputStream dis = new DataInputStream(fis);
                 int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);

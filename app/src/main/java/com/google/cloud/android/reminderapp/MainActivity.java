@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     boolean running;
     // View references
-    private TextView mText;
+    public static TextView mText;
     ImageSwitcher device;
     ImageButton record;
     ImageButton play;
@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     ImageView[] circles = new ImageView[5];
     Handler handler;
+
+    public static Handler vhandler;
 
     boolean isEnd = false;
     int SampleRate = 16000;
@@ -182,7 +184,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 if (!voicePlayer.isPlaying()) {
                     record.setEnabled(false);
-                    record.setVisibility(View.GONE);
+                    record.setVisibility(
+
+                            View.GONE);
                     play.setEnabled(false);
                     play.setVisibility(View.GONE);
                     rec.start();
@@ -252,6 +256,15 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     isEnd = true;
                 }
             }
+        };
+
+        vhandler = new Handler() {
+            public void handleMessage(Message msg) {
+                String fileName = (String) msg.obj;
+                String extractValue = new String();
+
+                    mText.setText(fileName);
+                }
         };
 
        device.setFactory(new ViewSwitcher.ViewFactory()
