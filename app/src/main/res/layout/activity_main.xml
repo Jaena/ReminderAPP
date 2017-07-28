@@ -127,5 +127,13 @@
         android:layout_alignTop="@+id/record"
         android:layout_alignStart="@+id/backgound" />
 
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp"
+        android:layout_above="@+id/device"
+        android:layout_centerHorizontal="true" />
 
-    </RelativeLayout>
+
+</RelativeLayout>

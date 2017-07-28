@@ -19,7 +19,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
  */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = "create table record (fileName text, alarmTime text);";//아이디 지우고  ㅇㅇ 저장할 것 만들고
+        String sql = "create table record (fileName text, alarmTime text, text text);";//아이디 지우고  ㅇㅇ 저장할 것 만들고
         db.execSQL(sql);
     }
     /**

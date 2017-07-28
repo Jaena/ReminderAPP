@@ -1,6 +1,7 @@
 package com.google.cloud.android.reminderapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -89,6 +90,9 @@ public class VoicePlayer {
                 audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SampleRate, CHANNEL, ENCODING, minBufferSize, AudioTrack.MODE_STREAM);
                 audioTrack.play();
                 while (((count = dis.read(data, 0, mBufferSize)) > -1)&&mIsPlaying) {
+                    SharedPreferences preference = context.getSharedPreferences("volume", context.MODE_PRIVATE);
+                    float volume = preference.getFloat("volume", 1f);
+                    audioTrack.setVolume(volume);
                     audioTrack.write(data, 0, count);
                 }
                 audioTrack.stop();

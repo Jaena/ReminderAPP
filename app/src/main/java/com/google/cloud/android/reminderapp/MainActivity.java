@@ -21,6 +21,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -31,11 +32,13 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -59,7 +62,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private VoiceRecorder mVoiceRecorder;
     VoicePlayer voicePlayer;
 
-    boolean running;
+    boolean recRunning = false;
+    boolean playRunning = false;
     // View references
     private TextView mText;
     ImageSwitcher device;
@@ -67,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ImageButton play;
 
     RecordingSwtich rec = new RecordingSwtich();
+    PlayingSwtich playS = new PlayingSwtich();
+
+    SeekBar settingBar;
 
     ImageView[] circles = new ImageView[5];
     Handler handler;
@@ -88,30 +95,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 * @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
 * */
     private final VoiceRecorder.Callback mVoiceCallback = new VoiceRecorder.Callback() {
-//
-//        @Override
-//        public void onVoiceStart() {
-//            //showStatus(true);
-//            if (mSpeechService != null) {
-//                mSpeechService.startRecognizing(mVoiceRecorder.getSampleRate());
-//            }
-//        }
-//
-//        @Override
-//        public void onVoice(byte[] data, int size) {
-//            if (mSpeechService != null) {
-//                mSpeechService.recognize(data, size);
-//            }
-//        }
-//
-//        @Override
-//        public void onVoiceEnd() {
-//            //showStatus(false);
-//            if (mSpeechService != null) {
-//                mSpeechService.finishRecognizing();
-//            }
-//        }
-//
+
     };
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -142,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         mText = (TextView) findViewById(R.id.text);
         record = (ImageButton) findViewById(R.id.record);
         play = (ImageButton) findViewById(R.id.play);
+        settingBar = (SeekBar)findViewById(R.id.seekBar);
+        settingBar.setMax(5);
         db = new DataBase(MainActivity.this);
         mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
@@ -170,9 +156,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
                     rec.start();
-                    sound.play(soundbeep, 1f, 1f, 0, 0, 1);
-//                    recordDisplay();
-//                    NoticeDisplay();
+                    SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
+                    float volume = preference.getFloat("volume", 1f);
+                    sound.play(soundbeep, volume, volume, 0, 0, 1);
                     startVoiceRecorder();
                 }
             }
@@ -185,11 +171,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     record.setVisibility(View.GONE);
                     play.setEnabled(false);
                     play.setVisibility(View.GONE);
-                    rec.start();
+                    playS.start();
                     mText.setText("재생중");
                     mText.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
-
 //                    playDisplay();
 //                    NoticeDisplay();
                     voicePlayer.startPlaying(SampleRate, BufferSize);
@@ -204,8 +189,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 System.out.println("MainActivity에서 mVoiceRecorder.isRecording 확인 : " + mVoiceRecorder.isRecording());
                 if (mVoiceRecorder.isRecording()) {
                     System.out.println("stop Voice Recorder");
-                    sound.play(soundbeep, 1f, 1f, 0, 0, 1);
-                    running = false;
+                    SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
+                    float volume = preference.getFloat("volume", 1f);
+                    sound.play(soundbeep, volume, volume, 0, 0, 1);
+                    recRunning = false;
                     stopVoiceRecorder();
                 }
                 if (voicePlayer.isPlaying()) {
@@ -214,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     record.setVisibility(View.VISIBLE);
                     play.setEnabled(true);
                     play.setVisibility(View.VISIBLE);
-                    running = false;
+                    playRunning = false;
                     mText.setText("");
                     mText.setVisibility(View.GONE);
                     device.setEnabled(false);
@@ -226,6 +213,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     play.setEnabled(true);
                     play.setVisibility(View.VISIBLE);
                     mText.setText("");
+                    SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
+                    float volume = preference.getFloat("volume", 1f);
+                    sound.play(soundbeep, volume, volume, 0, 0, 1);
                     isEnd = false;
                 }
             }
@@ -247,8 +237,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
                 else {
                     //TODO 계산된 예정 시간 정보도 데이터베이스에 함께 저장되도록 개선 필요
-                    mText.setText(timeAnalysis.Analysis(returnedValue));
+                    String text = timeAnalysis.Analysis(returnedValue);
+                    mText.setText(text);
+//                    db.update(db.getLastFileName(),text,returnedValue);
                     Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), "디비에 저장된 알람 값:"+db.getLastAlarmText(), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), "디비에 저장된 원래 텍스트 값:"+db.getLastText(), Toast.LENGTH_LONG).show();
+
                     isEnd = true;
                 }
             }
@@ -265,30 +260,40 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             }
         });
 
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while(true) {
-//                    if(mVoiceRecorder.isRecording() || voicePlayer.isPlaying()){
-//                        try {
-//                            Thread.sleep(100);
-//                        } catch (InterruptedException e) {
-//                        }
-//                        circles[index].setVisibility(View.VISIBLE);
-//                        index++;
-//                        if (index == 5) {
-//                            for (int i = 0; i < 5; i++) {
-//                                circles[i].setVisibility(View.INVISIBLE);
-//                            }
-//                            index = 0;
-//                        }
-//                    }
-//
-//
-//
-//                }
-//            }
-//        });
+
+        settingBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                Toast.makeText(getApplicationContext(),""+progress,Toast.LENGTH_SHORT).show();
+                if(progress>0) {
+                    progress--;
+                    SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = a.edit();
+                    editor.putFloat("volume", (float) (progress * 0.3));
+                    Log.d("volume setting", "" + progress * 0.3);
+                    editor.commit();
+                }
+                else
+                {
+//                    record.setEnabled(false);
+//                    record.setVisibility(View.GONE);
+//                    play.setEnabled(false);
+//                    play.setVisibility(View.GONE);
+//                    //녹음 중이면 녹음 중지하고 스피치 서비스 가면 안됨. -> 새로 메소드를 만들던가 해야할 듯 shared prefer
+//                    //재생 중이면 재생 멈춰야 함.
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
     }
 
@@ -437,85 +442,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
 
-//    boolean RecRunning = true;
-//    void recordDisplay(){
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (RecRunning) {
-//                    while (mVoiceRecorder.isRecording() == true) {
-//                        TimerTask task = new TimerTask() {
-//                            @Override
-//                            public void run() {
-//                                mText.setText("중지시 화면 클릭");
-//                            }
-//                        };
-//                        Timer mTimer = new Timer();
-//                        mTimer.schedule(task, 1000);
-//                        mText.setText("녹음중");
-//                        if (mVoiceRecorder.isRecording() == false)
-//                            RecRunning = false;
-//                    }
-//                }
-//            }
-//        });
-//
-//        }
-//
-//    boolean playRunning =true;
-//    void playDisplay() {
-//
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while(playRunning) {
-//                    while (voicePlayer.isPlaying() == true) {
-//                        TimerTask task = new TimerTask() {
-//                            @Override
-//                            public void run() {
-//                                mText.setText("중지시 화면 클릭");
-//                            }
-//                        };
-//                        Timer mTimer = new Timer();
-//                        mTimer.schedule(task, 1000);
-//                        mText.setText("재생중");
-//                        if(!voicePlayer.isPlaying())
-//                            playRunning = false;
-//                    }
-//                }
-//            }
-//        });
-//
-//    }
-//
-//    boolean noticeRunning = true;
-//    void NoticeDisplay() {
-//        int duration = 100;
-//        runOnUiThread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                while (noticeRunning) {
-//                    while (mVoiceRecorder.isRecording() || voicePlayer.isPlaying()) {
-//                        try {
-//                            Thread.sleep(100);
-//                        } catch (InterruptedException e) {
-//                        }
-//                        circles[index].setVisibility(View.VISIBLE);
-//                        index++;
-//                        if (index == 5) {
-//                            for (int i = 0; i < 5; i++) {
-//                                circles[i].setVisibility(View.INVISIBLE);
-//                            }
-//                            index = 0;
-//                        }
-//                        if (!(mVoiceRecorder.isRecording() || voicePlayer.isPlaying()))
-//                            noticeRunning = false;
-//                    }
-//                }
-//            }
-//        });
-//    }
 class RecordingSwtich extends Thread {
 
     int m_duration;
@@ -524,8 +450,8 @@ class RecordingSwtich extends Thread {
 
     @Override
     public void run() {
-        running = true;
-        while (running) {
+        recRunning = true;
+        while (recRunning) {
             synchronized (this) {
                 mHandler.post(new Runnable() {
                     @Override
@@ -548,4 +474,35 @@ class RecordingSwtich extends Thread {
     }
 }
 
+    class  PlayingSwtich extends Thread {
+
+        int m_duration;
+        final int image_m_Id[] = {R.drawable.display_off,R.drawable.display_off1,R.drawable.display_off2,R.drawable.display_off3,R.drawable.display_off4,R.drawable.display_off5,R.drawable.display_off};
+        int m_currentIndex = 0;
+
+        @Override
+        public void run() {
+            playRunning = true;
+            while (playRunning) {
+                synchronized (this) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            device.setImageResource(image_m_Id[m_currentIndex]);
+                        }
+                    });
+                    m_currentIndex++;
+                    if (m_currentIndex == image_m_Id.length) {
+                        m_currentIndex = 0;
+                    }
+                    try {
+                        m_duration = 600;
+                        Thread.sleep(m_duration);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }   //while end
+
+        }
+    }
 }
