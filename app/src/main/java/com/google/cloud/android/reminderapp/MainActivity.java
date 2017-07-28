@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 listView.setAdapter(adapter);
                 listView.setVisibility(View.VISIBLE);
+                playRunning = false;
                 mText.setVisibility(View.GONE);
                 //list.setVisibility(View.GONE);
             }
@@ -629,10 +630,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
             Playlist item = items.get(position);
             view.setName(item.getName());
-//            view.setMobile(item.getMobile());
-//            view.setAge(item.getAge());
-//            view.setImage(item.getResId());
-
             return view;
         }
     }
