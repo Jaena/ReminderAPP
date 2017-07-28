@@ -50,6 +50,7 @@ import com.tsengvn.typekit.TypekitContextWrapper;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.Buffer;
 import java.util.ArrayList;
 
 
@@ -160,18 +161,19 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         //listing
         listView = (ListView) findViewById(R.id.listView);
-        adapter = new PlaylistAdapter();
-        alarmTimeArr = db.getAllAlarmTime();
-        playCount = alarmTimeArr.length;
-        System.out.println("Play Count : " + playCount);
-        for (int i = playCount - 1; i >= 0; i--) {
-            String[] words = alarmTimeArr[i].split(":");
-            if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-            if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
-
-            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-            adapter.addItem(new Playlist(timeRegistered));
-        }
+//        adapter = new PlaylistAdapter();
+//        alarmTimeArr = db.getAllAlarmTime();
+//        playCount = alarmTimeArr.length;
+//        System.out.println("Play Count : " + playCount);
+//        for (int i = playCount - 1; i >= 0; i--) {
+//            String[] words = alarmTimeArr[i].split(":");
+//            if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+//            if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+//
+//            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+//            adapter.addItem(new Playlist(timeRegistered));
+//        }
+        makeList();
         // listView.setAdapter(adapter); //추가
 
         record.setOnClickListener(new View.OnClickListener() {
@@ -224,7 +226,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     device.setEnabled(true);
 //                    playDisplay();
 //                    NoticeDisplay();
-                    voicePlayer.startPlaying(SampleRate, BufferSize);
+                    // 중간에 녹음한 것에 대해서 playCount값이 여기서 갱신되지 않은 상태일 수 있으므로, 대신 -1을 전달하고
+                    // -1인 경우 voicePlayer에서 갱신된 디비로부터 playCount값을 얻는 식으로 처리할 것이다.
+//                    voicePlayer.startPlaying(SampleRate, BufferSize, playCount);
+                    voicePlayer.startPlaying(SampleRate, BufferSize, -1);
                     //TODO 모든 파일의 재생이 완료된 후, 시작 화면으로 전환되도록 개선 필요
                 }
             }
@@ -233,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                makeList();
                 listView.setAdapter(adapter);
                 listView.setVisibility(View.VISIBLE);
                 playRunning = false;
@@ -267,10 +273,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                 Toast.makeText(getApplicationContext(), (playCount - 1) - position + " " + position, Toast.LENGTH_SHORT).show();
                 System.out.println("재성 " + ((playCount - 1) - position) + " " + position);
-
-                isEnd = true;
-
-
+                //voicePlayer stop이후, 바로 startPlaying시 문제가 발생하여, stop이 완료될 때까지 좀 기다린 후 start한다.
+                try {
+                    Thread.sleep(500);
+                }catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //isEnd = true;
+                voicePlayer.startPlaying(SampleRate, BufferSize, playCount - position);
             }
         });
 
@@ -647,6 +657,21 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             Playlist item = items.get(position);
             view.setName(item.getName());
             return view;
+        }
+    }
+
+    public void makeList() {
+        adapter = new PlaylistAdapter();
+        alarmTimeArr = db.getAllAlarmTime();
+        playCount = alarmTimeArr.length;
+        System.out.println("Play Count : " + playCount);
+        for (int i = playCount - 1; i >= 0; i--) {
+            String[] words = alarmTimeArr[i].split(":");
+            if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+            if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+            adapter.addItem(new Playlist(timeRegistered));
         }
     }
 }

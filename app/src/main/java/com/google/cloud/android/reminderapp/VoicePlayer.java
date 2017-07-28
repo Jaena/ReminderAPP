@@ -46,9 +46,9 @@ public class VoicePlayer {
      * @param SampleRate     녹음 시 사용된 sample rate(Hertz)
      * @param mBufferSize    재생 시 음성 파일에서 한 번에 읽어오는 음성 데이터의 최대 크기
      */
-    public void startPlaying(final int SampleRate, final int mBufferSize) {
+    public void startPlaying(final int SampleRate, final int mBufferSize, int position) {
         // int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
-
+        playCount = position;
         mIsPlaying = true;
         mPlayingThread = new Thread(new Runnable() {
 
@@ -83,7 +83,9 @@ public class VoicePlayer {
         System.out.println("재생 시작");
         String fileName[] = db.getAllFileName();
         String alarmTime[] = db.getAllAlarmTime();
-        playCount = fileName.length;
+
+        if(playCount == -1) //재생버튼을 눌러서 재생이 시작되는 경우 ( 이 외에는 목록의 파일을 클릭해서 재생 시작하는 경우임)
+            playCount = fileName.length;
         int i;
         for(i=playCount-1;i>=0;i--){
             int count = 0;
