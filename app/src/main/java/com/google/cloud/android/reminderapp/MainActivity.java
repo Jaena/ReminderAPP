@@ -186,7 +186,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setText("녹음중 ");
                     mText.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
-                    rec.start();
+                    if(!rRunning) {
+                        recRunning = true;
+                        rec.start();
+                    }
+                    else
+                    {
+                        recRunning = true;
+                    }
                     SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
                     float volume = preference.getFloat("volume", 1f);
                     sound.play(soundbeep, volume, volume, 0, 0, 1);
@@ -203,7 +210,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     record.setVisibility(View.GONE);
                     play.setEnabled(false);
                     play.setVisibility(View.GONE);
-                    playS.start();
+                    if(!pRunning) {
+                        playRunning = true;
+                        playS.start();
+                    }
+                    else
+                    {
+                       playRunning = true;
+                    }
                     mText.setText("재생중");
                     mText.setVisibility(View.VISIBLE);
                     list.setVisibility(View.VISIBLE);
@@ -538,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
-
+    boolean rRunning = false;
     class RecordingSwtich extends Thread {
 
         int m_duration;
@@ -547,13 +561,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         @Override
         public void run() {
-            recRunning = true;
-            while (recRunning) {
+            rRunning = true;
+            while ( rRunning) {
                 synchronized (this) {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            device.setImageResource(image_m_Id[m_currentIndex]);
+                            if(recRunning)
+                              device.setImageResource(image_m_Id[m_currentIndex]);
                         }
                     });
                     m_currentIndex++;
@@ -570,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         }
     }
-
+    boolean pRunning = false;
     class PlayingSwtich extends Thread {
 
         int m_duration;
@@ -579,12 +594,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         @Override
         public void run() {
-            playRunning = true;
-            while (playRunning) {
+            pRunning = true;
+            while (pRunning) {
                 synchronized (this) {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            if(playRunning)
                             device.setImageResource(image_m_Id[m_currentIndex]);
                         }
                     });
