@@ -31,33 +31,32 @@ public class DataBase {
         db.insert(tableName, null, values);
     }
 
-
-
-//    public void insert(String fileName, String alarmTime) {
-//        db = helper.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        values.put("fileName", fileName);
-//        values.put("alarmTime", alarmTime);
-//        db.insert(tableName, null, values);
-//    }
-
-    /**
-     * 녹음 파일의 이름을 가지고 알람 시간을 데이터베이스에 업데이트 시켜준다.
-     * MainActivity 등에서 호출된다.
-     *
-     * @param fileName    알람이 생성된 시간을 가지고 있는 파일의 이름이다. yy-MM-dd hh:mm:ss. 몇 분 뒤 알람해줘 등과 같은 알람일 경우 현재 시간을 파악하기 위해 사용한다.
-     * @param alarmTime   알람이 울릴 시간으로 String으로 저장된다.  yy:MM:dd:hh:mm의 형식으로 저장된다.
-     * @param text 음성 입력한 text가 저장된다.
-     */
-    public void update (String fileName, String alarmTime, String text) {
+    //fileName과 alarmTime, 인식된 text를 같이 insert하는 함수.
+    public void insert(String fileName, String alarmTime,String text) {
         db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put("fileName", fileName);
         values.put("alarmTime", alarmTime);
-        ContentValues values2 = new ContentValues();
-        values2.put("text",text);
-        db.update(tableName, values, "fileName=?", new String[]{fileName});
-        db.update(tableName, values2, "fileName=?", new String[]{fileName});
+        values.put("text",text);
+        db.insert(tableName, null, values);
     }
+
+
+//    /**
+//     * 녹음 파일의 이름을 가지고 알람 시간을 데이터베이스에 업데이트 시켜준다.
+//     * MainActivity 등에서 호출된다.
+//     *
+//     * @param fileName    알람이 생성된 시간을 가지고 있는 파일의 이름이다. yy-MM-dd hh:mm:ss. 몇 분 뒤 알람해줘 등과 같은 알람일 경우 현재 시간을 파악하기 위해 사용한다.
+//     * @param alarmTime   알람이 울릴 시간으로 String으로 저장된다.  yy:MM:dd:hh:mm의 형식으로 저장된다.
+//     * @param text 음성 입력한 text가 저장된다.
+//     */
+//    public void update (String fileName, String alarmTime, String text) {
+//        db = helper.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        values.put("alarmTime", alarmTime);
+//        values2.put("text",text);
+//        db.update(tableName, values, "fileName=?", new String[]{fileName});
+//    }
 
     /**
      * 아직 사용되진 않았지만 후에 파일을 지울 때 사용할 예정이다.
@@ -152,6 +151,19 @@ public class DataBase {
             temp[i] = c.getString(0);
         }
         return temp[num-1];
+    }
+    public String[] getAllAlarmTime(){
+        db = helper.getReadableDatabase();
+        String SQL ="SELECT alarmTime FROM "+tableName+";";
+        Cursor c = db.rawQuery(SQL,null);
+        int num = c.getCount();
+        String temp [] = new String[num];
+        for(int i=0;i<num;i++){
+            c.moveToNext();
+            temp[i] = c.getString(0);
+            System.out.println("test : " + temp[i]);
+        }
+        return temp;
     }
 
 }

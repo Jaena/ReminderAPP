@@ -139,7 +139,7 @@ public class VoiceRecorder {
         String tempTime = sdf.format(date);
         String fileName = tempTime + ".pcm";
 
-        db.insert(fileName);
+        MainActivity.fileName = fileName;//db.insert(fileName); //db에 fileName, alarmTime 둘 다 넣어야 함.
         try {
             fos = context.openFileOutput(fileName,context.MODE_PRIVATE);
             while (mIsRecording) {

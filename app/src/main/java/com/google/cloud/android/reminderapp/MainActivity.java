@@ -35,10 +35,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -47,6 +50,7 @@ import com.tsengvn.typekit.TypekitContextWrapper;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements MessageDialogFragment.Listener {
@@ -65,10 +69,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     boolean recRunning = false;
     boolean playRunning = false;
     // View references
-    private TextView mText;
+    public static TextView mText;
     ImageSwitcher device;
     ImageButton record;
     ImageButton play;
+    ImageButton list;
 
     RecordingSwtich rec = new RecordingSwtich();
     PlayingSwtich playS = new PlayingSwtich();
@@ -77,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     ImageView[] circles = new ImageView[5];
     Handler handler;
+
+    public static Handler vhandler;
 
     boolean isEnd = false;
     int SampleRate = 16000;
@@ -89,11 +96,16 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 1; //추가
     boolean isButtonPushed = false; //추가
 
+    public static String fileName;
+    String alarmTimeArr[];
+    int playCount;
 
+    ListView listView;
+    PlaylistAdapter adapter;
 
-/**
-* @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
-* */
+    /**
+     * @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
+     */
     private final VoiceRecorder.Callback mVoiceCallback = new VoiceRecorder.Callback() {
 
     };
@@ -115,9 +127,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     int index = 0;
 
     /**
-    * 텍스트, 버튼 등 UI 요소의 클릭 등을 관리하고
+     * 텍스트, 버튼 등 UI 요소의 클릭 등을 관리하고
      * 핸들러를 통해 Service Search Listener로 부터 받아온 텍스트를 TimeAnalysis로 보내어 분석한다.
-    * */
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,8 +138,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         mText = (TextView) findViewById(R.id.text);
         record = (ImageButton) findViewById(R.id.record);
         play = (ImageButton) findViewById(R.id.play);
-        settingBar = (SeekBar)findViewById(R.id.seekBar);
+        settingBar = (SeekBar) findViewById(R.id.seekBar);
         settingBar.setMax(5);
+
+        list = (ImageButton) findViewById(R.id.list);
+
         db = new DataBase(MainActivity.this);
         mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
@@ -142,6 +157,22 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         circles[4] = (ImageView) (findViewById(R.id.circle5));
         sound = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
         soundbeep = sound.load(getApplicationContext(), R.raw.rec_start, 1);
+
+        //listing
+        listView = (ListView) findViewById(R.id.listView);
+        adapter = new PlaylistAdapter();
+        alarmTimeArr = db.getAllAlarmTime();
+        playCount = alarmTimeArr.length;
+        System.out.println("Play Count : " + playCount);
+        for (int i = playCount - 1; i >= 0; i--) {
+            String[] words = alarmTimeArr[i].split(":");
+            if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+            if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+            adapter.addItem(new Playlist(timeRegistered));
+        }
+        // listView.setAdapter(adapter); //추가
 
         record.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (!voicePlayer.isPlaying()) {
                     record.setEnabled(false);
                     record.setVisibility(View.GONE);
@@ -174,12 +206,56 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     playS.start();
                     mText.setText("재생중");
                     mText.setVisibility(View.VISIBLE);
+                    list.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
 //                    playDisplay();
 //                    NoticeDisplay();
                     voicePlayer.startPlaying(SampleRate, BufferSize);
                     //TODO 모든 파일의 재생이 완료된 후, 시작 화면으로 전환되도록 개선 필요
                 }
+            }
+        });
+
+        list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listView.setAdapter(adapter);
+                listView.setVisibility(View.VISIBLE);
+                mText.setVisibility(View.GONE);
+                //list.setVisibility(View.GONE);
+            }
+        });
+
+        /*
+        listView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listView.setVisibility(View.GONE);
+                mText.setVisibility(View.VISIBLE);
+            }
+        });
+        */
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                voicePlayer.stopPlaying();
+                listView.setVisibility(View.GONE);
+
+                String[] words = alarmTimeArr[(playCount - 1) - position].split(":");
+                if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                System.out.println("재성 " + timeRegistered);
+                mText.setText(timeRegistered);
+                mText.setVisibility(View.VISIBLE);
+
+                Toast.makeText(getApplicationContext(), (playCount - 1) - position + " " + position, Toast.LENGTH_SHORT).show();
+                System.out.println("재성 " + ((playCount - 1) - position) + " " + position);
+
+                isEnd = true;
+
+
             }
         });
 
@@ -206,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setVisibility(View.GONE);
                     device.setEnabled(false);
                 }
+
                 if (isEnd) {
                     device.setEnabled(false);
                     record.setEnabled(true);
@@ -227,30 +304,51 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 String extractValue = new String();
 
                 //아무말 없이 취소했을 경우
-                if(returnedValue.equals(""))
-                {
+                if (returnedValue.equals("")) {
                     //mText.setText("터치해주세요");
-                    Toast.makeText(getApplicationContext(),"아무말도 안하셨습니다", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "아무말도 안하셨습니다", Toast.LENGTH_LONG).show();
                     isEnd = true;
                     device.callOnClick();
                 }
                 //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
                 else {
                     //TODO 계산된 예정 시간 정보도 데이터베이스에 함께 저장되도록 개선 필요
-                    String text = timeAnalysis.Analysis(returnedValue);
-                    mText.setText(text);
-//                    db.update(db.getLastFileName(),text,returnedValue);
+                    String alarmTime = timeAnalysis.Analysis(returnedValue);
+                    String[] words = alarmTime.split(":");
+                    if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                    if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                    mText.setText(timeRegistered);
+
+                    db.insert(fileName, alarmTime, returnedValue);
+
                     Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
-//                    Toast.makeText(getApplicationContext(), "디비에 저장된 알람 값:"+db.getLastAlarmText(), Toast.LENGTH_LONG).show();
-//                    Toast.makeText(getApplicationContext(), "디비에 저장된 원래 텍스트 값:"+db.getLastText(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "디비에 저장된 알람 값:" + db.getLastAlarmText(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "디비에 저장된 원래 텍스트 값:" + db.getLastText(), Toast.LENGTH_LONG).show();
 
                     isEnd = true;
                 }
             }
         };
 
-       device.setFactory(new ViewSwitcher.ViewFactory()
-        {
+        vhandler = new Handler() {
+            public void handleMessage(Message msg) {
+                if (voicePlayer.isPlaying()) {
+                    String alarmTime = (String) msg.obj;
+                    String[] words = alarmTime.split(":");
+
+                    if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                    if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                    System.out.println("재성(vhandler) " + timeRegistered);
+                    mText.setText(timeRegistered);
+                }
+            }
+        };
+
+        device.setFactory(new ViewSwitcher.ViewFactory() {
             public View makeView() {
                 ImageView imageView = new ImageView(getApplicationContext());
                 imageView.setBackgroundColor(0x00000000);
@@ -260,21 +358,18 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             }
         });
 
-
         settingBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                Toast.makeText(getApplicationContext(),""+progress,Toast.LENGTH_SHORT).show();
-                if(progress>0) {
+                Toast.makeText(getApplicationContext(), "" + progress, Toast.LENGTH_SHORT).show();
+                if (progress > 0) {
                     progress--;
                     SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
                     SharedPreferences.Editor editor = a.edit();
                     editor.putFloat("volume", (float) (progress * 0.3));
                     Log.d("volume setting", "" + progress * 0.3);
                     editor.commit();
-                }
-                else
-                {
+                } else {
 //                    record.setEnabled(false);
 //                    record.setVisibility(View.GONE);
 //                    play.setEnabled(false);
@@ -371,12 +466,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             mVoiceRecorder.stopRecording();
             FileInputStream fis = null;
             try {
-                String fileName = db.getLastFileName();
+                //    String fileName = db.getLastFileName(); //전역변수 fileNme에 현재 녹음한 파일이름이 저장돼있음.
                 fis = openFileInput(fileName);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
             System.out.println("녹음 완료 후, 구글 STT서버로 보내기");
+            System.out.println("테스트 파일이름 : " + fileName);
             mSpeechService.recognizeInputStream(fis);
             System.out.println("구글 STT서버로 잘 보내진건가...?");
         }
@@ -424,9 +520,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
             };
 
-/**
- * DBInstance를 다른 Class에서도 사용할 수 있도록 하기 위해 사용한다.
- * */
+    /**
+     * DBInstance를 다른 Class에서도 사용할 수 있도록 하기 위해 사용한다.
+     */
     public static DataBase getDBInstance() {
         return db;
     }
@@ -442,42 +538,42 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
 
-class RecordingSwtich extends Thread {
-
-    int m_duration;
-    final int image_m_Id[] = {R.drawable.display_off,R.drawable.display_off1,R.drawable.display_off2,R.drawable.display_off3,R.drawable.display_off4,R.drawable.display_off5,R.drawable.display_off};
-    int m_currentIndex = 0;
-
-    @Override
-    public void run() {
-        recRunning = true;
-        while (recRunning) {
-            synchronized (this) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        device.setImageResource(image_m_Id[m_currentIndex]);
-                    }
-                });
-                m_currentIndex++;
-                if (m_currentIndex == image_m_Id.length) {
-                    m_currentIndex = 0;
-                }
-                try {
-                    m_duration = 600;
-                    Thread.sleep(m_duration);
-                } catch (InterruptedException e) {
-                }
-            }
-        }   //while end
-
-    }
-}
-
-    class  PlayingSwtich extends Thread {
+    class RecordingSwtich extends Thread {
 
         int m_duration;
-        final int image_m_Id[] = {R.drawable.display_off,R.drawable.display_off1,R.drawable.display_off2,R.drawable.display_off3,R.drawable.display_off4,R.drawable.display_off5,R.drawable.display_off};
+        final int image_m_Id[] = {R.drawable.display_off, R.drawable.display_off1, R.drawable.display_off2, R.drawable.display_off3, R.drawable.display_off4, R.drawable.display_off5, R.drawable.display_off};
+        int m_currentIndex = 0;
+
+        @Override
+        public void run() {
+            recRunning = true;
+            while (recRunning) {
+                synchronized (this) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            device.setImageResource(image_m_Id[m_currentIndex]);
+                        }
+                    });
+                    m_currentIndex++;
+                    if (m_currentIndex == image_m_Id.length) {
+                        m_currentIndex = 0;
+                    }
+                    try {
+                        m_duration = 600;
+                        Thread.sleep(m_duration);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }   //while end
+
+        }
+    }
+
+    class PlayingSwtich extends Thread {
+
+        int m_duration;
+        final int image_m_Id[] = {R.drawable.display_off, R.drawable.display_off1, R.drawable.display_off2, R.drawable.display_off3, R.drawable.display_off4, R.drawable.display_off5, R.drawable.display_off};
         int m_currentIndex = 0;
 
         @Override
@@ -502,7 +598,42 @@ class RecordingSwtich extends Thread {
                     }
                 }
             }   //while end
+        }
+    }
 
+    class PlaylistAdapter extends BaseAdapter {
+        ArrayList<Playlist> items = new ArrayList<Playlist>();
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+
+        public void addItem(Playlist item) {
+            items.add(item);
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup viewGroup) {
+            PlaylistView view = new PlaylistView(getApplicationContext());
+
+            Playlist item = items.get(position);
+            view.setName(item.getName());
+//            view.setMobile(item.getMobile());
+//            view.setAge(item.getAge());
+//            view.setImage(item.getResId());
+
+            return view;
         }
     }
 }

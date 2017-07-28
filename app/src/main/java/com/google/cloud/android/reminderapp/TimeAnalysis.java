@@ -1050,6 +1050,12 @@ public class TimeAnalysis {
 
             calHour = 8;
             calMinute = 0; //working time의 초기 시간으로 설정
+
+            int day_num = days[curMonth];
+            calMonth += calDay / day_num;
+            calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
+            calYear += calMonth / 12;
+            calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
         }
         return isExtracted;
     }
@@ -1091,6 +1097,15 @@ public class TimeAnalysis {
                 System.out.println("test22 : " + calweekday + " " + curHour + " " + calHour);
                 calDay += calweekday;
             }
+
+            //TODO 요일에 관련된 함수들을 아래의 식을 적용시켜야한다. 추가 요망
+            int day_num = days[curMonth];
+            if(day_num != calDay) {
+                calMonth += calDay / day_num;
+            }
+            calDay = calDay % day_num == 0 ? day_num : calDay % day_num;
+            calYear += calMonth / 12;
+            calMonth = calMonth % 12 == 0 ? 12 : calMonth % 12;
 
         }
         return isExtracted;
@@ -1788,11 +1803,11 @@ public class TimeAnalysis {
      * 이 메소드는 현재 시간에 영향을 받지 않으며, 추출한 시간표현이 정해져있을시 이 메소드의 시간표현의 연산을 적용시킨다.
      * 몇월 몇일 몇시 몇분을 예시로 들 수 있다.
      *
-     * @param 년
-     * @param 월
-     * @param 일
-     * @param 시
-     * @param 분
+     * @param y 년
+     * @param M 월
+     * @param d 일
+     * @param h 시
+     * @param m 분
     */
     public void atTime(int y, int M, int d, int h, int m) {
         System.out.println("hour : " + h + " " + "minute : " + m);
