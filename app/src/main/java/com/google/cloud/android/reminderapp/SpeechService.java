@@ -400,6 +400,7 @@ public class SpeechService extends Service {
 
             // Schedule access token refresh before it expires
             if (mHandler != null) {
+                System.out.println("What is null ? : " + mHandler + accessToken);
                 mHandler.postDelayed(mFetchAccessTokenRunnable,
                         Math.max(accessToken.getExpirationTime().getTime()
                                 - System.currentTimeMillis()

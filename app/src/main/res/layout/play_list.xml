@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="39dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="New Text"
+            android:id="@+id/textView"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="#ff5805" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentLeft="true"-->
+                <!--android:text="New Text"-->
+                <!--android:id="@+id/textView2"-->
+                <!--android:textSize="15dp"-->
+                <!--android:textColor="#0223e0"-->
+                <!--android:layout_marginTop="6dp" />-->
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:text="New Text"-->
+                <!--android:id="@+id/textView3"-->
+                <!--android:textSize="15dp"-->
+                <!--android:textColor="#4902d6" />-->
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

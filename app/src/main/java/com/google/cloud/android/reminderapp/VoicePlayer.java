@@ -46,7 +46,7 @@ public class VoicePlayer {
      * @param mBufferSize    재생 시 음성 파일에서 한 번에 읽어오는 음성 데이터의 최대 크기
      */
     public void startPlaying(final int SampleRate, final int mBufferSize) {
-       // int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
+        // int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
 
         mIsPlaying = true;
         mPlayingThread = new Thread(new Runnable() {
@@ -81,13 +81,17 @@ public class VoicePlayer {
     public void playWaveFile(int SampleRate,int mBufferSize) {
         System.out.println("재생 시작");
         String fileName[] = db.getAllFileName();
+        String alarmTime[] = db.getAllAlarmTime();
         playCount = fileName.length;
         int i;
         for(i=playCount-1;i>=0;i--){
             int count = 0;
             byte[] data = new byte[mBufferSize];
 
-            Message message = MainActivity.vhandler.obtainMessage(1, fileName[i]);
+
+            Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]);
+            System.out.println("알람타임 테스트 : " + alarmTime[i]);
+
             MainActivity.vhandler.sendMessage(message);
 
 

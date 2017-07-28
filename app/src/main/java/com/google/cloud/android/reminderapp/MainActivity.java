@@ -33,9 +33,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -44,6 +46,7 @@ import com.tsengvn.typekit.TypekitContextWrapper;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements MessageDialogFragment.Listener {
@@ -84,11 +87,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 1; //추가
     boolean isButtonPushed = false; //추가
 
+    public static String fileName;
 
+    ListView listView;
+    PlaylistAdapter adapter;
 
-/**
-* @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
-* */
+    /**
+     * @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
+     * */
     private final VoiceRecorder.Callback mVoiceCallback = new VoiceRecorder.Callback() {
 //
 //        @Override
@@ -133,9 +139,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     int index = 0;
 
     /**
-    * 텍스트, 버튼 등 UI 요소의 클릭 등을 관리하고
+     * 텍스트, 버튼 등 UI 요소의 클릭 등을 관리하고
      * 핸들러를 통해 Service Search Listener로 부터 받아온 텍스트를 TimeAnalysis로 보내어 분석한다.
-    * */
+     * */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -182,11 +188,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                listView.setAdapter(adapter); //추가
                 if (!voicePlayer.isPlaying()) {
                     record.setEnabled(false);
-                    record.setVisibility(
-
-                            View.GONE);
+                    record.setVisibility(View.GONE);
                     play.setEnabled(false);
                     play.setVisibility(View.GONE);
                     rec.start();
@@ -251,7 +256,16 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
                 else {
                     //TODO 계산된 예정 시간 정보도 데이터베이스에 함께 저장되도록 개선 필요
-                    mText.setText(timeAnalysis.Analysis(returnedValue));
+                    String alarmTime = timeAnalysis.Analysis(returnedValue);
+                    String[] words = alarmTime.split(":");
+                    if(Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                    if(Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                    mText.setText(timeRegistered);
+
+                    db.insert(fileName, alarmTime);
+
                     Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     isEnd = true;
                 }
@@ -260,14 +274,18 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         vhandler = new Handler() {
             public void handleMessage(Message msg) {
-                String fileName = (String) msg.obj;
-                String extractValue = new String();
+                String alarmTime = (String) msg.obj;
+                String[] words = alarmTime.split(":");
 
-                    mText.setText(fileName);
-                }
+                if(Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                if(Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                mText.setText(timeRegistered);
+            }
         };
 
-       device.setFactory(new ViewSwitcher.ViewFactory()
+        device.setFactory(new ViewSwitcher.ViewFactory()
         {
             public View makeView() {
                 ImageView imageView = new ImageView(getApplicationContext());
@@ -303,6 +321,21 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 //            }
 //        });
 
+        listView = (ListView) findViewById(R.id.listView);
+        adapter = new PlaylistAdapter();
+        String fileName[] = db.getAllFileName();
+        String alarmTime[] = db.getAllAlarmTime();
+        int playCount = fileName.length;
+        System.out.println("Play Count : " + playCount);
+        for(int i = playCount -1; i >= 0; i--) {
+            String[] words = alarmTime[i].split(":");
+            if(Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+            if(Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+            adapter.addItem(new Playlist(timeRegistered));
+        }
+       // listView.setAdapter(adapter); //추가
     }
 
     /**
@@ -379,12 +412,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             mVoiceRecorder.stopRecording();
             FileInputStream fis = null;
             try {
-                String fileName = db.getLastFileName();
+            //    String fileName = db.getLastFileName(); //전역변수 fileNme에 현재 녹음한 파일이름이 저장돼있음.
                 fis = openFileInput(fileName);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
             System.out.println("녹음 완료 후, 구글 STT서버로 보내기");
+            System.out.println("테스트 파일이름 : " + fileName);
             mSpeechService.recognizeInputStream(fis);
             System.out.println("구글 STT서버로 잘 보내진건가...?");
         }
@@ -432,9 +466,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
             };
 
-/**
- * DBInstance를 다른 Class에서도 사용할 수 있도록 하기 위해 사용한다.
- * */
+    /**
+     * DBInstance를 다른 Class에서도 사용할 수 있도록 하기 위해 사용한다.
+     * */
     public static DataBase getDBInstance() {
         return db;
     }
@@ -450,7 +484,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
 
-//    boolean RecRunning = true;
+    //    boolean RecRunning = true;
 //    void recordDisplay(){
 //        runOnUiThread(new Runnable() {
 //            @Override
@@ -529,36 +563,63 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 //            }
 //        });
 //    }
-class RecordingSwtich extends Thread {
+    class RecordingSwtich extends Thread {
 
-    int m_duration;
-    final int image_m_Id[] = {R.drawable.display_off,R.drawable.display_off1,R.drawable.display_off2,R.drawable.display_off3,R.drawable.display_off4,R.drawable.display_off5,R.drawable.display_off};
-    int m_currentIndex = 0;
+        int m_duration;
+        final int image_m_Id[] = {R.drawable.display_off,R.drawable.display_off1,R.drawable.display_off2,R.drawable.display_off3,R.drawable.display_off4,R.drawable.display_off5,R.drawable.display_off};
+        int m_currentIndex = 0;
 
-    @Override
-    public void run() {
-        running = true;
-        while (running) {
-            synchronized (this) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        device.setImageResource(image_m_Id[m_currentIndex]);
+        @Override
+        public void run() {
+            running = true;
+            while (running) {
+                synchronized (this) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            device.setImageResource(image_m_Id[m_currentIndex]);
+                        }
+                    });
+                    m_currentIndex++;
+                    if (m_currentIndex == image_m_Id.length) {
+                        m_currentIndex = 0;
                     }
-                });
-                m_currentIndex++;
-                if (m_currentIndex == image_m_Id.length) {
-                    m_currentIndex = 0;
+                    try {
+                        m_duration = 600;
+                        Thread.sleep(m_duration);
+                    } catch (InterruptedException e) {
+                    }
                 }
-                try {
-                    m_duration = 600;
-                    Thread.sleep(m_duration);
-                } catch (InterruptedException e) {
-                }
-            }
-        }   //while end
+            }   //while end
 
+        }
     }
-}
 
+    class PlaylistAdapter extends BaseAdapter {
+        ArrayList<Playlist> items = new ArrayList<Playlist>();
+
+        @Override
+        public int getCount() { return items.size(); }
+
+        public void addItem(Playlist item) { items.add(item); }
+
+        @Override
+        public Object getItem(int position) { return items.get(position); }
+
+        @Override
+        public long getItemId(int position) { return position; }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup viewGroup) {
+            PlaylistView view = new PlaylistView(getApplicationContext());
+
+            Playlist item = items.get(position);
+            view.setName(item.getName());
+//            view.setMobile(item.getMobile());
+//            view.setAge(item.getAge());
+//            view.setImage(item.getResId());
+
+            return view;
+        }
+    }
 }

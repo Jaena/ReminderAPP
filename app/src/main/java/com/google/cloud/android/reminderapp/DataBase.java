@@ -30,14 +30,14 @@ public class DataBase {
         values.put("fileName", fileName);
         db.insert(tableName, null, values);
     }
-
-//    public void insert(String fileName, String alarmTime) {
-//        db = helper.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        values.put("fileName", fileName);
-//        values.put("alarmTime", alarmTime);
-//        db.insert(tableName, null, values);
-//    }
+    //fileName과 alarmTime을 같이 insert하는 함수.
+    public void insert(String fileName, String alarmTime) {
+        db = helper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("fileName", fileName);
+        values.put("alarmTime", alarmTime);
+        db.insert(tableName, null, values);
+    }
 
     /**
      * 녹음 파일의 이름을 가지고 알람 시간을 데이터베이스에 업데이트 시켜준다.
@@ -122,5 +122,17 @@ public class DataBase {
         return temp[num-1];
     }
 
-
+    public String[] getAllAlarmTime(){
+        db = helper.getReadableDatabase();
+        String SQL ="SELECT alarmTime FROM "+tableName+";";
+        Cursor c = db.rawQuery(SQL,null);
+        int num = c.getCount();
+        String temp [] = new String[num];
+        for(int i=0;i<num;i++){
+            c.moveToNext();
+            temp[i] = c.getString(0);
+            System.out.println("test : " + temp[i]);
+        }
+        return temp;
+    }
 }
