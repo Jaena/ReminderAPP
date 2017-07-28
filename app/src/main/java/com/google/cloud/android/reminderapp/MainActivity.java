@@ -33,6 +33,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ImageSwitcher device;
     ImageButton record;
     ImageButton play;
+    ImageButton list;
 
     RecordingSwtich rec = new RecordingSwtich();
 
@@ -88,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     boolean isButtonPushed = false; //추가
 
     public static String fileName;
+    String alarmTimeArr[];
+    int playCount;
 
     ListView listView;
     PlaylistAdapter adapter;
@@ -150,6 +154,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         mText = (TextView) findViewById(R.id.text);
         record = (ImageButton) findViewById(R.id.record);
         play = (ImageButton) findViewById(R.id.play);
+
+        list = (ImageButton) findViewById(R.id.list);
+
         db = new DataBase(MainActivity.this);
         mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
@@ -164,6 +171,22 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         circles[4] = (ImageView) (findViewById(R.id.circle5));
         sound = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
         soundbeep = sound.load(getApplicationContext(), R.raw.rec_start, 1);
+
+        //listing
+        listView = (ListView) findViewById(R.id.listView);
+        adapter = new PlaylistAdapter();
+        alarmTimeArr = db.getAllAlarmTime();
+        playCount = alarmTimeArr.length;
+        System.out.println("Play Count : " + playCount);
+        for(int i = playCount -1; i >= 0; i--) {
+            String[] words = alarmTimeArr[i].split(":");
+            if(Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+            if(Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+            adapter.addItem(new Playlist(timeRegistered));
+        }
+        // listView.setAdapter(adapter); //추가
 
         record.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listView.setAdapter(adapter); //추가
+
                 if (!voicePlayer.isPlaying()) {
                     record.setEnabled(false);
                     record.setVisibility(View.GONE);
@@ -197,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     rec.start();
                     mText.setText("재생중");
                     mText.setVisibility(View.VISIBLE);
+                    list.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
 
 //                    playDisplay();
@@ -204,6 +228,49 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     voicePlayer.startPlaying(SampleRate, BufferSize);
                     //TODO 모든 파일의 재생이 완료된 후, 시작 화면으로 전환되도록 개선 필요
                 }
+            }
+        });
+
+        list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listView.setAdapter(adapter);
+                listView.setVisibility(View.VISIBLE);
+                mText.setVisibility(View.GONE);
+                //list.setVisibility(View.GONE);
+            }
+        });
+
+        /*
+        listView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listView.setVisibility(View.GONE);
+                mText.setVisibility(View.VISIBLE);
+            }
+        });
+        */
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                voicePlayer.stopPlaying();
+                listView.setVisibility(View.GONE);
+
+                String[] words = alarmTimeArr[(playCount -1) - position].split(":");
+                if(Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                if(Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                System.out.println("재성 " + timeRegistered);
+                mText.setText(timeRegistered);
+                mText.setVisibility(View.VISIBLE);
+
+                Toast.makeText(getApplicationContext(),(playCount -1) - position + " " + position ,Toast.LENGTH_SHORT).show();
+                System.out.println("재성 " + ((playCount -1) - position) + " " + position);
+
+                isEnd = true;
+
+
             }
         });
 
@@ -228,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setVisibility(View.GONE);
                     device.setEnabled(false);
                 }
+
                 if (isEnd) {
                     device.setEnabled(false);
                     record.setEnabled(true);
@@ -274,14 +342,17 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         vhandler = new Handler() {
             public void handleMessage(Message msg) {
-                String alarmTime = (String) msg.obj;
-                String[] words = alarmTime.split(":");
+                if(voicePlayer.isPlaying()) {
+                    String alarmTime = (String) msg.obj;
+                    String[] words = alarmTime.split(":");
 
-                if(Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-                if(Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                    if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                    if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
-                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                mText.setText(timeRegistered);
+                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                    System.out.println("재성(vhandler) " + timeRegistered);
+                    mText.setText(timeRegistered);
+                }
             }
         };
 
@@ -320,22 +391,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 //                }
 //            }
 //        });
-
-        listView = (ListView) findViewById(R.id.listView);
-        adapter = new PlaylistAdapter();
-        String fileName[] = db.getAllFileName();
-        String alarmTime[] = db.getAllAlarmTime();
-        int playCount = fileName.length;
-        System.out.println("Play Count : " + playCount);
-        for(int i = playCount -1; i >= 0; i--) {
-            String[] words = alarmTime[i].split(":");
-            if(Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-            if(Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
-
-            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-            adapter.addItem(new Playlist(timeRegistered));
-        }
-       // listView.setAdapter(adapter); //추가
     }
 
     /**
