@@ -88,13 +88,14 @@ public class VoicePlayer {
         String fileName[] = db.getAllFileName();
         String alarmTime[] = db.getAllAlarmTime();
 
-        if(playCount == -1) //재생버튼을 눌러서 재생이 시작되는 경우 ( 이 외에는 목록의 파일을 클릭해서 재생 시작하는 경우임)
-            playCount = fileName.length;
+//       if(playCount == -1) //재생버튼을 눌러서 재생이 시작되는 경우 ( 이 외에는 목록의 파일을 클릭해서 재생 시작하는 경우임)
+//            playCount = fileName.length;
 //        int i; //전역변수로 선언하겠음 (stopPlayin에서 현재 재생 중인 파일의 위치를 return하기 위해서)
         for(i=playCount-1;i>=0;i--){
             int count = 0;
             byte[] data = new byte[mBufferSize];
 
+            if(!mIsPlaying) break; //추가했음. - 아래 while문에 mIsPlaying는 없어도 될듯.
 
             Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]);
             System.out.println("알람타임 테스트 : " + alarmTime[i]);
@@ -109,6 +110,7 @@ public class VoicePlayer {
                 int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
                 audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SampleRate, CHANNEL, ENCODING, minBufferSize, AudioTrack.MODE_STREAM);
                 audioTrack.play();
+
                 while (((count = dis.read(data, 0, mBufferSize)) > -1)&&mIsPlaying) {
                     SharedPreferences preference = context.getSharedPreferences("volume", context.MODE_PRIVATE);
                     float volume = preference.getFloat("volume", 1f);
@@ -124,6 +126,14 @@ public class VoicePlayer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        System.out.println("i값 : " + i);
+        if(i == -1) {
+            //mIsPlaying = false;
+            System.out.println("play count : " + playCount);
+            Message message2 = MainActivity.vhandler.obtainMessage(1, "stop");
+            MainActivity.vhandler.sendMessage(message2);
         }
     }
 

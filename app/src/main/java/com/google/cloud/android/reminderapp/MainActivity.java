@@ -241,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 //                    NoticeDisplay();
                     // 중간에 녹음한 것에 대해서 playCount값이 여기서 갱신되지 않은 상태일 수 있으므로, 대신 -1을 전달하고
                     // -1인 경우 voicePlayer에서 갱신된 디비로부터 playCount값을 얻는 식으로 처리할 것이다.
-//                    voicePlayer.startPlaying(SampleRate, BufferSize, playCount);
-                    voicePlayer.startPlaying(SampleRate, BufferSize, -1);
+                    voicePlayer.startPlaying(SampleRate, BufferSize, playCount);
+//                    voicePlayer.startPlaying(SampleRate, BufferSize, -1);
                     //TODO 모든 파일의 재생이 완료된 후, 시작 화면으로 전환되도록 개선 필요
                 }
             }
@@ -462,7 +462,12 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         vhandler = new Handler() {
             public void handleMessage(Message msg) {
-                if (voicePlayer.isPlaying()) {
+                if(((String)msg.obj).equals("stop")) {
+                    isEnd = true;
+                    device.callOnClick();
+                    System.out.println("device call on click");
+                }
+                else if (voicePlayer.isPlaying()) {
                     String alarmTime = (String) msg.obj;
                     String[] words = alarmTime.split(":");
 
