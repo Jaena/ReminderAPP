@@ -136,14 +136,19 @@ public class TimeAnalysis {
         calHour = curHour;
         calMinute = curMinute;
 
-        System.out.println("cur : " + curYear + " " + curMonth + " " + curDay + " " + curHour + " " + curMinute + " ");
-
+        String curTime = curYear + ":" + curMonth + ":" + curDay + ":" + curHour + ":" + curMinute ;
+        System.out.println("CurTime : " + curTime);
         //정규식 표현식에서 계산 값 추출
         extractManager(target);
 
         //String calTime = calYear + "년 " + calMonth + "월 " + calDay + "일 " + calHour + "시 " + calMinute + "분 ";
         String calTime = calYear + ":" + calMonth + ":" + calDay + ":" + calHour + ":" + calMinute ;
+        System.out.println("CalTime : " + calTime);
         //추출한 표현값 리턴
+
+        //시간표현이 없을 때 일반 메모로 인식하기 위해 note라는 문자열을 리턴함.
+        if(calTime.equals(curTime))
+            return "note";
         return calTime;
     }
     /**
@@ -1173,7 +1178,7 @@ public class TimeAnalysis {
             System.out.println("test : " + calYear + " " + calMonth + " " + calDay + " " + calHour + " " + calMinute + !isNextDay);
             System.out.println("test : " + curYear + " " + curMonth + " " + curDay + " " + curHour + " " + curMinute + !isNextDay);
 
-            if (calHour * 60 + calMinute <= curHour * 60 + curMinute && !isNextDay && (calYear * 365 + calMonth * 30 + calDay) <= (curYear * 365 + curMonth * 30 + curDay)) {
+            if (calHour * 60 + calMinute < curHour * 60 + curMinute && !isNextDay && (calYear * 365 + calMonth * 30 + calDay) <= (curYear * 365 + curMonth * 30 + curDay)) {
                 System.out.println("extract201 : " + calMonth + " " + calDay + " " + calHour + " " + calMinute);
                 System.out.println("extract201");
                 System.out.println("IS NEXT DAY : " + isNextDay);

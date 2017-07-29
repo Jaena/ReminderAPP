@@ -196,12 +196,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setText("녹음중 ");
                     mText.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
-                    if(!rRunning) {
+                    if (!rRunning) {
                         recRunning = true;
                         rec.start();
-                    }
-                    else
-                    {
+                    } else {
                         recRunning = true;
                     }
                     SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
@@ -215,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             @Override
             public void onClick(View v) {
                 makeList();
-                if(playCount == 0) {
+                if (playCount == 0) {
                     Toast.makeText(getApplicationContext(), "재생할 목록이 비어있습니다.", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -224,13 +222,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     record.setVisibility(View.GONE);
                     play.setEnabled(false);
                     play.setVisibility(View.GONE);
-                    if(!pRunning) {
+                    if (!pRunning) {
                         playRunning = true;
                         playS.start();
-                    }
-                    else
-                    {
-                       playRunning = true;
+                    } else {
+                        playRunning = true;
                     }
                     mText.setText("재생중");
                     mText.setVisibility(View.VISIBLE);
@@ -280,42 +276,49 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         });
 
         yesButton.setOnClickListener(new View.OnClickListener() {
-           @Override
+            @Override
             public void onClick(View v) {
-               String fileNameArr[] = db.getAllFileName();
-               alarmTimeArr = db.getAllAlarmTime();
-               db.delete(fileNameArr[playingPos]);
+                String fileNameArr[] = db.getAllFileName();
+                alarmTimeArr = db.getAllAlarmTime();
+                db.delete(fileNameArr[playingPos]);
 
-               whetherDelete.setVisibility(View.GONE);
-               yesButton.setVisibility(View.GONE);
-               noButton.setVisibility(View.GONE);
+                whetherDelete.setVisibility(View.GONE);
+                yesButton.setVisibility(View.GONE);
+                noButton.setVisibility(View.GONE);
 
-               if(playingPos == 0) {
-                   System.out.println("삭제 시 출력1");
-                   isEnd = true;
-                   device.callOnClick();
-               }
-               else {
-                   System.out.println("삭제 시 출력2");
-                   String[] words = alarmTimeArr[playingPos - 1].split(":");
-                   if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-                   if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
-                   String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                   System.out.println("재성 " + timeRegistered);
-                   mText.setText(timeRegistered);
-                   mText.setVisibility(View.VISIBLE);
-                   list.setVisibility(View.VISIBLE);
-                   deleteButton.setVisibility(View.VISIBLE);
+                if (playingPos == 0) {
+                    System.out.println("삭제 시 출력1");
+                    isEnd = true;
+                    device.callOnClick();
+                } else {
 
-                   try {
-                       Thread.sleep(500);
-                   } catch (InterruptedException e) {
-                       e.printStackTrace();
-                   }
+                    if(alarmTimeArr[playingPos-1].equals("일반 메모"))
+                    {
+                        mText.setText("일반 메모");
+                    }
 
-                   voicePlayer.startPlaying(SampleRate, BufferSize, playingPos); //다음 파일부터 재생
-               }
-           }
+                    else {
+                        System.out.println("삭제 시 출력2");
+                        String[] words = alarmTimeArr[playingPos - 1].split(":");
+                        if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                        if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                        String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                        System.out.println("재성 " + timeRegistered);
+                        mText.setText(timeRegistered);
+                    }
+                    mText.setVisibility(View.VISIBLE);
+                    list.setVisibility(View.VISIBLE);
+                    deleteButton.setVisibility(View.VISIBLE);
+
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    voicePlayer.startPlaying(SampleRate, BufferSize, playingPos); //다음 파일부터 재생
+                }
+            }
         });
 
         noButton.setOnClickListener(new View.OnClickListener() { //삭제 안함 -> 다음 파일부터 재생
@@ -328,19 +331,27 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 yesButton.setVisibility(View.GONE);
                 noButton.setVisibility(View.GONE);
 
-                String[] words = alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0].split(":");
-                if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-                if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
-                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                System.out.println("재성 " + timeRegistered);
-                mText.setText(timeRegistered);
+                if((alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0]).equals("일반 메모"))
+                {
+                    mText.setText("일반 메모");
+                }
+
+                else {
+                    String[] words = alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0].split(":");
+                    if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+
+                    if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                    System.out.println("재성 " + timeRegistered);
+                    mText.setText(timeRegistered);
+                }
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
 
                 try {
                     Thread.sleep(500);
-                }catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
@@ -354,12 +365,19 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 voicePlayer.stopPlaying();
                 listView.setVisibility(View.GONE);
 
-                String[] words = alarmTimeArr[(playCount - 1) - position].split(":");
-                if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-                if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
-                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                System.out.println("재성 " + timeRegistered);
-                mText.setText(timeRegistered);
+                if(alarmTimeArr[(playCount - 1)-position].equals("일반 메모"))
+                {
+                    mText.setText("일반 메모");
+                }
+
+                else {
+                    String[] words = alarmTimeArr[(playCount - 1) - position].split(":");
+                    if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                    if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                    System.out.println("재성 " + timeRegistered);
+                    mText.setText(timeRegistered);
+                }
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
@@ -369,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 //voicePlayer stop이후, 바로 startPlaying시 문제가 발생하여, stop이 완료될 때까지 좀 기다린 후 start한다.
                 try {
                     Thread.sleep(500);
-                }catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 //isEnd = true;
@@ -440,43 +458,55 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
                 //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
                 else {
-                    //TODO 계산된 예정 시간 정보도 데이터베이스에 함께 저장되도록 개선 필요
                     String alarmTime = timeAnalysis.Analysis(returnedValue);
-                    String[] words = alarmTime.split(":");
-                    if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-                    if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
-                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                    mText.setText(timeRegistered);
+                    if (alarmTime.equals("note")) {
+                        db.insert(fileName, "일반 메모", returnedValue);
+                        mText.setText("일반 메모");
+                    } else {
+                        String[] words = alarmTime.split(":");
+                        if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                        if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
-                    db.insert(fileName, alarmTime, returnedValue);
+                        String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                        mText.setText(timeRegistered);
 
-                    Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
-                    Toast.makeText(getApplicationContext(), "디비에 저장된 알람 값:" + db.getLastAlarmText(), Toast.LENGTH_LONG).show();
-                    Toast.makeText(getApplicationContext(), "디비에 저장된 원래 텍스트 값:" + db.getLastText(), Toast.LENGTH_LONG).show();
+                        db.insert(fileName, alarmTime, returnedValue);
 
+                        Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "디비에 저장된 알람 값:" + db.getLastAlarmText(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "디비에 저장된 원래 텍스트 값:" + db.getLastText(), Toast.LENGTH_LONG).show();
+                    }
                     isEnd = true;
                 }
             }
         };
 
+
         vhandler = new Handler() {
             public void handleMessage(Message msg) {
-                if(((String)msg.obj).equals("stop")) {
+                if (((String) msg.obj).equals("stop")) {
                     isEnd = true;
                     device.callOnClick();
                     System.out.println("device call on click");
-                }
-                else if (voicePlayer.isPlaying()) {
+                } else if (voicePlayer.isPlaying()) {
                     String alarmTime = (String) msg.obj;
-                    String[] words = alarmTime.split(":");
 
-                    if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-                    if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                    if(alarmTime.equals("일반 메모"))
+                    {
+                        mText.setText("일반 메모");
+                    }
 
-                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                    System.out.println("재성(vhandler) " + timeRegistered);
-                    mText.setText(timeRegistered);
+                    else {
+                        String[] words = alarmTime.split(":");
+
+                        if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                        if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+                        String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                        System.out.println("재성(vhandler) " + timeRegistered);
+                        mText.setText(timeRegistered);
+                    }
                 }
             }
         };
@@ -670,7 +700,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
+
     boolean rRunning = false;
+
     class RecordingSwtich extends Thread {
 
         int m_duration;
@@ -680,13 +712,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         @Override
         public void run() {
             rRunning = true;
-            while ( rRunning) {
+            while (rRunning) {
                 synchronized (this) {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if(recRunning)
-                              device.setImageResource(image_m_Id[m_currentIndex]);
+                            if (recRunning)
+                                device.setImageResource(image_m_Id[m_currentIndex]);
                         }
                     });
                     m_currentIndex++;
@@ -703,7 +735,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         }
     }
+
     boolean pRunning = false;
+
     class PlayingSwtich extends Thread {
 
         int m_duration;
@@ -718,8 +752,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if(playRunning)
-                            device.setImageResource(image_m_Id[m_currentIndex]);
+                            if (playRunning)
+                                device.setImageResource(image_m_Id[m_currentIndex]);
                         }
                     });
                     m_currentIndex++;
@@ -774,12 +808,19 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         playCount = alarmTimeArr.length;
         System.out.println("Play Count : " + playCount);
         for (int i = playCount - 1; i >= 0; i--) {
-            String[] words = alarmTimeArr[i].split(":");
-            if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-            if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
-            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-            adapter.addItem(new Playlist(timeRegistered));
+            if(alarmTimeArr[i].equals("일반 메모")) {
+                adapter.addItem(new Playlist("일반 메모"));
+            }
+
+            else {
+                String[] words = alarmTimeArr[i].split(":");
+                if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                adapter.addItem(new Playlist(timeRegistered));
+            }
         }
     }
 }
