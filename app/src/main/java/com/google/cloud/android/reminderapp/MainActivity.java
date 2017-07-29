@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 listView.setVisibility(View.VISIBLE);
                 playRunning = false;
                 mText.setVisibility(View.GONE);
-                //list.setVisibility(View.GONE);
+                list.setVisibility(View.GONE);
             }
         });
 
@@ -270,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 System.out.println("재성 " + timeRegistered);
                 mText.setText(timeRegistered);
                 mText.setVisibility(View.VISIBLE);
+                list.setVisibility(View.VISIBLE);
 
                 Toast.makeText(getApplicationContext(), (playCount - 1) - position + " " + position, Toast.LENGTH_SHORT).show();
                 System.out.println("재성 " + ((playCount - 1) - position) + " " + position);
@@ -305,6 +306,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     playRunning = false;
                     mText.setText("");
                     mText.setVisibility(View.GONE);
+                    list.setVisibility(View.GONE);
+                    listView.setVisibility((View.GONE));
                     device.setEnabled(false);
                 }
 
@@ -314,6 +317,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     record.setVisibility(View.VISIBLE);
                     play.setEnabled(true);
                     play.setVisibility(View.VISIBLE);
+                    list.setVisibility(View.GONE);
+                    listView.setVisibility((View.GONE));
                     mText.setText("");
                     SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
                     float volume = preference.getFloat("volume", 1f);
