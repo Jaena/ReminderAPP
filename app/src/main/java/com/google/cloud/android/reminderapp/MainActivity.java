@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
@@ -75,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ImageButton record;
     ImageButton play;
     ImageButton list;
+    ImageButton deleteButton;
+    TextView whetherDelete;
+    Button yesButton, noButton;
 
     RecordingSwtich rec = new RecordingSwtich();
     PlayingSwtich playS = new PlayingSwtich();
@@ -99,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     public static String fileName;
     String alarmTimeArr[];
-    int playCount;
+    int playCount, playingPos;
 
     ListView listView;
     PlaylistAdapter adapter;
@@ -143,6 +147,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         settingBar.setMax(5);
 
         list = (ImageButton) findViewById(R.id.list);
+        deleteButton = (ImageButton) findViewById(R.id.deleteButton);
+        whetherDelete = (TextView) findViewById(R.id.whetherDelete);
+        yesButton = (Button) findViewById(R.id.yesButton);
+        noButton = (Button) findViewById(R.id.noButton);
 
         db = new DataBase(MainActivity.this);
         mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
@@ -206,7 +214,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                makeList();
+                if(playCount == 0) {
+                    Toast.makeText(getApplicationContext(), "재생할 목록이 비어있습니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!voicePlayer.isPlaying()) {
                     record.setEnabled(false);
                     record.setVisibility(View.GONE);
@@ -223,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setText("재생중");
                     mText.setVisibility(View.VISIBLE);
                     list.setVisibility(View.VISIBLE);
+                    deleteButton.setVisibility(View.VISIBLE);
                     device.setEnabled(true);
 //                    playDisplay();
 //                    NoticeDisplay();
@@ -244,18 +257,96 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 playRunning = false;
                 mText.setVisibility(View.GONE);
                 list.setVisibility(View.GONE);
+                deleteButton.setVisibility(View.GONE);
+            }
+        });
+//삭제 버튼을 누르면 재생이 중지가 되고, 삭제 여부를 물어보는 화면이 뜬다. 거기서 yes를 누르면 삭제가 되고, 다음 파일부터 재생.
+//거기서 no를 누르면 다음 파일부터 재생한다.
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //재생 중지
+                playingPos = voicePlayer.stopPlaying();
+
+                playRunning = false;
+                mText.setVisibility(View.GONE);
+                list.setVisibility(View.GONE);
+                deleteButton.setVisibility(View.GONE);
+
+                whetherDelete.setVisibility(View.VISIBLE);
+                yesButton.setVisibility(View.VISIBLE);
+                noButton.setVisibility(View.VISIBLE);
             }
         });
 
-        /*
-        listView.setOnClickListener(new View.OnClickListener() {
+        yesButton.setOnClickListener(new View.OnClickListener() {
+           @Override
+            public void onClick(View v) {
+               String fileNameArr[] = db.getAllFileName();
+               alarmTimeArr = db.getAllAlarmTime();
+               db.delete(fileNameArr[playingPos]);
+
+               whetherDelete.setVisibility(View.GONE);
+               yesButton.setVisibility(View.GONE);
+               noButton.setVisibility(View.GONE);
+
+               if(playingPos == 0) {
+                   System.out.println("삭제 시 출력1");
+                   isEnd = true;
+                   device.callOnClick();
+               }
+               else {
+                   System.out.println("삭제 시 출력2");
+                   String[] words = alarmTimeArr[playingPos - 1].split(":");
+                   if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                   if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                   String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                   System.out.println("재성 " + timeRegistered);
+                   mText.setText(timeRegistered);
+                   mText.setVisibility(View.VISIBLE);
+                   list.setVisibility(View.VISIBLE);
+                   deleteButton.setVisibility(View.VISIBLE);
+
+                   try {
+                       Thread.sleep(500);
+                   } catch (InterruptedException e) {
+                       e.printStackTrace();
+                   }
+
+                   voicePlayer.startPlaying(SampleRate, BufferSize, playingPos); //다음 파일부터 재생
+               }
+           }
+        });
+
+        noButton.setOnClickListener(new View.OnClickListener() { //삭제 안함 -> 다음 파일부터 재생
             @Override
             public void onClick(View v) {
-                listView.setVisibility(View.GONE);
+                String fileNameArr[] = db.getAllFileName();
+                alarmTimeArr = db.getAllAlarmTime();
+
+                whetherDelete.setVisibility(View.GONE);
+                yesButton.setVisibility(View.GONE);
+                noButton.setVisibility(View.GONE);
+
+                String[] words = alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0].split(":");
+                if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                System.out.println("재성 " + timeRegistered);
+                mText.setText(timeRegistered);
                 mText.setVisibility(View.VISIBLE);
+                list.setVisibility(View.VISIBLE);
+                deleteButton.setVisibility(View.VISIBLE);
+
+                try {
+                    Thread.sleep(500);
+                }catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                voicePlayer.startPlaying(SampleRate, BufferSize, playingPos); //다음 파일부터 재생
             }
         });
-        */
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -271,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setText(timeRegistered);
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
+                deleteButton.setVisibility(View.VISIBLE);
 
                 Toast.makeText(getApplicationContext(), (playCount - 1) - position + " " + position, Toast.LENGTH_SHORT).show();
                 System.out.println("재성 " + ((playCount - 1) - position) + " " + position);
@@ -290,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 System.out.println("MainActivity에서 mVoiceRecorder.isRecording 확인 : " + mVoiceRecorder.isRecording());
                 if (mVoiceRecorder.isRecording()) {
+                    System.out.println("in device 1");
                     System.out.println("stop Voice Recorder");
                     SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
                     float volume = preference.getFloat("volume", 1f);
@@ -298,6 +391,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     stopVoiceRecorder();
                 }
                 if (voicePlayer.isPlaying()) {
+                    System.out.println("in device 2");
                     voicePlayer.stopPlaying();
                     record.setEnabled(true);
                     record.setVisibility(View.VISIBLE);
@@ -308,17 +402,21 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setVisibility(View.GONE);
                     list.setVisibility(View.GONE);
                     listView.setVisibility((View.GONE));
+                    deleteButton.setVisibility(View.GONE);
                     device.setEnabled(false);
                 }
 
                 if (isEnd) {
+                    System.out.println("in device 3");
                     device.setEnabled(false);
                     record.setEnabled(true);
                     record.setVisibility(View.VISIBLE);
                     play.setEnabled(true);
                     play.setVisibility(View.VISIBLE);
+                    mText.setVisibility(View.GONE);
                     list.setVisibility(View.GONE);
                     listView.setVisibility((View.GONE));
+                    deleteButton.setVisibility(View.GONE);
                     mText.setText("");
                     SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
                     float volume = preference.getFloat("volume", 1f);

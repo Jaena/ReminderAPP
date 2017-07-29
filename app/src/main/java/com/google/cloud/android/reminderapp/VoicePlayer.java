@@ -30,7 +30,7 @@ public class VoicePlayer {
 
     AudioTrack audioTrack;
     private Thread mPlayingThread = null;
-    int playCount;
+    int playCount, i = 0;
 
     VoicePlayer(Context c)
     {
@@ -63,10 +63,13 @@ public class VoicePlayer {
     //TODO 변수 playing을 mIsplaying으로 바꾸기
     /**
      * 이 메소드는 변수 playing을 false로 설정하여 재생을 중지한다.
+     *
+     * @return int 현재 재생 중인 파일의 index
      */
-    public void stopPlaying()
+    public int stopPlaying()
     {
         mIsPlaying = false;
+        return i == -1 ? 0 : i;
     }
 
     /**
@@ -75,6 +78,7 @@ public class VoicePlayer {
      *
      * @param SampleRate     녹음 시 사용된 sample rate(Hertz)
      * @param mBufferSize    재생 시 음성 파일에서 한 번에 읽어오는 음성 데이터의 최대 크기
+     *
      *
      * @exception FileNotFoundException
      * @exeption IOException
@@ -86,7 +90,7 @@ public class VoicePlayer {
 
         if(playCount == -1) //재생버튼을 눌러서 재생이 시작되는 경우 ( 이 외에는 목록의 파일을 클릭해서 재생 시작하는 경우임)
             playCount = fileName.length;
-        int i;
+//        int i; //전역변수로 선언하겠음 (stopPlayin에서 현재 재생 중인 파일의 위치를 return하기 위해서)
         for(i=playCount-1;i>=0;i--){
             int count = 0;
             byte[] data = new byte[mBufferSize];

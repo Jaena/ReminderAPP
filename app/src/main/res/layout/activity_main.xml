@@ -44,6 +44,17 @@
         android:layout_alignTop="@+id/listView"
         android:layout_alignEnd="@+id/circle5" />
 
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:background="#00ff0000"
+        android:scaleType="fitXY"
+        android:src="@drawable/delete_button"
+        android:visibility="gone"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/device" />
+
     <ImageView
         android:id="@+id/circle1"
         android:layout_width="13dp"
@@ -157,4 +168,45 @@
         android:layout_above="@+id/device"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:id="@+id/whetherDelete"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="27dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:padding="5dp"
+        android:text="삭제할까요?"
+        android:visibility="gone"
+        android:textSize="20dp"
+        android:layout_below="@+id/device"
+        android:layout_alignStart="@+id/yesButton" />
+        <!--android:textColor="#ffffffff"-->
+
+    <Button
+        android:id="@+id/yesButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#00ff0000"
+        android:padding="5dp"
+        android:scaleType="fitXY"
+        android:text="YES"
+        android:textSize="25dp"
+        android:visibility="gone"
+        android:src="@drawable/rec_button"
+        android:layout_below="@+id/whetherDelete"
+        android:layout_toStartOf="@+id/noButton" />
+
+    <Button
+        android:id="@+id/noButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#00ff0000"
+        android:padding="5dp"
+        android:scaleType="fitXY"
+        android:text="NO"
+        android:textSize="25dp"
+        android:visibility="gone"
+        android:src="@drawable/rec_button"
+        android:layout_below="@+id/whetherDelete"
+        android:layout_toStartOf="@+id/backgound" />
 </RelativeLayout>
