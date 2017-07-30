@@ -866,6 +866,7 @@ public class TimeAnalysis {
         while (matcher.find()) {
             System.out.println("extract8");
             isExtracted = true;
+            isNextDay = true;
             result = matcher.group(0);
             temp = result.split("월|일");
 

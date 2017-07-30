@@ -109,6 +109,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ListView listView;
     PlaylistAdapter adapter;
 
+    PlaylistView viewArr[] = new PlaylistView[100]; //list의 각 아이템들의 view값을 담고 있다. 일단 최대 100개로 해보자.
+    int tempPos = -1, tempPos2;
+
     /**
      * @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
      */
@@ -490,9 +493,39 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         phandler = new Handler() {
             public void handleMessage(Message msg) {
-                if (voicePlayer.isPlaying()) {
-                    //position = (int) msg.obj;
+                //재생 중이고, 현재 목록이 보이는 상태(View.VISIBLE)이면
+                if (voicePlayer.isPlaying() && listView.getVisibility() == View.VISIBLE) {
+                    int position = (int) msg.obj;
+                    tempPos2 = position;
+                    //같은 position이 여러번 들어오면 한 번만 색깔을 바꾸도록 하기 위함.
+                    if (tempPos != position) {
+                        tempPos = position;
+                    } else {
+                        return;
                     }
+
+                    System.out.println("phandler position : " + position);
+                    for (int i = 0; i < 10; i++) {
+                        System.out.println("viewarr : " + i + " - " + viewArr[i]);
+                    }
+
+//                   if(position != 0) {
+//                       System.out.println("하얀색으로 바뀌는 것 - " + (position - 1));
+//                   //    viewArr[position-1].setBackgroundColor(Color.WHITE);
+//                       viewArr[position-1].setBackgroundColor_white();
+//                   }
+//
+//                   System.out.println("초록으로 바뀌는 것 - " + position);
+//                   //viewArr[position].setBackgroundColor(Color.GREEN);
+//                   viewArr[position].setBackgroundColor_green();
+                    //listView.setVisibility(View.GONE);
+                    // makeList();
+
+
+                    listView.setAdapter(adapter);
+                    listView.setSelection(position);
+//                   listView.setVisibility(View.VISIBLE);
+                }
             }
         };
 
@@ -783,6 +816,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             PlaylistView view = new PlaylistView(getApplicationContext());
             Playlist item = items.get(position);
             view.setName(item.getName());
+
+            if (position == tempPos2) {
+                view.setBackgroundColor(Color.GREEN);
+            } else {
+                view.setBackgroundColor(Color.WHITE);
+            }
+            viewArr[position] = view;
+
             return view;
         }
     }

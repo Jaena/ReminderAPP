@@ -87,6 +87,7 @@ public class VoicePlayer {
         System.out.println("재생 시작");
         String fileName[] = db.getAllFileName();
         String alarmTime[] = db.getAllAlarmTime();
+        int cnt = fileName.length; //목록에서 선택 시 playCount값이 변하기 때문에... 이렇게 따로 cnt에 저장해놓자.
 
 //       if(playCount == -1) //재생버튼을 눌러서 재생이 시작되는 경우 ( 이 외에는 목록의 파일을 클릭해서 재생 시작하는 경우임)
 //            playCount = fileName.length;
@@ -97,15 +98,11 @@ public class VoicePlayer {
 
             if(!mIsPlaying) break; //추가했음. - 아래 while문에 mIsPlaying는 없어도 될듯.
 
-            //vhandler
             Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]);
-            System.out.println("알람타임 테스트 : " + alarmTime[i]);
             MainActivity.vhandler.sendMessage(message);
 
-            //phandler
-            Message message3 = MainActivity.phandler.obtainMessage(1, playCount-1-i);
-            MainActivity.phandler.sendMessage(message3);
-
+//            Message message3 = MainActivity.phandler.obtainMessage(1, cnt - 1 - i);
+//            MainActivity.phandler.sendMessage(message3);
 
             try {
                 //Toast.makeText(context.getApplicationContext(),"현재 재생중인 파일 " + fileName[i] +"",Toast.LENGTH_SHORT).show();
@@ -116,6 +113,11 @@ public class VoicePlayer {
                 audioTrack.play();
 
                 while (((count = dis.read(data, 0, mBufferSize)) > -1)&&mIsPlaying) {
+                    //재생 중인 파일 하이라이트하기 위해 position정보를 보낸다.(phandler이용)
+                    //여기다가 쓴 이유는 파일이 실행중일 때 목록버튼을 누르는 경우에도 하이라이트가 되도록 하기 위함이다.
+                    Message message3 = MainActivity.phandler.obtainMessage(1, cnt - 1 - i);
+                    MainActivity.phandler.sendMessage(message3);
+
                     SharedPreferences preference = context.getSharedPreferences("volume", context.MODE_PRIVATE);
                     float volume = preference.getFloat("volume", 1f);
                     audioTrack.setVolume(volume);
