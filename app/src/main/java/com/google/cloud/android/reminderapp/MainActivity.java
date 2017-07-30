@@ -523,7 +523,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
 
                     listView.setAdapter(adapter);
-                    listView.setSelection(position);
+                    if(position != 0) {
+                        listView.setSelection(position-1);
+                    }
 //                   listView.setVisibility(View.VISIBLE);
                 }
             }
