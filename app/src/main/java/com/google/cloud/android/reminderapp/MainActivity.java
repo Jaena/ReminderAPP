@@ -289,6 +289,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.GONE);
                 list.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
+
+
             }
         });
 //삭제 버튼을 누르면 재생이 중지가 되고, 삭제 여부를 물어보는 화면이 뜬다. 거기서 yes를 누르면 삭제가 되고, 다음 파일부터 재생.
@@ -307,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 whetherDelete.setVisibility(View.VISIBLE);
                 yesButton.setVisibility(View.VISIBLE);
                 noButton.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -350,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                     voicePlayer.startPlaying(SampleRate, BufferSize, playingPos); //다음 파일부터 재생
                 }
+
+
             }
         });
 
@@ -377,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
+
 
                 try {
                     Thread.sleep(500);
@@ -407,6 +413,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
+
+
 
                 Toast.makeText(getApplicationContext(), (playCount - 1) - position + " " + position, Toast.LENGTH_SHORT).show();
                 System.out.println("재성 " + ((playCount - 1) - position) + " " + position);
@@ -873,9 +881,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             view.setName(item.getName());
 
             if (position == tempPos2) {
-                view.setBackgroundColor(Color.GREEN);
+                view.setBackgroundColor(Color.YELLOW);
             } else {
-                view.setBackgroundColor(Color.WHITE);
+                view.setBackgroundColor(Color.BLACK);
             }
             viewArr[position] = view;
 

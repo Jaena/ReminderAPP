@@ -7,7 +7,7 @@
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
-            android:layout_height="39dp"
+            android:layout_height="30dp"
             android:gravity="center_vertical|center_horizontal"
             android:text="New Text"
             android:textColor="#ff5805"
