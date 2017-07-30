@@ -849,4 +849,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             }
         }
     }
+
+    //뒤로 가기 버튼 눌렀을 경우 모든 프로세스 종료
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+        finish();
+        android.os.Process.killProcess(android.os.Process.myPid());
+        super.onBackPressed();
+    }
+
 }
