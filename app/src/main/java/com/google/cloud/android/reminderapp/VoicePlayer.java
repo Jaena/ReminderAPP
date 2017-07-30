@@ -84,7 +84,6 @@ public class VoicePlayer {
      * @exeption IOException
      */
     public void playWaveFile(int SampleRate,int mBufferSize) {
-        System.out.println("재생 시작");
         String fileName[] = db.getAllFileName();
         String alarmTime[] = db.getAllAlarmTime();
         int cnt = fileName.length; //목록에서 선택 시 playCount값이 변하기 때문에... 이렇게 따로 cnt에 저장해놓자.
@@ -96,7 +95,9 @@ public class VoicePlayer {
             int count = 0;
             byte[] data = new byte[mBufferSize];
 
-            if(!mIsPlaying) break; //추가했음. - 아래 while문에 mIsPlaying는 없어도 될듯.
+            if(!mIsPlaying) {
+                break; //추가했음. - 아래 while문에 mIsPlaying는 없어도 될듯. - 아 재생 중간에 정지되려면 while문 안에 있어야 할지도..?
+            }
 
             Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]);
             MainActivity.vhandler.sendMessage(message);
@@ -127,6 +128,9 @@ public class VoicePlayer {
                 audioTrack.release();
                 dis.close();
                 fis.close();
+
+                if(!mIsPlaying) break;
+
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -134,7 +138,6 @@ public class VoicePlayer {
             }
         }
 
-        System.out.println("i값 : " + i);
         if(i == -1) {
             //mIsPlaying = false;
             System.out.println("play count : " + playCount);
