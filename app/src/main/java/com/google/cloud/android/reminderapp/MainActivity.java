@@ -17,15 +17,19 @@
 package com.google.cloud.android.reminderapp;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -54,12 +58,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.Timer;
 
 
 public class MainActivity extends AppCompatActivity implements MessageDialogFragment.Listener {
 
     private static final String FRAGMENT_MESSAGE_DIALOG = "message_dialog";
-
     private static final String STATE_RESULTS = "results";
 
     Handler mHandler = new Handler();
@@ -71,8 +75,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     boolean recRunning = false;
     boolean playRunning = false;
+
     // View references
     public static TextView mText;
+
+    //EPD timer
+    public static int value = 0;
+
     ImageSwitcher device;
     ImageButton record;
     ImageButton play;
@@ -91,9 +100,12 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     SeekBar settingBar;
 
     ImageView[] circles = new ImageView[5];
-    Handler handler;
 
-    public static Handler vhandler;
+    //핸들러
+    Handler handler; //화면 클릭했을때 녹음 처리 핸들러
+    public static Handler vhandler; // 재생중인 화면 mtext 처리 핸들러
+    public static Handler phandler; // 재생중인 리스터 처리 핸들러
+    Handler dhandler; // EPD 핸들러
 
     boolean isEnd = false;
     int SampleRate = 16000;
@@ -112,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     ListView listView;
     PlaylistAdapter adapter;
+
+    PlaylistView viewArr[] = new PlaylistView[100]; //list의 각 아이템들의 view값을 담고 있다. 일단 최대 100개로 해보자.
+    int tempPos = -1, tempPos2;
 
     /**
      * @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
@@ -171,20 +186,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         //listing
         listView = (ListView) findViewById(R.id.listView);
-//        adapter = new PlaylistAdapter();
-//        alarmTimeArr = db.getAllAlarmTime();
-//        playCount = alarmTimeArr.length;
-//        System.out.println("Play Count : " + playCount);
-//        for (int i = playCount - 1; i >= 0; i--) {
-//            String[] words = alarmTimeArr[i].split(":");
-//            if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-//            if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
-//
-//            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-//            adapter.addItem(new Playlist(timeRegistered));
-//        }
         makeList();
-        // listView.setAdapter(adapter); //추가
 
         record.setEnabled(false);
         record.setVisibility(View.GONE);
@@ -195,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             @Override
             public void onClick(View v) {
 
+                System.out.println("여기까지" + mVoiceRecorder.isRecording());
                 if (!mVoiceRecorder.isRecording()) {
                     record.setEnabled(false);
                     record.setVisibility(View.GONE);
@@ -213,9 +216,41 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     float volume = preference.getFloat("volume", 1f);
                     sound.play(soundbeep, volume, volume, 0, 0, 1);
                     startVoiceRecorder();
-                }
+
+                    //EPD 기능 구현
+                    CountDownTimer timer;
+                    timer =  new CountDownTimer(7000, 980){
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            value++;
+                            //System.out.println("결과값 : " + value);
+                            if(value == 7){
+                                onFinish();
+                            }
+                            else if(!mVoiceRecorder.isRecording())
+                            {
+                                onFinish();
+                            }
+                        }
+                        @Override
+                        public void onFinish() {
+                            if(value == 7) {
+                                Message message = dhandler.obtainMessage(1, 1);
+                                dhandler.sendMessage(message);
+                                value = 0;
+                            }
+                            else
+                            {
+                                Message message = dhandler.obtainMessage(1, 2);
+                                dhandler.sendMessage(message);
+                                value = 0;
+                            }
+                        }
+                    }.start();  // 타이머 시작
+            }
             }
         });
+
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -261,6 +296,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.GONE);
                 list.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
+
+
             }
         });
 //삭제 버튼을 누르면 재생이 중지가 되고, 삭제 여부를 물어보는 화면이 뜬다. 거기서 yes를 누르면 삭제가 되고, 다음 파일부터 재생.
@@ -279,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 whetherDelete.setVisibility(View.VISIBLE);
                 yesButton.setVisibility(View.VISIBLE);
                 noButton.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -299,12 +337,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     device.callOnClick();
                 } else {
 
-                    if(alarmTimeArr[playingPos-1].equals("일반 메모"))
-                    {
+                    if (alarmTimeArr[playingPos - 1].equals("일반 메모")) {
                         mText.setText("일반 메모");
-                    }
-
-                    else {
+                    } else {
                         System.out.println("삭제 시 출력2");
                         String[] words = alarmTimeArr[playingPos - 1].split(":");
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
@@ -325,6 +360,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                     voicePlayer.startPlaying(SampleRate, BufferSize, playingPos); //다음 파일부터 재생
                 }
+
+
             }
         });
 
@@ -338,12 +375,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 yesButton.setVisibility(View.GONE);
                 noButton.setVisibility(View.GONE);
 
-                if((alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0]).equals("일반 메모"))
-                {
+                if ((alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0]).equals("일반 메모")) {
                     mText.setText("일반 메모");
-                }
-
-                else {
+                } else {
                     String[] words = alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0].split(":");
                     if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
 
@@ -355,6 +389,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
+
 
                 try {
                     Thread.sleep(500);
@@ -372,12 +407,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 voicePlayer.stopPlaying();
                 listView.setVisibility(View.GONE);
 
-                if(alarmTimeArr[(playCount - 1)-position].equals("일반 메모"))
-                {
+                if (alarmTimeArr[(playCount - 1) - position].equals("일반 메모")) {
                     mText.setText("일반 메모");
-                }
-
-                else {
+                } else {
                     String[] words = alarmTimeArr[(playCount - 1) - position].split(":");
                     if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
                     if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
@@ -388,6 +420,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
+
+
 
                 Toast.makeText(getApplicationContext(), (playCount - 1) - position + " " + position, Toast.LENGTH_SHORT).show();
                 System.out.println("재성 " + ((playCount - 1) - position) + " " + position);
@@ -472,6 +506,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     if (alarmTime.equals("note")) {
                         db.insert(fileName, "일반 메모", returnedValue);
                         mText.setText("일반 메모");
+                        Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     } else {
                         String[] words = alarmTime.split(":");
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
@@ -483,8 +518,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         db.insert(fileName, alarmTime, returnedValue);
 
                         Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
-                        Toast.makeText(getApplicationContext(), "디비에 저장된 알람 값:" + db.getLastAlarmText(), Toast.LENGTH_LONG).show();
-                        Toast.makeText(getApplicationContext(), "디비에 저장된 원래 텍스트 값:" + db.getLastText(), Toast.LENGTH_LONG).show();
                     }
                     isEnd = true;
                 }
@@ -501,12 +534,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 } else if (voicePlayer.isPlaying()) {
                     String alarmTime = (String) msg.obj;
 
-                    if(alarmTime.equals("일반 메모"))
-                    {
+                    if (alarmTime.equals("일반 메모")) {
                         mText.setText("일반 메모");
-                    }
-
-                    else {
+                    } else {
                         String[] words = alarmTime.split(":");
 
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
@@ -516,6 +546,55 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         System.out.println("재성(vhandler) " + timeRegistered);
                         mText.setText(timeRegistered);
                     }
+                }
+            }
+        };
+
+        phandler = new Handler() {
+            public void handleMessage(Message msg) {
+                //재생 중이고, 현재 목록이 보이는 상태(View.VISIBLE)이면
+                if (voicePlayer.isPlaying() && listView.getVisibility() == View.VISIBLE) {
+                    int position = (int) msg.obj;
+                    tempPos2 = position;
+                    //같은 position이 여러번 들어오면 한 번만 색깔을 바꾸도록 하기 위함.
+                    if (tempPos != position) {
+                        tempPos = position;
+                    } else {
+                        return;
+                    }
+
+                    System.out.println("phandler position : " + position);
+                    for (int i = 0; i < 10; i++) {
+                        System.out.println("viewarr : " + i + " - " + viewArr[i]);
+                    }
+
+//                   if(position != 0) {
+//                       System.out.println("하얀색으로 바뀌는 것 - " + (position - 1));
+//                   //    viewArr[position-1].setBackgroundColor(Color.WHITE);
+//                       viewArr[position-1].setBackgroundColor_white();
+//                   }
+//
+//                   System.out.println("초록으로 바뀌는 것 - " + position);
+//                   //viewArr[position].setBackgroundColor(Color.GREEN);
+//                   viewArr[position].setBackgroundColor_green();
+                    //listView.setVisibility(View.GONE);
+                    // makeList();
+
+
+                    listView.setAdapter(adapter);
+                    if(position != 0) {
+                        listView.setSelection(position-1);
+                    }
+//                   listView.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+
+        dhandler = new Handler() {
+            public void handleMessage(Message msg) {
+                System.out.println("결과값 : " + (int)(msg.obj));
+                if((int)(msg.obj) == 1) {
+                    device.callOnClick();
                 }
             }
         };
@@ -533,17 +612,15 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         settingBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                Toast.makeText(getApplicationContext(), "" + progress, Toast.LENGTH_SHORT).show();
                 if (progress > 0) {
                     if(powerOn==false) {
-
+                        Toast.makeText(getApplicationContext(), "전원 켜짐", Toast.LENGTH_SHORT).show();
                         powerOn = true;
                         record.setEnabled(true);
                         record.setVisibility(View.VISIBLE);
                         play.setEnabled(true);
                         play.setVisibility(View.VISIBLE);
                     }
-                    Toast.makeText(getApplicationContext(), "전원 켜짐", Toast.LENGTH_SHORT).show();
                     if(progress==1){
                         SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
                         SharedPreferences.Editor editor = a.edit();
@@ -657,7 +734,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
             if (permissions.length == 1 && grantResults.length == 1
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startVoiceRecorder();
+                //startVoiceRecorder();
             } else {
                 showPermissionMessageDialog();
             }
@@ -886,6 +963,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
     }
 
+    // 목록을 관리해주는 adapter
     class PlaylistAdapter extends BaseAdapter {
         ArrayList<Playlist> items = new ArrayList<Playlist>();
 
@@ -911,9 +989,16 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         @Override
         public View getView(int position, View convertView, ViewGroup viewGroup) {
             PlaylistView view = new PlaylistView(getApplicationContext());
-
             Playlist item = items.get(position);
             view.setName(item.getName());
+
+            if (position == tempPos2) {
+                view.setBackgroundColor(Color.YELLOW);
+            } else {
+                view.setBackgroundColor(Color.BLACK);
+            }
+            viewArr[position] = view;
+
             return view;
         }
     }
@@ -925,11 +1010,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         System.out.println("Play Count : " + playCount);
         for (int i = playCount - 1; i >= 0; i--) {
 
-            if(alarmTimeArr[i].equals("일반 메모")) {
+            if (alarmTimeArr[i].equals("일반 메모")) {
                 adapter.addItem(new Playlist("일반 메모"));
-            }
-
-            else {
+            } else {
                 String[] words = alarmTimeArr[i].split(":");
                 if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
                 if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
@@ -939,6 +1022,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             }
         }
     }
+
 /**
  * 내부저장소에 저장된 파일을 지우기 위한 메소드이다
  *
@@ -948,4 +1032,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         File tempFile = new File(getFilesDir(),fileName);
         tempFile.delete();
     }
+
+    //뒤로 가기 버튼 눌렀을 경우 모든 프로세스 종료
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+        finish();
+        android.os.Process.killProcess(android.os.Process.myPid());
+        super.onBackPressed();
+    }
+
 }

@@ -161,6 +161,19 @@ public class TimeAnalysis {
     */
     public boolean extractManager(String searchTarget) {
         searchTarget = searchTarget.replaceAll(" ", "");
+        searchTarget = searchTarget.replaceAll("한시", "1시");
+        searchTarget = searchTarget.replaceAll("두시", "2시");
+        searchTarget = searchTarget.replaceAll("세시", "3시");
+        searchTarget = searchTarget.replaceAll("네시", "4시");
+        searchTarget = searchTarget.replaceAll("다섯시", "5시");
+        searchTarget = searchTarget.replaceAll("여섯시", "6시");
+        searchTarget = searchTarget.replaceAll("일곱시", "7시");
+        searchTarget = searchTarget.replaceAll("여덟시", "8시");
+        searchTarget = searchTarget.replaceAll("아홉시", "9시");
+        searchTarget = searchTarget.replaceAll("열시", "10시");
+        searchTarget = searchTarget.replaceAll("열한시", "11시");
+        searchTarget = searchTarget.replaceAll("열두시", "12시");
+
         searchTarget = searchTarget.replaceAll("새벽", "오전");
         searchTarget = searchTarget.replaceAll("아침", "오전");
         searchTarget = searchTarget.replaceAll("저녁", "오후");
@@ -173,12 +186,9 @@ public class TimeAnalysis {
         searchTarget = searchTarget.replaceAll("사일", "4일");
         searchTarget = searchTarget.replaceAll("오일", "5일");
 
-        searchTarget = searchTarget.replaceAll("세시", "3시");
-        searchTarget = searchTarget.replaceAll("네시", "4시");
-        searchTarget = searchTarget.replaceAll("넷이", "4시");
 
+        searchTarget = searchTarget.replaceAll("넷이", "4시");
         searchTarget = searchTarget.replaceAll("메시", "4시");
-        searchTarget = searchTarget.replaceAll("다섯시", "5시");
 
         searchTarget = searchTarget.replaceAll("하루", "1");
         searchTarget = searchTarget.replaceAll("이틀", "2");
@@ -866,6 +876,7 @@ public class TimeAnalysis {
         while (matcher.find()) {
             System.out.println("extract8");
             isExtracted = true;
+            isNextDay = true;
             result = matcher.group(0);
             temp = result.split("월|일");
 
