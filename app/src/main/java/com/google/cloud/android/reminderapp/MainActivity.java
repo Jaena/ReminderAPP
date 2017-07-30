@@ -49,6 +49,7 @@ import android.widget.ViewSwitcher;
 
 import com.tsengvn.typekit.TypekitContextWrapper;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.Buffer;
@@ -79,9 +80,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ImageButton deleteButton;
     TextView whetherDelete;
     Button yesButton, noButton;
+    ImageSwitcher deviceOn;
+    ImageSwitcher deviceOff;
 
     RecordingSwtich rec = new RecordingSwtich();
     PlayingSwtich playS = new PlayingSwtich();
+    DeviceOn deviceON= new DeviceOn();
+    DeviceOff deviceOFF= new DeviceOff();
 
     SeekBar settingBar;
 
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         record = (ImageButton) findViewById(R.id.record);
         play = (ImageButton) findViewById(R.id.play);
         settingBar = (SeekBar) findViewById(R.id.seekBar);
-        settingBar.setMax(5);
+        settingBar.setMax(4);
 
         list = (ImageButton) findViewById(R.id.list);
         deleteButton = (ImageButton) findViewById(R.id.deleteButton);
@@ -156,14 +161,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
         timeAnalysis = new TimeAnalysis();
-        device.setEnabled(false);
         mText.setVisibility(View.VISIBLE);
 
-        circles[0] = (ImageView) (findViewById(R.id.circle1));
-        circles[1] = (ImageView) (findViewById(R.id.circle2));
-        circles[2] = (ImageView) (findViewById(R.id.circle3));
-        circles[3] = (ImageView) (findViewById(R.id.circle4));
-        circles[4] = (ImageView) (findViewById(R.id.circle5));
+        deviceOn = (ImageSwitcher) findViewById(R.id.device_on);
+        deviceOff = (ImageSwitcher)findViewById(R.id.device_off);
+
         sound = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
         soundbeep = sound.load(getApplicationContext(), R.raw.rec_start, 1);
 
@@ -183,6 +185,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 //        }
         makeList();
         // listView.setAdapter(adapter); //추가
+
+        record.setEnabled(false);
+        record.setVisibility(View.GONE);
+        play.setEnabled(false);
+        play.setVisibility(View.GONE);
 
         record.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -453,8 +460,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 if (returnedValue.equals("")) {
                     //mText.setText("터치해주세요");
                     Toast.makeText(getApplicationContext(), "아무말도 안하셨습니다", Toast.LENGTH_LONG).show();
-                    isEnd = true;
-                    device.callOnClick();
+                    if(powerOn==true) {
+                        isEnd = true;
+                        device.callOnClick();
+                    }
                 }
                 //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
                 else {
@@ -526,19 +535,66 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 Toast.makeText(getApplicationContext(), "" + progress, Toast.LENGTH_SHORT).show();
                 if (progress > 0) {
-                    progress--;
-                    SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = a.edit();
-                    editor.putFloat("volume", (float) (progress * 0.3));
-                    Log.d("volume setting", "" + progress * 0.3);
-                    editor.commit();
-                } else {
-//                    record.setEnabled(false);
-//                    record.setVisibility(View.GONE);
-//                    play.setEnabled(false);
-//                    play.setVisibility(View.GONE);
-//                    //녹음 중이면 녹음 중지하고 스피치 서비스 가면 안됨. -> 새로 메소드를 만들던가 해야할 듯 shared prefer
-//                    //재생 중이면 재생 멈춰야 함.
+                    if(powerOn==false) {
+
+                        powerOn = true;
+                        record.setEnabled(true);
+                        record.setVisibility(View.VISIBLE);
+                        play.setEnabled(true);
+                        play.setVisibility(View.VISIBLE);
+                    }
+                    Toast.makeText(getApplicationContext(), "전원 켜짐", Toast.LENGTH_SHORT).show();
+                    if(progress==1){
+                        SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = a.edit();
+                        editor.putFloat("volume", 0);
+                        editor.commit();}
+                        else{
+                            progress--;
+                            SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = a.edit();
+                            editor.putFloat("volume", (float) (progress * 0.3));
+                            Log.d("volume setting", "" + progress * 0.3);
+                            editor.commit();
+                        }
+                }
+                else {
+                    if(mVoiceRecorder.isRecording())
+                    {
+                        stopVoiceRecorder();
+                        deleteInternalFile();
+                        fileName = "";
+                        record.setEnabled(false);
+                        record.setVisibility(View.GONE);
+                        play.setEnabled(false);
+                        play.setVisibility(View.GONE);
+                        mText.setVisibility(View.GONE);
+                        list.setVisibility(View.GONE);
+                        listView.setVisibility((View.GONE));
+                        deleteButton.setVisibility(View.GONE);
+                        mText.setText("");
+                    }
+                    if(voicePlayer.isPlaying())
+                    {
+                        System.out.println("in device 2");
+                        voicePlayer.stopPlaying();
+                        playRunning = false;
+                        mText.setText("");
+                        mText.setVisibility(View.GONE);
+                        list.setVisibility(View.GONE);
+                        listView.setVisibility((View.GONE));
+                        deleteButton.setVisibility(View.GONE);
+                    }
+                    if(powerOn==true)
+                    {
+                        powerOn = false;
+                        device.setVisibility(View.INVISIBLE);
+                        Toast.makeText(getApplicationContext(), "전원 꺼짐", Toast.LENGTH_SHORT).show();
+                        record.setEnabled(false);
+                        record.setVisibility(View.GONE);
+                        play.setEnabled(false);
+                        play.setVisibility(View.GONE);
+                    }
                 }
             }
 
@@ -623,21 +679,27 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     /**
      * 음성 녹음을 멈춘뒤, 스피치 서비스를 통해 구글 STT 서버로 파일을 전송시킨다.
      */
+    boolean powerOn;
     private void stopVoiceRecorder() {
-        if (mVoiceRecorder != null) {
-            System.out.println("녹음을 중지하자.");
+        if(!powerOn){
             mVoiceRecorder.stopRecording();
-            FileInputStream fis = null;
-            try {
-                //    String fileName = db.getLastFileName(); //전역변수 fileNme에 현재 녹음한 파일이름이 저장돼있음.
-                fis = openFileInput(fileName);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+        }
+        else {
+            if (mVoiceRecorder != null) {
+                System.out.println("녹음을 중지하자.");
+                mVoiceRecorder.stopRecording();
+                FileInputStream fis = null;
+                try {
+                    //    String fileName = db.getLastFileName(); //전역변수 fileNme에 현재 녹음한 파일이름이 저장돼있음.
+                    fis = openFileInput(fileName);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("녹음 완료 후, 구글 STT서버로 보내기");
+                System.out.println("테스트 파일이름 : " + fileName);
+                mSpeechService.recognizeInputStream(fis);
+                System.out.println("구글 STT서버로 잘 보내진건가...?");
             }
-            System.out.println("녹음 완료 후, 구글 STT서버로 보내기");
-            System.out.println("테스트 파일이름 : " + fileName);
-            mSpeechService.recognizeInputStream(fis);
-            System.out.println("구글 STT서버로 잘 보내진건가...?");
         }
     }
 
@@ -706,7 +768,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     class RecordingSwtich extends Thread {
 
         int m_duration;
-        final int image_m_Id[] = {R.drawable.display_off, R.drawable.display_off1, R.drawable.display_off2, R.drawable.display_off3, R.drawable.display_off4, R.drawable.display_off5, R.drawable.display_off};
+        final int image_m_Id[] = {R.drawable.display_off1, R.drawable.display_off2, R.drawable.display_off3, R.drawable.display_off4, R.drawable.display_off5, R.drawable.display_off};
         int m_currentIndex = 0;
 
         @Override
@@ -741,7 +803,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     class PlayingSwtich extends Thread {
 
         int m_duration;
-        final int image_m_Id[] = {R.drawable.display_off, R.drawable.display_off1, R.drawable.display_off2, R.drawable.display_off3, R.drawable.display_off4, R.drawable.display_off5, R.drawable.display_off};
+        final int image_m_Id[] = { R.drawable.display_off1, R.drawable.display_off2, R.drawable.display_off3, R.drawable.display_off4, R.drawable.display_off5, R.drawable.display_off};
         int m_currentIndex = 0;
 
         @Override
@@ -760,6 +822,60 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     if (m_currentIndex == image_m_Id.length) {
                         m_currentIndex = 0;
                     }
+                    try {
+                        m_duration = 600;
+                        Thread.sleep(m_duration);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }   //while end
+        }
+    }
+
+    class DeviceOn extends Thread {
+
+        int m_duration;
+        final int image_m_Id[] = {R.drawable.display_off,R.drawable.display_on};
+        int m_currentIndex = 0;
+
+        @Override
+        public void run() {
+            while (m_currentIndex != image_m_Id.length) {
+                synchronized (this) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                                device.setImageResource(image_m_Id[m_currentIndex]);
+                        }
+                    });
+                    m_currentIndex++;
+                    try {
+                        m_duration = 600;
+                        Thread.sleep(m_duration);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }   //while end
+        }
+    }
+
+    class DeviceOff extends Thread {
+
+        int m_duration;
+        final int image_m_Id[] = {R.drawable.display_off,R.drawable.display_off_1};
+        int m_currentIndex = 0;
+
+        @Override
+        public void run() {
+            while (m_currentIndex != image_m_Id.length) {
+                synchronized (this) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            device.setImageResource(image_m_Id[m_currentIndex]);
+                        }
+                    });
+                    m_currentIndex++;
                     try {
                         m_duration = 600;
                         Thread.sleep(m_duration);
@@ -822,5 +938,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 adapter.addItem(new Playlist(timeRegistered));
             }
         }
+    }
+/**
+ * 내부저장소에 저장된 파일을 지우기 위한 메소드이다
+ *
+ */
+    private void deleteInternalFile()
+    {
+        File tempFile = new File(getFilesDir(),fileName);
+        tempFile.delete();
     }
 }

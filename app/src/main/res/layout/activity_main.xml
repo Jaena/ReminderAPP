@@ -14,10 +14,55 @@
         android:layout_centerVertical="true"
         android:src="@drawable/background" />
 
+    <ImageView
+        android:id="@+id/backgound_off"
+        android:layout_width="132dp"
+        android:layout_height="130dp"
+        android:background="#00ff0000"
+        android:layout_alignTop="@+id/device"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/display_off"/>
+
+    <ImageView
+        android:id="@+id/device_side"
+        android:layout_width="300dp"
+        android:layout_height="70dp"
+        android:background="#00ff0000"
+        android:src="@drawable/device_side"
+        android:layout_marginBottom="34dp"
+        android:layout_above="@+id/device"
+        android:layout_alignStart="@+id/seekBar" />
+
+    <ImageSwitcher
+        android:id="@+id/device_on"
+        android:layout_width="132dp"
+        android:layout_height="130dp"
+        android:background="#00ff0000"
+        android:layout_alignTop="@+id/device"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:visibility="invisible"
+        android:src="@drawable/display_on"
+        />
+
+    <ImageSwitcher
+        android:id="@+id/device_off"
+        android:layout_width="132dp"
+        android:layout_height="130dp"
+        android:background="#00ff0000"
+        android:layout_alignTop="@+id/device"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:visibility="invisible"
+        android:src="@drawable/display_off_1"
+        />
+
     <ImageSwitcher
         android:id="@+id/backgound"
         android:layout_width="132dp"
         android:layout_height="130dp"
+        android:background="#00ff0000"
         android:layout_alignTop="@+id/device"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
