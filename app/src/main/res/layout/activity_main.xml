@@ -158,7 +158,8 @@
         android:padding="5dp"
         android:text=""
         android:textColor="#ffffffff"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        android:visibility="gone"/>
 
     <SeekBar
         android:id="@+id/seekBar"

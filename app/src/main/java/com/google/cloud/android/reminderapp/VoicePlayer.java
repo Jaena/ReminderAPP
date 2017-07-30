@@ -97,10 +97,14 @@ public class VoicePlayer {
 
             if(!mIsPlaying) break; //추가했음. - 아래 while문에 mIsPlaying는 없어도 될듯.
 
+            //vhandler
             Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]);
             System.out.println("알람타임 테스트 : " + alarmTime[i]);
-
             MainActivity.vhandler.sendMessage(message);
+
+            //phandler
+            Message message3 = MainActivity.phandler.obtainMessage(1, playCount-1-i);
+            MainActivity.phandler.sendMessage(message3);
 
 
             try {

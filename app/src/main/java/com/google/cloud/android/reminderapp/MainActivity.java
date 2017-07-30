@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -58,7 +59,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements MessageDialogFragment.Listener {
 
     private static final String FRAGMENT_MESSAGE_DIALOG = "message_dialog";
-
     private static final String STATE_RESULTS = "results";
 
     Handler mHandler = new Handler();
@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     Handler handler;
 
     public static Handler vhandler;
+    public static Handler phandler;
 
     boolean isEnd = false;
     int SampleRate = 16000;
@@ -169,25 +170,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         //listing
         listView = (ListView) findViewById(R.id.listView);
-//        adapter = new PlaylistAdapter();
-//        alarmTimeArr = db.getAllAlarmTime();
-//        playCount = alarmTimeArr.length;
-//        System.out.println("Play Count : " + playCount);
-//        for (int i = playCount - 1; i >= 0; i--) {
-//            String[] words = alarmTimeArr[i].split(":");
-//            if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-//            if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
-//
-//            String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-//            adapter.addItem(new Playlist(timeRegistered));
-//        }
         makeList();
-        // listView.setAdapter(adapter); //추가
 
         record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                System.out.println("여기까지" + mVoiceRecorder.isRecording());
                 if (!mVoiceRecorder.isRecording()) {
                     record.setEnabled(false);
                     record.setVisibility(View.GONE);
@@ -292,12 +281,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     device.callOnClick();
                 } else {
 
-                    if(alarmTimeArr[playingPos-1].equals("일반 메모"))
-                    {
+                    if (alarmTimeArr[playingPos - 1].equals("일반 메모")) {
                         mText.setText("일반 메모");
-                    }
-
-                    else {
+                    } else {
                         System.out.println("삭제 시 출력2");
                         String[] words = alarmTimeArr[playingPos - 1].split(":");
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
@@ -331,12 +317,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 yesButton.setVisibility(View.GONE);
                 noButton.setVisibility(View.GONE);
 
-                if((alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0]).equals("일반 메모"))
-                {
+                if ((alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0]).equals("일반 메모")) {
                     mText.setText("일반 메모");
-                }
-
-                else {
+                } else {
                     String[] words = alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0].split(":");
                     if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
 
@@ -365,12 +348,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 voicePlayer.stopPlaying();
                 listView.setVisibility(View.GONE);
 
-                if(alarmTimeArr[(playCount - 1)-position].equals("일반 메모"))
-                {
+                if (alarmTimeArr[(playCount - 1) - position].equals("일반 메모")) {
                     mText.setText("일반 메모");
-                }
-
-                else {
+                } else {
                     String[] words = alarmTimeArr[(playCount - 1) - position].split(":");
                     if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
                     if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
@@ -492,12 +472,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 } else if (voicePlayer.isPlaying()) {
                     String alarmTime = (String) msg.obj;
 
-                    if(alarmTime.equals("일반 메모"))
-                    {
+                    if (alarmTime.equals("일반 메모")) {
                         mText.setText("일반 메모");
-                    }
-
-                    else {
+                    } else {
                         String[] words = alarmTime.split(":");
 
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
@@ -508,6 +485,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         mText.setText(timeRegistered);
                     }
                 }
+            }
+        };
+
+        phandler = new Handler() {
+            public void handleMessage(Message msg) {
+                if (voicePlayer.isPlaying()) {
+                    //position = (int) msg.obj;
+                    }
             }
         };
 
@@ -601,7 +586,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
             if (permissions.length == 1 && grantResults.length == 1
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startVoiceRecorder();
+                //startVoiceRecorder();
             } else {
                 showPermissionMessageDialog();
             }
@@ -770,6 +755,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
     }
 
+    // 목록을 관리해주는 adapter
     class PlaylistAdapter extends BaseAdapter {
         ArrayList<Playlist> items = new ArrayList<Playlist>();
 
@@ -795,7 +781,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         @Override
         public View getView(int position, View convertView, ViewGroup viewGroup) {
             PlaylistView view = new PlaylistView(getApplicationContext());
-
             Playlist item = items.get(position);
             view.setName(item.getName());
             return view;
@@ -809,11 +794,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         System.out.println("Play Count : " + playCount);
         for (int i = playCount - 1; i >= 0; i--) {
 
-            if(alarmTimeArr[i].equals("일반 메모")) {
+            if (alarmTimeArr[i].equals("일반 메모")) {
                 adapter.addItem(new Playlist("일반 메모"));
-            }
-
-            else {
+            } else {
                 String[] words = alarmTimeArr[i].split(":");
                 if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
                 if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
