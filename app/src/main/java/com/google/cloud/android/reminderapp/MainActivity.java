@@ -17,6 +17,8 @@
 package com.google.cloud.android.reminderapp;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +29,7 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -54,6 +57,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.Timer;
 
 
 public class MainActivity extends AppCompatActivity implements MessageDialogFragment.Listener {
@@ -70,8 +74,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     boolean recRunning = false;
     boolean playRunning = false;
+
     // View references
     public static TextView mText;
+
+    //EPD timer
+    public static int value = 0;
+
     ImageSwitcher device;
     ImageButton record;
     ImageButton play;
@@ -86,10 +95,12 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     SeekBar settingBar;
 
     ImageView[] circles = new ImageView[5];
-    Handler handler;
 
-    public static Handler vhandler;
-    public static Handler phandler;
+    //핸들러
+    Handler handler; //화면 클릭했을때 녹음 처리 핸들러
+    public static Handler vhandler; // 재생중인 화면 mtext 처리 핸들러
+    public static Handler phandler; // 재생중인 리스터 처리 핸들러
+    Handler dhandler; // EPD 핸들러
 
     boolean isEnd = false;
     int SampleRate = 16000;
@@ -198,9 +209,41 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     float volume = preference.getFloat("volume", 1f);
                     sound.play(soundbeep, volume, volume, 0, 0, 1);
                     startVoiceRecorder();
-                }
+
+                    //EPD 기능 구현
+                    CountDownTimer timer;
+                    timer =  new CountDownTimer(7000, 980){
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            value++;
+                            //System.out.println("결과값 : " + value);
+                            if(value == 7){
+                                onFinish();
+                            }
+                            else if(!mVoiceRecorder.isRecording())
+                            {
+                                onFinish();
+                            }
+                        }
+                        @Override
+                        public void onFinish() {
+                            if(value == 7) {
+                                Message message = dhandler.obtainMessage(1, 1);
+                                dhandler.sendMessage(message);
+                                value = 0;
+                            }
+                            else
+                            {
+                                Message message = dhandler.obtainMessage(1, 2);
+                                dhandler.sendMessage(message);
+                                value = 0;
+                            }
+                        }
+                    }.start();  // 타이머 시작
+            }
             }
         });
+
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -446,6 +489,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     if (alarmTime.equals("note")) {
                         db.insert(fileName, "일반 메모", returnedValue);
                         mText.setText("일반 메모");
+                        Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     } else {
                         String[] words = alarmTime.split(":");
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
@@ -527,6 +571,15 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         listView.setSelection(position-1);
                     }
 //                   listView.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+
+        dhandler = new Handler() {
+            public void handleMessage(Message msg) {
+                System.out.println("결과값 : " + (int)(msg.obj));
+                if((int)(msg.obj) == 1) {
+                    device.callOnClick();
                 }
             }
         };
