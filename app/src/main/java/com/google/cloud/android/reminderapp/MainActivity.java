@@ -199,13 +199,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                 System.out.println("여기까지" + mVoiceRecorder.isRecording());
                 if (!mVoiceRecorder.isRecording()) {
+                    device.setVisibility(View.VISIBLE);
                     record.setEnabled(false);
                     record.setVisibility(View.GONE);
                     play.setEnabled(false);
                     play.setVisibility(View.GONE);
                     mText.setText("녹음중 ");
                     mText.setVisibility(View.VISIBLE);
-                    device.setEnabled(true);
                     if (!rRunning) {
                         recRunning = true;
                         rec.start();
@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             @Override
             public void onClick(View v) {
                 makeList();
+                device.setVisibility(View.VISIBLE);
                 if (playCount == 0) {
                     Toast.makeText(getApplicationContext(), "재생할 목록이 비어있습니다.", Toast.LENGTH_SHORT).show();
                     return;
@@ -274,7 +275,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setVisibility(View.VISIBLE);
                     list.setVisibility(View.VISIBLE);
                     deleteButton.setVisibility(View.VISIBLE);
-                    device.setEnabled(true);
 //                    playDisplay();
 //                    NoticeDisplay();
                     // 중간에 녹음한 것에 대해서 playCount값이 여기서 갱신되지 않은 상태일 수 있으므로, 대신 -1을 전달하고
@@ -296,8 +296,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.GONE);
                 list.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
-
-
             }
         });
 //삭제 버튼을 누르면 재생이 중지가 되고, 삭제 여부를 물어보는 화면이 뜬다. 거기서 yes를 누르면 삭제가 되고, 다음 파일부터 재생.
@@ -441,6 +439,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 System.out.println("MainActivity에서 mVoiceRecorder.isRecording 확인 : " + mVoiceRecorder.isRecording());
                 if (mVoiceRecorder.isRecording()) {
+                    device.setVisibility(View.INVISIBLE);
                     System.out.println("in device 1");
                     System.out.println("stop Voice Recorder");
                     SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
@@ -450,6 +449,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     stopVoiceRecorder();
                 }
                 if (voicePlayer.isPlaying()) {
+                    device.setVisibility(View.INVISIBLE);
                     System.out.println("in device 2");
                     voicePlayer.stopPlaying();
                     record.setEnabled(true);
@@ -462,12 +462,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     list.setVisibility(View.GONE);
                     listView.setVisibility((View.GONE));
                     deleteButton.setVisibility(View.GONE);
-                    device.setEnabled(false);
                 }
 
                 if (isEnd) {
+                    device.setVisibility(View.INVISIBLE);
                     System.out.println("in device 3");
-                    device.setEnabled(false);
                     record.setEnabled(true);
                     record.setVisibility(View.VISIBLE);
                     play.setEnabled(true);
@@ -639,6 +638,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     if(mVoiceRecorder.isRecording())
                     {
                         stopVoiceRecorder();
+                        recRunning = false;
                         deleteInternalFile();
                         fileName = "";
                         record.setEnabled(false);
@@ -665,12 +665,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     if(powerOn==true)
                     {
                         powerOn = false;
-                        device.setVisibility(View.INVISIBLE);
                         Toast.makeText(getApplicationContext(), "전원 꺼짐", Toast.LENGTH_SHORT).show();
                         record.setEnabled(false);
                         record.setVisibility(View.GONE);
                         play.setEnabled(false);
                         play.setVisibility(View.GONE);
+                        mText.setText("");
+                        device.setVisibility(View.INVISIBLE);
                     }
                 }
             }
