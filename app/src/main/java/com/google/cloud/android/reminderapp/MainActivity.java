@@ -439,7 +439,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 System.out.println("MainActivity에서 mVoiceRecorder.isRecording 확인 : " + mVoiceRecorder.isRecording());
                 if (mVoiceRecorder.isRecording()) {
-                    device.setVisibility(View.INVISIBLE);
                     System.out.println("in device 1");
                     System.out.println("stop Voice Recorder");
                     SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
@@ -449,7 +448,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     stopVoiceRecorder();
                 }
                 if (voicePlayer.isPlaying()) {
-                    device.setVisibility(View.INVISIBLE);
                     System.out.println("in device 2");
                     voicePlayer.stopPlaying();
                     record.setEnabled(true);
@@ -465,7 +463,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 }
 
                 if (isEnd) {
-                    device.setVisibility(View.INVISIBLE);
                     System.out.println("in device 3");
                     record.setEnabled(true);
                     record.setVisibility(View.VISIBLE);
