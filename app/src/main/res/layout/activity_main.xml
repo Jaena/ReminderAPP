@@ -85,7 +85,8 @@
         android:layout_marginTop="248dp"
         android:background="#00ff0000"
         android:scaleType="fitXY"
-        android:src="@drawable/list_button" />
+        android:src="@drawable/list_button"
+        android:visibility="gone"/>
 
     <ImageButton
         android:id="@+id/deleteButton"
@@ -95,7 +96,8 @@
         android:layout_marginTop="246dp"
         android:background="#00ff0000"
         android:scaleType="fitXY"
-        android:src="@drawable/delete_button2" />
+        android:src="@drawable/delete_button2"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/circle1"
