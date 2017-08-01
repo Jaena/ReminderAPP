@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     Handler handler; //화면 클릭했을때 녹음 처리 핸들러
     public static Handler vhandler; // 재생중인 화면 mtext 처리 핸들러
     public static Handler phandler; // 재생중인 리스터 처리 핸들러
-    Handler dhandler; // EPD 핸들러
+//    Handler dhandler; // EPD 핸들러
 
     boolean isEnd = false;
     int SampleRate = 16000;
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     boolean isButtonPushed = false; //추가
 
     public static String fileName;
-    String alarmTimeArr[];
+    String alarmTimeArr[], fileNameArr[];
     int playCount, playingPos;
 
     ListView listView;
@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     PlaylistView viewArr[] = new PlaylistView[100]; //list의 각 아이템들의 view값을 담고 있다. 일단 최대 100개로 해보자.
     int tempPos = -1, tempPos2;
+
+    //Timer
+    CountDownTimer timer;
 
     /**
      * @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐
@@ -193,6 +196,21 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         play.setEnabled(false);
         play.setVisibility(View.GONE);
 
+        //timer - 시간 제한 7초.
+        timer =  new CountDownTimer(7000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                value++;
+                System.out.println("value값 계속 ++됨? : " + value);
+            }
+
+            @Override
+            public void onFinish() {
+                value = 0;
+                device.callOnClick();
+            }
+        };
+
         record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,37 +235,35 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     sound.play(soundbeep, volume, volume, 0, 0, 1);
                     startVoiceRecorder();
 
-                    //EPD 기능 구현
-                    CountDownTimer timer;
-                    timer =  new CountDownTimer(7000, 980){
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            value++;
-                            //System.out.println("결과값 : " + value);
-                            if(value == 7){
-                                onFinish();
-                            }
-                            else if(!mVoiceRecorder.isRecording())
-                            {
-                                onFinish();
-                            }
-                        }
-                        @Override
-                        public void onFinish() {
-                            if(value == 7) {
-                                Message message = dhandler.obtainMessage(1, 1);
-                                dhandler.sendMessage(message);
-                                value = 0;
-                            }
-                            else
-                            {
-                                Message message = dhandler.obtainMessage(1, 2);
-                                dhandler.sendMessage(message);
-                                value = 0;
-                            }
-                        }
-                    }.start();  // 타이머 시작
-            }
+                    //TimeLimit 구현
+                    timer.cancel();
+                    timer.start(); //타이머 시작
+//                    CountDownTimer timer;
+//                    timer =  new CountDownTimer(7000, 980) {
+//                        @Override
+//                        public void onTick(long millisUntilFinished) {
+//                            value++;
+//                            if (value == 7) {
+//                                onFinish();
+//                            } else if (!mVoiceRecorder.isRecording()) {
+//                                onFinish();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFinish() {
+//                            if (value == 7) {
+//                                Message message = dhandler.obtainMessage(1, 1);
+//                                dhandler.sendMessage(message);
+//                                value = 0;
+//                            } else {
+//                                Message message = dhandler.obtainMessage(1, 2);
+//                                dhandler.sendMessage(message);
+//                                value = 0;
+//                            }
+//                        }
+//                      }.start();  // 타이머 시작
+                }
             }
         });
 
@@ -366,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         noButton.setOnClickListener(new View.OnClickListener() { //삭제 안함 -> 다음 파일부터 재생
             @Override
             public void onClick(View v) {
-                String fileNameArr[] = db.getAllFileName();
+                fileNameArr = db.getAllFileName();
                 alarmTimeArr = db.getAllAlarmTime();
 
                 whetherDelete.setVisibility(View.GONE);
@@ -412,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
                     if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
                     String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                    System.out.println("재성 " + timeRegistered);
                     mText.setText(timeRegistered);
                 }
                 mText.setVisibility(View.VISIBLE);
@@ -586,14 +601,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             }
         };
 
-        dhandler = new Handler() {
-            public void handleMessage(Message msg) {
-                System.out.println("결과값 : " + (int)(msg.obj));
-                if((int)(msg.obj) == 1) {
-                    device.callOnClick();
-                }
-            }
-        };
+//        dhandler = new Handler() {
+//            public void handleMessage(Message msg) {
+//                System.out.println("dhandler 결과값 : " + (int)(msg.obj));
+//                if((int)(msg.obj) == 1) {
+//                    device.callOnClick();
+//                }
+//            }
+//        };
 
         device.setFactory(new ViewSwitcher.ViewFactory() {
             public View makeView() {
@@ -732,7 +747,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
             if (permissions.length == 1 && grantResults.length == 1
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //startVoiceRecorder();
+//                startVoiceRecorder();
+//                stopVoiceRecorder();
             } else {
                 showPermissionMessageDialog();
             }
@@ -1001,14 +1017,18 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         }
     }
 
+    /**
+     * 재생 목록을 만드는 메소드, 재생 목록에는 각 녹음파일의 녹음한 시각이 보여진다.
+     */
     public void makeList() {
         adapter = new PlaylistAdapter();
+        fileNameArr = db.getAllFileName();
         alarmTimeArr = db.getAllAlarmTime();
         playCount = alarmTimeArr.length;
         System.out.println("Play Count : " + playCount);
         for (int i = playCount - 1; i >= 0; i--) {
-
-            if (alarmTimeArr[i].equals("일반 메모")) {
+            //기존의 알림 예정 시간 혹은 일반 메모를 출력하는 코드
+            /*if (alarmTimeArr[i].equals("일반 메모")) {
                 adapter.addItem(new Playlist("일반 메모"));
             } else {
                 String[] words = alarmTimeArr[i].split(":");
@@ -1017,8 +1037,20 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                 String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
                 adapter.addItem(new Playlist(timeRegistered));
-            }
+            }*/
+            //각 녹음 파일의 녹음한 시각을 목록에 출력하는 코드.
+            adapter.addItem(new Playlist(currentTime(fileNameArr[i])));
         }
+    }
+
+    /**
+     * file name이 가지고 있는 현재 시간 정보(yy-MM-dd hh:mm:ss)를  시:분(-월-일) 형식으로 변환하는 메소드
+     * @param fileName 파일 이름(시간 정보로 되어있음) String값
+     * @return 변환된 형식의 시간정보(시:분(-월-일)) String값
+     */
+    public String currentTime(String fileName) {
+        String retStr = fileName.substring(3, fileName.length() - 7);
+        return retStr;
     }
 
 /**
@@ -1039,5 +1071,4 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onBackPressed();
     }
-
 }
