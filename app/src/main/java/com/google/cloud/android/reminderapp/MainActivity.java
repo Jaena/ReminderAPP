@@ -465,7 +465,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     sound.play(soundbeep, volume, volume, 0, 0, 1);
                     recRunning = false;
                     stopVoiceRecorder();
-                    mText.setText("녹음 종료");
+                    timer.cancel();
                 }
                 if (voicePlayer.isPlaying()) {
                     System.out.println("in device 2");
