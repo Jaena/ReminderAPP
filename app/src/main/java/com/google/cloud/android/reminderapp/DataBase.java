@@ -166,4 +166,17 @@ public class DataBase {
         return temp;
     }
 
+    public String[] getAllContent(){
+        db = helper.getReadableDatabase();
+        String SQL ="SELECT text FROM "+tableName+";";
+        Cursor c = db.rawQuery(SQL,null);
+        int num = c.getCount();
+        String temp [] = new String[num];
+        for(int i=0;i<num;i++){
+            c.moveToNext();
+            temp[i] = c.getString(0);
+            System.out.println("test : " + temp[i]);
+        }
+        return temp;
+    }
 }

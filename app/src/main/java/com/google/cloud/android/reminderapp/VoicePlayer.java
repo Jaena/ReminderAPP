@@ -86,6 +86,7 @@ public class VoicePlayer {
     public void playWaveFile(int SampleRate,int mBufferSize) {
         String fileName[] = db.getAllFileName();
         String alarmTime[] = db.getAllAlarmTime();
+        String contentValue[] = db.getAllContent();
         int cnt = fileName.length; //목록에서 선택 시 playCount값이 변하기 때문에... 이렇게 따로 cnt에 저장해놓자.
 
 //       if(playCount == -1) //재생버튼을 눌러서 재생이 시작되는 경우 ( 이 외에는 목록의 파일을 클릭해서 재생 시작하는 경우임)
@@ -99,10 +100,10 @@ public class VoicePlayer {
                 break; //추가했음. - 아래 while문에 mIsPlaying는 없어도 될듯. - 아 재생 중간에 정지되려면 while문 안에 있어야 할지도..?
             }
 
-            Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]);
+            Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]+":"+contentValue[i]);
             MainActivity.vhandler.sendMessage(message);
 
-//            Message message3 = MainActivity.phandler.obtainMessage(1, cnt - 1 - i);
+//            Message message4 = MainActivity.phandler.obtainMessage(1, cnt - 1 - i);
 //            MainActivity.phandler.sendMessage(message3);
 
             try {

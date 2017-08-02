@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private int soundbeep;
 
     TimeAnalysis timeAnalysis;
+    ContentAnalysis contentAnalysis;
 
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 1; //추가
     boolean isButtonPushed = false; //추가
@@ -179,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         mVoiceRecorder = new VoiceRecorder(this, mVoiceCallback);
         voicePlayer = new VoicePlayer(this);
         timeAnalysis = new TimeAnalysis();
+        contentAnalysis = new ContentAnalysis();
         mText.setVisibility(View.VISIBLE);
 
         deviceOn = (ImageSwitcher) findViewById(R.id.device_on);
@@ -520,10 +522,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                 else {
                     String alarmTime = timeAnalysis.Analysis(returnedValue);
+                    String contentValue = contentAnalysis.Analysis(returnedValue);
 
                     if (alarmTime.equals("note")) {
-                        db.insert(fileName, "일반 메모", returnedValue);
-                        mText.setText("일반 메모");
+                        db.insert(fileName, "일반 메모", contentValue);
+                        mText.setText("<일반메모>\n"+ contentValue);
                         Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     } else {
                         String[] words = alarmTime.split(":");
@@ -531,9 +534,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
                         String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                        mText.setText("<알람시간>\n" +timeRegistered);
+                        mText.setText("<알람시간>\n" +timeRegistered + "\n" + contentValue);
 
-                        db.insert(fileName, alarmTime, returnedValue);
+                        db.insert(fileName, alarmTime, contentValue);
 
                         Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     }
@@ -551,18 +554,18 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     System.out.println("device call on click");
                 } else if (voicePlayer.isPlaying()) {
                     String alarmTime = (String) msg.obj;
+                    String[] words = alarmTime.split(":");
 
-                    if (alarmTime.equals("일반 메모")) {
-                        mText.setText("일반 메모");
+                    if (words[0].equals("일반 메모")) {
+                        mText.setText("<일반 메모>\n" + words[1]);
                     } else {
-                        String[] words = alarmTime.split(":");
 
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
                         if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
                         String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
                         System.out.println("재성(vhandler) " + timeRegistered);
-                        mText.setText(timeRegistered);
+                        mText.setText(timeRegistered +"\n" + words[5]);
                     }
                 }
             }
