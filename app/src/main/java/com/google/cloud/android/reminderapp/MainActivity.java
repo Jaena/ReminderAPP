@@ -529,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
                         String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                        mText.setText(timeRegistered);
+                        mText.setText("<알람시간>\n" +timeRegistered);
 
                         db.insert(fileName, alarmTime, returnedValue);
 
