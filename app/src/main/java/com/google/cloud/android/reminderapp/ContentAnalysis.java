@@ -18,13 +18,14 @@ public class ContentAnalysis {
         contentValue = contentValue.replaceAll("([0-9]?[0-9])월(달|달에|날|에|뒤에|후에)?","");
         contentValue = contentValue.replaceAll("([0-9]?[0-9])일(날|에|뒤에|후에)?","");
         contentValue = contentValue.replaceAll("([0-9]?[0-9])시반(날|에|뒤에|후에)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])시간(날|에|뒤에|후에)?","");
         contentValue = contentValue.replaceAll("([0-9]?[0-9])시(날|에|뒤에|후에)?","");
         contentValue = contentValue.replaceAll("([0-9]?[0-9])분(날|에|뒤에|후에)?","");
         contentValue = contentValue.replaceAll("([0-9]?[0-9])초(날|에|뒤에|후에)?","");
         contentValue = contentValue.replaceAll("([0-9]?[0-9])주(날|에|뒤에|후에)?","");
+
         contentValue = contentValue.replaceAll("(월|화|수|목|금|토|일)요일(날|에|뒤에|후에)?","");
         contentValue = contentValue.replaceAll("(다?다음주)(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])시간(날|에|뒤에|후에)?","");
         contentValue = contentValue.replaceAll("(오전|오후)","");
         contentValue = contentValue.replaceAll("(다다음날|다음날|내일|내일모레|내일모레글피|오늘|자정|정오|명일|명월|금일|작일|모레|낼모레|익일)","");
 
