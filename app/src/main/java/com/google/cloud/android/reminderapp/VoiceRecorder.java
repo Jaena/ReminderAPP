@@ -135,9 +135,21 @@ public class VoiceRecorder {
         short sData[] = new short[mBufferSize];
         FileOutputStream fos;
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd hh:mm:ss:a");
         String tempTime = sdf.format(date);
-        String fileName = tempTime + ".pcm";
+
+        String temp[] = tempTime.split(":");
+        int curHour = (tempTime.charAt(9) - '0') * 10 + (tempTime.charAt(10) - '0');
+        if (temp[3].equals("오전") && curHour == 12) {
+            curHour = 0; //0시
+        }
+        if(temp[3].equals("오후") && curHour != 12) {
+            curHour += 12;
+        }
+        tempTime = tempTime.substring(0, 9) + (curHour < 10 ? "0"+curHour : curHour) +tempTime.substring(11, tempTime.length());
+        String fileName = tempTime.substring(0, 17) + ".pcm";
+
+        System.out.println("tempTime : " + tempTime + ", fileName : " + fileName);
 
         MainActivity.fileName = fileName;//db.insert(fileName); //db에 fileName, alarmTime 둘 다 넣어야 함.
         try {

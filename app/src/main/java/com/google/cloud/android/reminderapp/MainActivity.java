@@ -197,17 +197,20 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         play.setVisibility(View.GONE);
 
         //timer - 시간 제한 7초.
-        timer =  new CountDownTimer(7000, 1000) {
+        timer =  new CountDownTimer(7000, 880) {
             @Override
             public void onTick(long millisUntilFinished) {
-                value++;
                 System.out.println("value값 계속 ++됨? : " + value);
+                mText.setText("녹음중\n" + (7-value) + "초 후 종료");
+                value++;
             }
 
             @Override
             public void onFinish() {
                 value = 0;
+                mText.setText("녹음 종료");
                 device.callOnClick();
+            //    device.setVisibility(View.INVISIBLE);
             }
         };
 
@@ -312,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.GONE);
                 list.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
+                device.setVisibility(View.INVISIBLE);
             }
         });
 //삭제 버튼을 누르면 재생이 중지가 되고, 삭제 여부를 물어보는 화면이 뜬다. 거기서 yes를 누르면 삭제가 되고, 다음 파일부터 재생.
@@ -330,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 whetherDelete.setVisibility(View.VISIBLE);
                 yesButton.setVisibility(View.VISIBLE);
                 noButton.setVisibility(View.VISIBLE);
-
+                device.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -344,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 whetherDelete.setVisibility(View.GONE);
                 yesButton.setVisibility(View.GONE);
                 noButton.setVisibility(View.GONE);
-
+                device.setVisibility(View.VISIBLE);
                 if (playingPos == 0) {
                     System.out.println("삭제 시 출력1");
                     isEnd = true;
@@ -403,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
-
+                device.setVisibility(View.VISIBLE);
 
                 try {
                     Thread.sleep(500);
@@ -433,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 mText.setVisibility(View.VISIBLE);
                 list.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
-
+                device.setVisibility(View.VISIBLE);
 
 
                 Toast.makeText(getApplicationContext(), (playCount - 1) - position + " " + position, Toast.LENGTH_SHORT).show();
@@ -461,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     sound.play(soundbeep, volume, volume, 0, 0, 1);
                     recRunning = false;
                     stopVoiceRecorder();
+                    mText.setText("녹음 종료");
                 }
                 if (voicePlayer.isPlaying()) {
                     System.out.println("in device 2");
@@ -476,7 +481,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     listView.setVisibility((View.GONE));
                     deleteButton.setVisibility(View.GONE);
                 }
-
+                value = 0;
                 if (isEnd) {
                     System.out.println("in device 3");
                     record.setEnabled(true);
