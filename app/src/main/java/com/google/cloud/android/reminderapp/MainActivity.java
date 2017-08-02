@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 value = 0;
                 mText.setText("녹음 종료");
                 device.callOnClick();
-            //    device.setVisibility(View.INVISIBLE);
+                //    device.setVisibility(View.INVISIBLE);
             }
         };
 
@@ -642,14 +642,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         SharedPreferences.Editor editor = a.edit();
                         editor.putFloat("volume", 0);
                         editor.commit();}
-                        else{
-                            progress--;
-                            SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = a.edit();
-                            editor.putFloat("volume", (float) (progress * 0.3));
-                            Log.d("volume setting", "" + progress * 0.3);
-                            editor.commit();
-                        }
+                    else{
+                        progress--;
+                        SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = a.edit();
+                        editor.putFloat("volume", (float) (progress * 0.3));
+                        Log.d("volume setting", "" + progress * 0.3);
+                        editor.commit();
+                    }
                 }
                 else {
                     if(mVoiceRecorder.isRecording())
@@ -941,7 +941,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                                device.setImageResource(image_m_Id[m_currentIndex]);
+                            device.setImageResource(image_m_Id[m_currentIndex]);
                         }
                     });
                     m_currentIndex++;
@@ -1058,10 +1058,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         return retStr;
     }
 
-/**
- * 내부저장소에 저장된 파일을 지우기 위한 메소드이다
- *
- */
+    /**
+     * 내부저장소에 저장된 파일을 지우기 위한 메소드이다
+     *
+     */
     private void deleteInternalFile()
     {
         File tempFile = new File(getFilesDir(),fileName);

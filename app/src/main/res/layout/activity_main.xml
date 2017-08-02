@@ -216,40 +216,37 @@
     <TextView
         android:id="@+id/whetherDelete"
         android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_alignBottom="@+id/circle1"
-        android:layout_alignEnd="@+id/backgound"
-        android:layout_alignStart="@+id/backgound"
-        android:layout_alignTop="@+id/record"
-        android:layout_below="@+id/device"
-        android:gravity="center_horizontal|center_vertical"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="127dp"
+        android:layout_marginTop="250dp"
         android:padding="5dp"
         android:text="삭제할까요?"
+
         android:textColor="#ffffffff"
-        android:textSize="16dp"
+        android:textSize="20dp"
         android:visibility="gone" />
 
     <Button
         android:id="@+id/yesButton"
-        android:layout_width="27dp"
-        android:layout_height="25dp"
-        android:layout_marginLeft="145dp"
-        android:layout_marginTop="300dp"
+        android:layout_width="63dp"
+        android:layout_height="65dp"
+        android:layout_marginLeft="117dp"
+        android:layout_marginTop="284dp"
         android:background="@android:color/holo_red_dark"
         android:text="YES"
         android:textColor="#ffffffff"
-        android:textSize="14dp"
+        android:textSize="20dp"
         android:visibility="gone"/>
 
     <Button
         android:id="@+id/noButton"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginLeft="185dp"
-        android:layout_marginTop="300dp"
+        android:layout_width="63dp"
+        android:layout_height="65dp"
+        android:layout_marginLeft="181dp"
+        android:layout_marginTop="284dp"
         android:background="@android:color/darker_gray"
         android:text="NO"
         android:textColor="#ffffffff"
-        android:textSize="14dp"
+        android:textSize="20dp"
         android:visibility="gone"/>
 </RelativeLayout>
