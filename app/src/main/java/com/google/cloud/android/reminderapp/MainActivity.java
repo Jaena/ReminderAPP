@@ -510,12 +510,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 if (returnedValue.equals("")) {
                     //mText.setText("터치해주세요");
                     Toast.makeText(getApplicationContext(), "아무말도 안하셨습니다", Toast.LENGTH_LONG).show();
+
                     if(powerOn==true) {
                         isEnd = true;
-                        device.callOnClick();
+                        mText.setText("음성인식 실패");
+                        //device.callOnClick();
                     }
                 }
-                //TODO 말이 있을 경우 (원하는 답을 찾지 못할때 인식 불가 기능을 추가할 예정)
+
                 else {
                     String alarmTime = timeAnalysis.Analysis(returnedValue);
 
@@ -689,6 +691,16 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         play.setVisibility(View.GONE);
                         mText.setText("");
                         device.setVisibility(View.INVISIBLE);
+
+                        //삭제 화면일 경우 전원 꺼지면 다 초기화
+                        whetherDelete.setVisibility(View.GONE);
+                        yesButton.setVisibility(View.GONE);
+                        noButton.setVisibility(View.GONE);
+
+                        //전원 꺼지면 카운트 다운 초기화
+                        value = 0;
+                        timer.cancel();
+
                     }
                 }
             }
