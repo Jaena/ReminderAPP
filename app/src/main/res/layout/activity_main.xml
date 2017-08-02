@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        ></LinearLayout>
 
     <ImageSwitcher
         android:id="@+id/device_on"
@@ -16,7 +23,9 @@
         android:layout_marginTop="25dp"
         android:visibility="invisible"
         android:src="@drawable/display_on"
-        />
+        >
+
+    </ImageSwitcher>
 
     <ImageView
         android:id="@+id/device"
@@ -249,4 +258,26 @@
         android:textColor="#ffffffff"
         android:textSize="18dp"
         android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="#00ff0000"
+        android:scaleType="fitXY"
+        android:src="@drawable/arrow"
+        android:layout_marginTop="40dp"
+        android:layout_alignTop="@+id/seekBar"
+        android:layout_toStartOf="@+id/circle3" />
+
+    <TextView
+        android:id="@+id/numPlayList"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="13dp"
+        android:textColor="#ffffffff"
+        android:textSize="20dp"
+        android:layout_alignTop="@+id/play"
+        android:layout_alignEnd="@+id/device_on" />
+
 </RelativeLayout>

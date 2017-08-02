@@ -126,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ListView listView;
     PlaylistAdapter adapter;
 
+    TextView numPlayList;
+
     PlaylistView viewArr[] = new PlaylistView[100]; //list의 각 아이템들의 view값을 담고 있다. 일단 최대 100개로 해보자.
     int tempPos = -1, tempPos2;
 
@@ -163,12 +165,14 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        numPlayList = (TextView)findViewById(R.id.numPlayList);
         device = (ImageSwitcher) findViewById(R.id.backgound);
         mText = (TextView) findViewById(R.id.text);
         record = (ImageButton) findViewById(R.id.record);
         play = (ImageButton) findViewById(R.id.play);
         settingBar = (SeekBar) findViewById(R.id.seekBar);
         settingBar.setMax(4);
+
 
         list = (ImageButton) findViewById(R.id.list);
         deleteButton = (ImageButton) findViewById(R.id.deleteButton);
@@ -183,11 +187,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         contentAnalysis = new ContentAnalysis();
         mText.setVisibility(View.VISIBLE);
 
+
         deviceOn = (ImageSwitcher) findViewById(R.id.device_on);
         deviceOff = (ImageSwitcher)findViewById(R.id.device_off);
 
         sound = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
         soundbeep = sound.load(getApplicationContext(), R.raw.rec_start, 1);
+
 
         //listing
         listView = (ListView) findViewById(R.id.listView);
@@ -197,6 +203,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         record.setVisibility(View.GONE);
         play.setEnabled(false);
         play.setVisibility(View.GONE);
+        numPlayList.setVisibility(View.GONE);
+
 
         //timer - 시간 제한 7초.
         timer =  new CountDownTimer(7000, 880) {
@@ -277,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 makeList();
                 device.setVisibility(View.VISIBLE);
+                numPlayList.setVisibility(View.INVISIBLE);
                 if (playCount == 0) {
                     Toast.makeText(getApplicationContext(), "재생할 목록이 비어있습니다.", Toast.LENGTH_SHORT).show();
                     return;
@@ -311,13 +320,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             @Override
             public void onClick(View v) {
                 makeList();
+                device.setVisibility(View.INVISIBLE);
                 listView.setAdapter(adapter);
                 listView.setVisibility(View.VISIBLE);
                 playRunning = false;
                 mText.setVisibility(View.GONE);
                 list.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
-                device.setVisibility(View.INVISIBLE);
             }
         });
 //삭제 버튼을 누르면 재생이 중지가 되고, 삭제 여부를 물어보는 화면이 뜬다. 거기서 yes를 누르면 삭제가 되고, 다음 파일부터 재생.
@@ -371,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setVisibility(View.VISIBLE);
                     list.setVisibility(View.VISIBLE);
                     deleteButton.setVisibility(View.VISIBLE);
-
+                    device.setVisibility(View.VISIBLE);
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
@@ -473,6 +482,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     System.out.println("in device 2");
                     voicePlayer.stopPlaying();
                     record.setEnabled(true);
+                    numPlayList.setVisibility(View.VISIBLE);
+                    numPlayList.setText(db.getAllPlayListNum()+"");
                     record.setVisibility(View.VISIBLE);
                     play.setEnabled(true);
                     play.setVisibility(View.VISIBLE);
@@ -486,10 +497,12 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 value = 0;
                 if (isEnd) {
                     System.out.println("in device 3");
+                    numPlayList.setVisibility(View.VISIBLE);
                     record.setEnabled(true);
                     record.setVisibility(View.VISIBLE);
                     play.setEnabled(true);
                     play.setVisibility(View.VISIBLE);
+                    numPlayList.setText(db.getAllPlayListNum()+"");
                     mText.setVisibility(View.GONE);
                     list.setVisibility(View.GONE);
                     listView.setVisibility((View.GONE));
@@ -637,10 +650,12 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     if(powerOn==false) {
                         Toast.makeText(getApplicationContext(), "전원 켜짐", Toast.LENGTH_SHORT).show();
                         powerOn = true;
+                        numPlayList.setVisibility(View.VISIBLE);
                         record.setEnabled(true);
                         record.setVisibility(View.VISIBLE);
                         play.setEnabled(true);
                         play.setVisibility(View.VISIBLE);
+                        numPlayList.setText(db.getAllPlayListNum()+"");
                     }
                     if(progress==1){
                         SharedPreferences a = getSharedPreferences("volume", MODE_PRIVATE);
@@ -671,6 +686,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         list.setVisibility(View.GONE);
                         listView.setVisibility((View.GONE));
                         deleteButton.setVisibility(View.GONE);
+                        numPlayList.setVisibility(View.GONE);
                         mText.setText("");
                     }
                     if(voicePlayer.isPlaying())
@@ -683,6 +699,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         list.setVisibility(View.GONE);
                         listView.setVisibility((View.GONE));
                         deleteButton.setVisibility(View.GONE);
+                        numPlayList.setVisibility(View.GONE);
                     }
                     if(powerOn==true)
                     {
@@ -694,7 +711,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         play.setVisibility(View.GONE);
                         mText.setText("");
                         device.setVisibility(View.INVISIBLE);
-
+                        numPlayList.setVisibility(View.INVISIBLE);
                         //삭제 화면일 경우 전원 꺼지면 다 초기화
                         whetherDelete.setVisibility(View.GONE);
                         yesButton.setVisibility(View.GONE);

@@ -179,4 +179,13 @@ public class DataBase {
         }
         return temp;
     }
+
+    public int getAllPlayListNum()
+    {
+        db = helper.getReadableDatabase();
+        String SQL ="SELECT alarmTime FROM "+tableName+";";
+        Cursor c = db.rawQuery(SQL,null);
+        int num = c.getCount();
+        return num;
+    }
 }
