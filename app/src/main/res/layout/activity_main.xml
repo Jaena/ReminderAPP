@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        ></LinearLayout>
+        android:id="@+id/linearLayout"></LinearLayout>
 
     <ImageSwitcher
         android:id="@+id/device_on"
@@ -265,19 +265,22 @@
         android:layout_height="100dp"
         android:background="#00ff0000"
         android:scaleType="fitXY"
-        android:src="@drawable/arrow"
-        android:layout_marginTop="40dp"
-        android:layout_alignTop="@+id/seekBar"
-        android:layout_toStartOf="@+id/circle3" />
+        android:src="@drawable/arrow3"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="169dp"/>
 
     <TextView
         android:id="@+id/numPlayList"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_marginTop="13dp"
-        android:textColor="#ffffffff"
-        android:textSize="20dp"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="15dp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:background="@drawable/countcircle"
         android:layout_alignTop="@+id/play"
-        android:layout_alignEnd="@+id/device_on" />
+        android:layout_marginLeft="215dp"
+        />
 
 </RelativeLayout>

@@ -237,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     play.setVisibility(View.GONE);
                     mText.setText("녹음중 ");
                     mText.setVisibility(View.VISIBLE);
+                    numPlayList.setVisibility(View.INVISIBLE);
                     if (!rRunning) {
                         recRunning = true;
                         rec.start();
@@ -288,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 numPlayList.setVisibility(View.INVISIBLE);
                 if (playCount == 0) {
                     Toast.makeText(getApplicationContext(), "재생할 목록이 비어있습니다.", Toast.LENGTH_SHORT).show();
+                    numPlayList.setVisibility(View.VISIBLE);
                     return;
                 }
                 if (!voicePlayer.isPlaying()) {
@@ -1087,6 +1089,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
      */
     public String currentTime(String fileName) {
         String retStr = fileName.substring(3, fileName.length() - 7);
+        retStr = retStr.substring(6)+ "("+retStr.substring(0,2)+"월" + retStr.substring(3,5)+"일)";
         return retStr;
     }
 
