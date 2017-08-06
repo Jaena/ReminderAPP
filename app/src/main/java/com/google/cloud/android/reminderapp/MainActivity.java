@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     boolean isButtonPushed = false; //추가
 
     public static String fileName;
-    String alarmTimeArr[], fileNameArr[];
+    String alarmTimeArr[], fileNameArr[], contentNameArr[];
     int playCount, playingPos;
 
     ListView listView;
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
         //listing
         listView = (ListView) findViewById(R.id.listView);
-        makeList();
+        makeList2();
 
         record.setEnabled(false);
         record.setVisibility(View.GONE);
@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                makeList();
+                makeList2();
                 device.setVisibility(View.VISIBLE);
                 numPlayList.setVisibility(View.INVISIBLE);
                 if (playCount == 0) {
@@ -321,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                makeList();
+                makeList2();
                 device.setVisibility(View.INVISIBLE);
                 listView.setAdapter(adapter);
                 listView.setVisibility(View.VISIBLE);
@@ -540,8 +540,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     String contentValue = contentAnalysis.Analysis(returnedValue);
 
                     if (alarmTime.equals("note")) {
-                        db.insert(fileName, "일반 메모", contentValue);
-                        mText.setText("<일반메모>\n"+ contentValue);
+                        db.insert(fileName, "일반 메모", returnedValue);
+                        mText.setText("<일반메모>\n"+ returnedValue);
                         Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
                     } else {
                         String[] words = alarmTime.split(":");
@@ -1059,11 +1059,39 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     /**
      * 재생 목록을 만드는 메소드, 재생 목록에는 각 녹음파일의 녹음한 시각이 보여진다.
      */
+    /*
     public void makeList() {
         adapter = new PlaylistAdapter();
         fileNameArr = db.getAllFileName();
         alarmTimeArr = db.getAllAlarmTime();
         playCount = alarmTimeArr.length;
+        System.out.println("Play Count : " + playCount);
+        for (int i = playCount - 1; i >= 0; i--) {
+            //기존의 알림 예정 시간 혹은 일반 메모를 출력하는 코드
+            if (alarmTimeArr[i].equals("일반 메모")) {
+                adapter.addItem(new Playlist("일반 메모"));
+            } else {
+                String[] words = alarmTimeArr[i].split(":");
+                if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                adapter.addItem(new Playlist(timeRegistered));
+            }
+            //각 녹음 파일의 녹음한 시각을 목록에 출력하는 코드.
+            adapter.addItem(new Playlist(recordTime(fileNameArr[i])));
+        }
+    }
+    */
+
+    /**
+     * 재생 목록을 만드는 메소드, 재생 목록에는 각 컨텐츠들이 보여진다.
+     */
+    public void makeList2() {
+        adapter = new PlaylistAdapter();
+        contentNameArr = db.getAllContent();
+        alarmTimeArr = db.getAllAlarmTime();
+        playCount = contentNameArr.length;
         System.out.println("Play Count : " + playCount);
         for (int i = playCount - 1; i >= 0; i--) {
             //기존의 알림 예정 시간 혹은 일반 메모를 출력하는 코드
@@ -1077,20 +1105,51 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
                 adapter.addItem(new Playlist(timeRegistered));
             }*/
-            //각 녹음 파일의 녹음한 시각을 목록에 출력하는 코드.
-            adapter.addItem(new Playlist(currentTime(fileNameArr[i])));
+            //각 녹음 파일의 일정 내용을 목록에 출력하는 코드.
+            adapter.addItem(new Playlist((i+1)+". " + contentTime(contentNameArr[i])));
         }
     }
 
+    /*
+    //알람이 울리는 시간을 리스트로 보여준다.
+    public void makeList3() {
+        adapter = new PlaylistAdapter();
+        alarmTimeArr = db.getAllAlarmTime();
+        playCount = alarmTimeArr.length();
+        System.out.println("Play Count : " + playCount);
+        for (int i = playCount - 1; i >= 0; i--) {
+            //기존의 알림 예정 시간 혹은 일반 메모를 출력하는 코드
+            if (alarmTimeArr[i].equals("일반 메모")) {
+                adapter.addItem(new Playlist("일반 메모"));
+            } else {
+                String[] words = alarmTimeArr[i].split(":");
+                if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
+                if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
+
+                String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                adapter.addItem(new Playlist(timeRegistered));
+            }
+        }
+    }
+    */
+
+    /*
     /**
      * file name이 가지고 있는 현재 시간 정보(yy-MM-dd hh:mm:ss)를  시:분(-월-일) 형식으로 변환하는 메소드
      * @param fileName 파일 이름(시간 정보로 되어있음) String값
      * @return 변환된 형식의 시간정보(시:분(-월-일)) String값
-     */
-    public String currentTime(String fileName) {
+    //make list에서 사용 (녹음시간으로 나타내기 위해서)
+    public String recordTime(String fileName) {
         String retStr = fileName.substring(3, fileName.length() - 7);
         retStr = retStr.substring(6)+ "("+retStr.substring(0,2)+"월" + retStr.substring(3,5)+"일)";
         return retStr;
+    }
+    */
+
+    // make list2에서 사용 (컨텐츠 명으로 나타내기 위해서)
+    public String contentTime(String contentName) {
+        if(contentName.length() > 6) return contentName.substring(0,6);
+        else return contentName;
     }
 
     /**
