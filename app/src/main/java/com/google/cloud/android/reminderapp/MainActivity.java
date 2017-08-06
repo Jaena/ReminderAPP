@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ImageSwitcher deviceOff;
 
     RecordingSwtich rec = new RecordingSwtich();
-    PlayingSwtich playS = new PlayingSwtich();
     DeviceOn deviceON= new DeviceOn();
     DeviceOff deviceOFF= new DeviceOff();
 
@@ -299,7 +298,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     play.setVisibility(View.GONE);
                     if (!pRunning) {
                         playRunning = true;
-                        playS.start();
                     } else {
                         playRunning = true;
                     }
@@ -929,38 +927,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
     boolean pRunning = false;
-
-    class PlayingSwtich extends Thread {
-
-        int m_duration;
-        final int image_m_Id[] = { R.drawable.display_off1, R.drawable.display_off2, R.drawable.display_off3, R.drawable.display_off4, R.drawable.display_off5, R.drawable.display_off};
-        int m_currentIndex = 0;
-
-        @Override
-        public void run() {
-            pRunning = true;
-            while (pRunning) {
-                synchronized (this) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (playRunning)
-                                device.setImageResource(image_m_Id[m_currentIndex]);
-                        }
-                    });
-                    m_currentIndex++;
-                    if (m_currentIndex == image_m_Id.length) {
-                        m_currentIndex = 0;
-                    }
-                    try {
-                        m_duration = 600;
-                        Thread.sleep(m_duration);
-                    } catch (InterruptedException e) {
-                    }
-                }
-            }   //while end
-        }
-    }
 
     class DeviceOn extends Thread {
 
