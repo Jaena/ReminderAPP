@@ -14,20 +14,22 @@ public class ContentAnalysis {
         contentValue = extractManager(target);
 
         //정규식
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])년(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])월(달|달에|날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])일(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])시반(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])시간(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])시(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])분(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])초(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("([0-9]?[0-9])주(날|에|뒤에|후에)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])년(까지|날까지|날|에|뒤에|후에|후|뒤|쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])월(까지|날까지|달|달에|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])일(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])시반(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])시간(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])시(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])분(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])초(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("([0-9]?[0-9])주(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
 
-        contentValue = contentValue.replaceAll("(월|화|수|목|금|토|일)요일(날|에|뒤에|후에)?","");
-        contentValue = contentValue.replaceAll("(다?다음주)(날|에|뒤에|후에)?","");
+        contentValue = contentValue.replaceAll("(월|화|수|목|금|토|일)요일(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("(다?다음주)(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
+        contentValue = contentValue.replaceAll("(오전쯤(에)?|오후쯤(에)?)","");
+        contentValue = contentValue.replaceAll("(오전에|오후에)","");
         contentValue = contentValue.replaceAll("(오전|오후)","");
-        contentValue = contentValue.replaceAll("(다다음날|다음날|내일|내일모레|내일모레글피|오늘|자정|정오|명일|명월|금일|작일|모레|낼모레|익일)","");
+        contentValue = contentValue.replaceAll("(다다음날|다음날|내일|내일모레|내일모레글피|오늘|자정|정오|명일|명월|금일|작일|모레|낼모레|익일)(까지|날까지|날|에|뒤에|후에|후|뒤쯤에|쯤)?","");
 
         return contentValue;
     }
@@ -47,13 +49,13 @@ public class ContentAnalysis {
             searchTarget = searchTarget.replaceAll("열한시", "11시");
             searchTarget = searchTarget.replaceAll("열두시", "12시");
 
-            searchTarget = searchTarget.replaceAll("새벽", "오전");
-            searchTarget = searchTarget.replaceAll("아침", "오전");
-            searchTarget = searchTarget.replaceAll("저녁", "오후");
-            searchTarget = searchTarget.replaceAll("낮", "오후");
+            searchTarget = searchTarget.replaceAll("새벽((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오전");
+            searchTarget = searchTarget.replaceAll("아침((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오전");
+            searchTarget = searchTarget.replaceAll("저녁((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오후");
+            searchTarget = searchTarget.replaceAll("낮((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오후");
             searchTarget = searchTarget.replaceAll("밤1시", "오전1시");
             searchTarget = searchTarget.replaceAll("밤12시", "오전0시");
-            searchTarget = searchTarget.replaceAll("밤", "오후");
+            searchTarget = searchTarget.replaceAll("밤((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오후");
 
             searchTarget = searchTarget.replaceAll("삼일", "3일");
             searchTarget = searchTarget.replaceAll("사일", "4일");
