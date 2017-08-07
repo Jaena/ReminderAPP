@@ -641,11 +641,17 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         ///////////////////////////////알람 설정 //////////////////////////////////////////
                         ///////////////////////알람 설정//////////////////////////
                         System.out.println("알람 시간 형식 : " + alarmTime);
-//                        db2.insert(alarmTime);
-//                        String allAlarmTimeName[] = db2.getAllFileName();
-                        String allAlarmTimeName[] = db.getAllFileName();
+                        //SharedPreferences 사용해서 누적된 알람의 개수 저장
+                        SharedPreferences alarmNumPref = getSharedPreferences("anPref", MODE_PRIVATE);
+                        int alarmNum = alarmNumPref.getInt("anum", 0); //anum에 해당하는 값이 없으면 0을 받아온다.
+//                        SharedPreferences alarmNumPref = getSharedPreferences("anPref", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = alarmNumPref.edit();
+                        editor.putInt("anum", alarmNum + 1); // 값 수정.
+                        editor.commit();
 
-                        int rCode = allAlarmTimeName.length;
+//                        String allAlarmTimeName[] = db.getAllFileName();
+//                        int rCode = allAlarmTimeName.length;
+                        int rCode = alarmNum;
 
                         Calendar mCalendar = Calendar.getInstance();
                         int yy, MM, dd, hh, mm;
