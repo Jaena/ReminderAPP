@@ -79,28 +79,18 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     // View references
     public static TextView mText;
-<<<<<<< HEAD
     public static TextView mText2;
-=======
-    public static TextView informationText;
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
 
     //EPD timer
     public static int value = 0;
 
     ImageSwitcher device;
     ImageView device2;
-<<<<<<< HEAD
-=======
-
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
     ImageButton record;
     ImageButton play;
     ImageButton list;
     ImageButton information;
     ImageButton deleteButton;
-    ImageButton information;
-
     TextView whetherDelete;
     Button yesButton, noButton;
     ImageSwitcher deviceOn;
@@ -121,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 //    Handler dhandler; // EPD 핸들러
 
     boolean isEnd = false;
-    boolean isInformation = false;
     int SampleRate = 16000;
     int BufferSize = 1024;
     private SoundPool sound;
@@ -181,16 +170,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         setContentView(R.layout.activity_main);
         numPlayList = (TextView) findViewById(R.id.numPlayList);
         device = (ImageSwitcher) findViewById(R.id.backgound);
-<<<<<<< HEAD
         device2 = (ImageView) findViewById(R.id.information_background);
         mText = (TextView) findViewById(R.id.playtext);
         mText2 = (TextView) findViewById(R.id.recordtext);
-=======
-        device2 = (ImageView) findViewById(R.id.backgound2);
-
-        mText = (TextView) findViewById(R.id.text);
-        informationText = (TextView) findViewById(R.id.informationtext);
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
 
         record = (ImageButton) findViewById(R.id.record);
         play = (ImageButton) findViewById(R.id.play);
@@ -200,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         list = (ImageButton) findViewById(R.id.list);
         information = (ImageButton) findViewById(R.id.information);
         deleteButton = (ImageButton) findViewById(R.id.deleteButton);
-        information = (ImageButton) findViewById(R.id.information);
         whetherDelete = (TextView) findViewById(R.id.whetherDelete);
         yesButton = (Button) findViewById(R.id.yesButton);
         noButton = (Button) findViewById(R.id.noButton);
@@ -232,11 +213,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             @Override
             public void onTick(long millisUntilFinished) {
                 System.out.println("value값 계속 ++됨? : " + value);
-<<<<<<< HEAD
                 mText2.setText("녹음중\n" + (7 - value) + "초 후 종료");
-=======
-                mText.setText("녹음중\n" + (7 - value) + "초 후 종료");
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
                 value++;
             }
 
@@ -393,7 +370,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 list.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
                 information.setVisibility(View.GONE);
-<<<<<<< HEAD
                 device.setVisibility(View.INVISIBLE);
                 device2.setVisibility(View.VISIBLE);
             }
@@ -408,89 +384,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             }
         });
 
-=======
-            }
-        });
-
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //재생 중지
-                playingPos = voicePlayer.stopPlaying();
-
-                playRunning = false;
-                mText.setVisibility(View.GONE);
-                list.setVisibility(View.GONE);
-                deleteButton.setVisibility(View.GONE);
-                information.setVisibility(View.GONE);
-
-                whetherDelete.setVisibility(View.VISIBLE);
-                yesButton.setVisibility(View.VISIBLE);
-                noButton.setVisibility(View.VISIBLE);
-                device.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        //녹음 시간/ 알람 시간 정보에 대해서 나온다. 이때 재생은 중지가 되며, 다시 돌아가려면 화면을 클릭하면 된다.
-        information.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //재생 중지
-                playingPos = voicePlayer.stopPlaying();
-
-                playRunning = false;
-                //mText.setVisibility(View.GONE);
-                list.setVisibility(View.GONE);
-                deleteButton.setVisibility(View.GONE);
-                information.setVisibility(View.GONE);
-                System.out.println("여기 돌아가 고 있음");
-                device.setVisibility(View.INVISIBLE);
-                device2.setVisibility(View.VISIBLE);
-
-            }
-        });
-
-        //인포메이션에서 클릭시 화면이 재생하는 곳으로 넘어 가게 된다.
-        device2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                fileNameArr = db.getAllFileName();
-                alarmTimeArr = db.getAllAlarmTime();
-
-                whetherDelete.setVisibility(View.GONE);
-                yesButton.setVisibility(View.GONE);
-                noButton.setVisibility(View.GONE);
-
-                if ((alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0]).equals("일반 메모")) {
-                    mText.setText("일반 메모");
-                } else {
-                    String[] words = alarmTimeArr[playingPos > 0 ? (playingPos - 1) : 0].split(":");
-                    if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
-
-                    if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
-                    String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                    System.out.println("재성 " + timeRegistered);
-                    mText.setText(timeRegistered);
-                }
-                mText.setVisibility(View.VISIBLE);
-                list.setVisibility(View.VISIBLE);
-                deleteButton.setVisibility(View.VISIBLE);
-                information.setVisibility(View.VISIBLE);
-                device.setVisibility(View.GONE);
-                device.setVisibility(View.VISIBLE);
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                voicePlayer.startPlaying(SampleRate, BufferSize, playingPos); //다음 파일부터 재생
-            }
-        });
-
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
 
 //삭제 버튼을 누르면 재생이 중지가 되고, 삭제 여부를 물어보는 화면이 뜬다. 거기서 yes를 누르면 삭제가 되고, 다음 파일부터 재생.
 //거기서 no를 누르면 다음 파일부터 재생한다.
@@ -711,24 +604,15 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                     if (alarmTime.equals("note")) {
                         db.insert(fileName, "일반 메모", returnedValue);
-<<<<<<< HEAD
                         mText2.setText("<일반메모>\n" + recordCutValue(returnedValue.replaceAll(" ",""),1));
 
-=======
-                        mText.setText("<일반메모>\n" + returnedValue);
-                        Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
                     } else {
                         String[] words = alarmTime.split(":");
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
                         if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
                         String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-<<<<<<< HEAD
                         mText2.setText("<알람시간>\n" + timeRegistered + "\n" + recordCutValue(contentValue,2));
-=======
-                        mText.setText("<알람시간>\n" + timeRegistered + "\n" + contentValue);
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
 
                         db.insert(fileName, alarmTime, contentValue);
 
@@ -760,13 +644,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                         String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
                         System.out.println("재성(vhandler) " + timeRegistered);
-<<<<<<< HEAD
                         //mText.setText(timeRegistered +"\n" + words[5]);
                         */
                         mText.setText(playCutValue(words[5].replaceAll(" ","")));
-=======
-                        mText.setText(timeRegistered + "\n" + words[5]);
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
                     }
                 }
             }
@@ -1343,10 +1223,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     // make list2에서 사용 (컨텐츠 명으로 나타내기 위해서)
     public String contentTime(String contentName) {
-<<<<<<< HEAD
         contentName= contentName.replaceAll(" ","");
-=======
->>>>>>> 1023eb2a47d91fa7b15a5d619e22f763ef9702c7
         if (contentName.length() > 6) return contentName.substring(0, 6);
         else return contentName;
     }
