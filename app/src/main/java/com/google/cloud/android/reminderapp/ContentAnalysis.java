@@ -49,13 +49,13 @@ public class ContentAnalysis {
             searchTarget = searchTarget.replaceAll("열한시", "11시");
             searchTarget = searchTarget.replaceAll("열두시", "12시");
 
-            searchTarget = searchTarget.replaceAll("새벽((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오전");
-            searchTarget = searchTarget.replaceAll("아침((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오전");
-            searchTarget = searchTarget.replaceAll("저녁((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오후");
-            searchTarget = searchTarget.replaceAll("낮((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오후");
+            searchTarget = searchTarget.replaceAll("새벽((([0-9])?[0-9])시)(([0-9])?[0-9]분)?(반)?", "오전");
+            searchTarget = searchTarget.replaceAll("아침((([0-9])?[0-9])시)(([0-9])?[0-9]분)?(반)?", "오전");
+            searchTarget = searchTarget.replaceAll("저녁((([0-9])?[0-9])시)(([0-9])?[0-9]분)?(반)?", "오후");
+            searchTarget = searchTarget.replaceAll("낮((([0-9])?[0-9])시)(([0-9])?[0-9]분)?(반)?", "오후");
             searchTarget = searchTarget.replaceAll("밤1시", "오전1시");
             searchTarget = searchTarget.replaceAll("밤12시", "오전0시");
-            searchTarget = searchTarget.replaceAll("밤((([0-9])?[0-9])시)(([0-9])?[0-9]분)?", "오후");
+            searchTarget = searchTarget.replaceAll("밤((([0-9])?[0-9])시)(([0-9])?[0-9]분)?(반)?", "오후");
 
             searchTarget = searchTarget.replaceAll("삼일", "3일");
             searchTarget = searchTarget.replaceAll("사일", "4일");

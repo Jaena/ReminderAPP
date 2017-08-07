@@ -653,8 +653,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         //String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
                         String timeRegistered = words[3] + ":" + words[4] + "(" + words[2] + "일" + ")" + "알람";
                         //recordresult.setText("<알람시간>\n" + timeRegistered + "\n" + recordCutValue(contentValue,2));
-                        recordresult.setText(timeRegistered + "\n" + recordCutValue(contentValue, 2));
-
+                        if (contentValue.equals("")) {
+                            recordresult.setText(timeRegistered + "\n" + "내용 없음");
+                        } else {
+                            recordresult.setText(timeRegistered + "\n" + recordCutValue(contentValue, 2));
+                        }
                         //db.insert(fileName, alarmTime, contentValue); db에 시간표현 없앤 표현을 넣기위해서 사용
                         db.insert(fileName, alarmTime, returnedValue);
                         Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
@@ -946,7 +949,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
             //한줄 처리일 경우
 
-           if (contentValue.length() > 8) {
+            if (contentValue.length() > 8) {
                 cutvalue = contentValue.substring(0, 6) + "..";
             } else {
                 cutvalue = contentValue.substring(0, contentValue.length());
@@ -1292,7 +1295,12 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             }*/
             //각 녹음 파일의 일정 내용을 목록에 출력하는 코드.
             contentNameArr[i] = contentAnalysis.Analysis(contentNameArr[i]);
-            adapter.addItem(new Playlist((i + 1) + ". " + contentTime(contentNameArr[i])));
+
+            if (contentNameArr[i].equals("")) {
+                adapter.addItem(new Playlist((i + 1) + ". " + "내용 없음"));
+            } else {
+                adapter.addItem(new Playlist((i + 1) + ". " + contentTime(contentNameArr[i])));
+            }
         }
     }
 
