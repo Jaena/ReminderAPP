@@ -55,6 +55,8 @@ import android.widget.ViewSwitcher;
 
 import com.tsengvn.typekit.TypekitContextWrapper;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -82,19 +84,22 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     // View references
     public static TextView mText;
     public static TextView mText2;
+    public static TextView alramtext;
 
     //EPD timer
     public static int value = 0;
 
     public static ImageSwitcher device;
-    ImageView device2;
+    public static ImageView device2;
+    public static ImageView alram;
+
     public static ImageButton record;
     public static ImageButton play;
-    ImageButton list;
-    ImageButton information;
-    ImageButton deleteButton;
+    public static ImageButton list;
+    public static ImageButton information;
+    public static ImageButton deleteButton;
     TextView whetherDelete;
-    Button yesButton, noButton;
+    public static Button yesButton, noButton;
     ImageSwitcher deviceOn;
     ImageSwitcher deviceOff;
 
@@ -126,7 +131,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     public static String fileName;
     String alarmTimeArr[], fileNameArr[], contentNameArr[];
-    int playCount, playingPos;
+    int playCount;
+    static int playingPos;
 
     ListView listView;
     PlaylistAdapter adapter;
@@ -173,6 +179,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         numPlayList = (TextView) findViewById(R.id.numPlayList);
         device = (ImageSwitcher) findViewById(R.id.backgound);
         device2 = (ImageView) findViewById(R.id.information_background);
+
+        alram = (ImageView)findViewById(R.id.alram);
+        alramtext = (TextView)findViewById(R.id.alramtext);
+
         mText = (TextView) findViewById(R.id.playtext);
         mText2 = (TextView) findViewById(R.id.recordtext);
 
@@ -382,7 +392,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 //재생 중지
                 device2.setVisibility(View.INVISIBLE);
-                noButton.callOnClick(); //재생화면으로 돌아가는 기능이 같기 때문에 사용하겠음.
+                if(playingPos == -100)
+                {
+                    device.callOnClick();
+                }
+                else {
+                    noButton.callOnClick(); //재생화면으로 돌아가는 기능이 같기 때문에 사용하겠음.
+                }
             }
         });
 
@@ -551,6 +567,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     record.setVisibility(View.VISIBLE);
                     play.setEnabled(true);
                     play.setVisibility(View.VISIBLE);
+                    alram.setVisibility(View.GONE);
+                    alramtext.setVisibility(View.GONE);
                     playRunning = false;
                     mText.setText("");
                     mText.setVisibility(View.GONE);
@@ -815,6 +833,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         play.setVisibility(View.GONE);
                         mText.setText("");
                         mText2.setText("");
+                        alramtext.setVisibility(View.GONE);
+                        alram.setVisibility(View.GONE);
                         device.setVisibility(View.INVISIBLE);
                         numPlayList.setVisibility(View.INVISIBLE);
                         //삭제 화면일 경우 전원 꺼지면 다 초기화

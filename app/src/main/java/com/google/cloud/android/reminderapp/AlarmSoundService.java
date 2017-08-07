@@ -2,12 +2,15 @@ package com.google.cloud.android.reminderapp;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.view.View;
 import android.widget.Toast;
 
+import static com.google.cloud.android.reminderapp.MainActivity.play;
+import static com.google.cloud.android.reminderapp.MainActivity.playingPos;
 import static com.google.cloud.android.reminderapp.MainActivity.value;
 
 public class AlarmSoundService extends Service {
@@ -28,12 +31,19 @@ public class AlarmSoundService extends Service {
         Toast.makeText(this, "알람이 울립니다. " + temp, Toast.LENGTH_LONG).show();
 
         MainActivity.device.setVisibility(View.VISIBLE);
+        MainActivity.alram.setVisibility(View.VISIBLE);
+        MainActivity.list.setVisibility(View.GONE);
+        MainActivity.information.setVisibility(View.GONE);
+        MainActivity.deleteButton.setVisibility(View.GONE);
         MainActivity.record.setEnabled(false);
         MainActivity.record.setVisibility(View.GONE);
         MainActivity.play.setEnabled(false);
         MainActivity.play.setVisibility(View.GONE);
-        MainActivity.mText.setText("알람 중");
-        MainActivity.mText.setVisibility(View.VISIBLE);
+        MainActivity.mText2.setText("       알람 중");
+        MainActivity.mText2.setVisibility(View.VISIBLE);
+        MainActivity.alramtext.setText("화면을 클릭시\n알람이 종료 됩니다.");
+        MainActivity.alramtext.setVisibility(View.VISIBLE);
+        MainActivity.mText.setVisibility(View.INVISIBLE);
         MainActivity.numPlayList.setVisibility(View.INVISIBLE);
 //        try {
 //            Thread.sleep(1000);
@@ -45,7 +55,12 @@ public class AlarmSoundService extends Service {
 
         class BackgroundTask extends AsyncTask<String, String, String> {
             protected void onPreExecute() {
-
+                MainActivity.playingPos = MainActivity.voicePlayer.stopPlaying();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             protected String doInBackground(String ... values) {
@@ -61,7 +76,8 @@ public class AlarmSoundService extends Service {
             }
 
             protected void onPostExecute(String result) {
-                MainActivity.device.callOnClick();
+                    System.out.println("여기는 안들어올걸? " + playingPos);
+                    MainActivity.device.callOnClick();
             }
 
             protected void onCancelled() {

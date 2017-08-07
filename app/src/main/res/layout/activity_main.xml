@@ -246,6 +246,32 @@
         android:textSize="16dp"
         android:visibility="gone" />
 
+    <ImageView
+        android:id="@+id/alram"
+        android:layout_width="30dp"
+        android:layout_height="103dp"
+        android:layout_marginTop="248dp"
+        android:layout_marginLeft="139dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:background="#00ff0000"
+        android:src="@drawable/alram"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/alramtext"
+        android:layout_width="125dp"
+        android:layout_height="103dp"
+        android:layout_marginTop="280dp"
+        android:layout_marginLeft="118dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:padding="2dp"
+        android:text=""
+        android:textColor="#ffffffff"
+        android:textSize="11dp"
+        android:visibility="gone"/>
+
+
+
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="300dp"
