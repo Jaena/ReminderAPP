@@ -29,13 +29,7 @@ public class ContentAnalysis {
         contentValue = contentValue.replaceAll("(오전|오후)","");
         contentValue = contentValue.replaceAll("(다다음날|다음날|내일|내일모레|내일모레글피|오늘|자정|정오|명일|명월|금일|작일|모레|낼모레|익일)","");
 
-        if(contentValue.length() >= 7) {
-            return contentValue.substring(0,7) +"...";
-        }
-        else
-        {
-            return contentValue.substring(0,contentValue.length());
-        }
+        return contentValue;
     }
         public String extractManager(String searchTarget) {
 

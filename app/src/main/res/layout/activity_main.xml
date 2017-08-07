@@ -36,6 +36,17 @@
         android:src="@drawable/background" />
 
     <ImageView
+        android:id="@+id/information_background"
+        android:layout_width="132dp"
+        android:layout_height="130dp"
+        android:background="#00ff0000"
+        android:layout_alignTop="@+id/device"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/display_off"/>
+
+
+    <ImageView
         android:id="@+id/backgound_off"
         android:layout_width="132dp"
         android:layout_height="130dp"
@@ -95,6 +106,17 @@
         android:background="#00ff0000"
         android:scaleType="fitXY"
         android:src="@drawable/list_button"
+        android:visibility="gone"/>
+
+    <ImageButton
+        android:id="@+id/information"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginLeft="170dp"
+        android:layout_marginTop="247dp"
+        android:background="#00ff0000"
+        android:scaleType="fitXY"
+        android:src="@drawable/information"
         android:visibility="gone"/>
 
     <ImageButton
@@ -199,16 +221,26 @@
         android:src="@drawable/play_button" />
 
     <TextView
-        android:id="@+id/text"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_alignBottom="@+id/circle1"
-        android:layout_alignEnd="@+id/backgound"
-        android:layout_alignStart="@+id/backgound"
-        android:layout_alignTop="@+id/record"
-        android:layout_marginTop="25dp"
+        android:id="@+id/playtext"
+        android:layout_width="125dp"
+        android:layout_height="83dp"
+        android:layout_marginTop="268dp"
+        android:layout_marginLeft="117dp"
         android:gravity="center_horizontal|center_vertical"
-        android:padding="5dp"
+        android:padding="2dp"
+        android:text=""
+        android:textColor="#ffffffff"
+        android:textSize="16dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/recordtext"
+        android:layout_width="125dp"
+        android:layout_height="103dp"
+        android:layout_marginTop="248dp"
+        android:layout_marginLeft="117dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:padding="2dp"
         android:text=""
         android:textColor="#ffffffff"
         android:textSize="16dp"
