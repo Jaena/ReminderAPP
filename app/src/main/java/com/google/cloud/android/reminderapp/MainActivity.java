@@ -85,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     public static TextView mText;
     public static TextView mText2;
     public static TextView alramtext;
+    public static TextView resulttitle;
+    public static TextView recordresult;
 
     //EPD timer
     public static int value = 0;
@@ -180,11 +182,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         device = (ImageSwitcher) findViewById(R.id.backgound);
         device2 = (ImageView) findViewById(R.id.information_background);
 
-        alram = (ImageView)findViewById(R.id.alram);
-        alramtext = (TextView)findViewById(R.id.alramtext);
+        alram = (ImageView) findViewById(R.id.alram);
+        alramtext = (TextView) findViewById(R.id.alramtext);
 
         mText = (TextView) findViewById(R.id.playtext);
         mText2 = (TextView) findViewById(R.id.recordtext);
+        resulttitle = (TextView) findViewById(R.id.resultitle);
+        recordresult = (TextView) findViewById(R.id.recordresult);
 
         record = (ImageButton) findViewById(R.id.record);
         play = (ImageButton) findViewById(R.id.play);
@@ -392,11 +396,9 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             public void onClick(View v) {
                 //재생 중지
                 device2.setVisibility(View.INVISIBLE);
-                if(playingPos == -100)
-                {
+                if (playingPos == -100) {
                     device.callOnClick();
-                }
-                else {
+                } else {
                     noButton.callOnClick(); //재생화면으로 돌아가는 기능이 같기 때문에 사용하겠음.
                 }
             }
@@ -588,6 +590,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     mText.setVisibility(View.GONE);
                     mText2.setText("");
                     mText2.setVisibility(View.GONE);
+                    resulttitle.setVisibility(View.GONE);
+                    recordresult.setVisibility(View.GONE);
                     list.setVisibility(View.GONE);
                     listView.setVisibility((View.GONE));
                     deleteButton.setVisibility(View.GONE);
@@ -609,6 +613,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                     information.setVisibility(View.GONE);
                     mText.setText("");
                     mText2.setVisibility(View.GONE);
+                    resulttitle.setVisibility(View.GONE);
+                    recordresult.setVisibility(View.GONE);
                     SharedPreferences preference = getSharedPreferences("volume", MODE_PRIVATE);
                     float volume = preference.getFloat("volume", 1f);
                     sound.play(soundbeep, volume, volume, 0, 0, 1);
@@ -629,27 +635,45 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                     if (powerOn == true) {
                         isEnd = true;
-                        mText2.setText("음성인식 실패");
+
+                        mText2.setVisibility(View.INVISIBLE);
+                        resulttitle.setVisibility(View.VISIBLE);
+                        recordresult.setVisibility(View.VISIBLE);
+
+                        resulttitle.setBackgroundColor(Color.RED);
+                        recordresult.setText("음성인식 실패");
                         //device.callOnClick();
                     }
                 } else {
                     String alarmTime = timeAnalysis.Analysis(returnedValue);
                     String contentValue = contentAnalysis.Analysis(returnedValue);
 
+                    mText2.setVisibility(View.INVISIBLE);
+                    resulttitle.setVisibility(View.VISIBLE);
+                    recordresult.setVisibility(View.VISIBLE);
+                    //TODO 색상 변경
+                    resulttitle.setBackgroundColor(Color.GREEN);
+
                     if (alarmTime.equals("note")) {
                         db.insert(fileName, "일반 메모", returnedValue);
-                        mText2.setText("<일반메모>\n" + recordCutValue(returnedValue.replaceAll(" ",""),1));
+                        //recordresult.setText("<일반메모>\n" + recordCutValue(returnedValue.replaceAll(" ",""),1));
+                        recordresult.setText(recordCutValue(returnedValue.replaceAll(" ", ""), 1));
 
                     } else {
                         String[] words = alarmTime.split(":");
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
                         if (Integer.parseInt(words[4]) < 10) words[4] = '0' + words[4];
 
-                        String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
-                        mText2.setText("<알람시간>\n" + timeRegistered + "\n" + recordCutValue(contentValue,2));
-
-                        db.insert(fileName, alarmTime, contentValue);
-
+                        //String timeRegistered = words[3] + ":" + words[4] + "(" + words[1] + "월" + words[2] + "일" + ")";
+                        String timeRegistered = words[3] + ":" + words[4] + "(" + words[2] + "일" + ")" + "알람";
+                        //recordresult.setText("<알람시간>\n" + timeRegistered + "\n" + recordCutValue(contentValue,2));
+                        if (contentValue.equals("")) {
+                            recordresult.setText(timeRegistered + "\n" + "내용 없음");
+                        } else {
+                            recordresult.setText(timeRegistered + "\n" + recordCutValue(contentValue, 2));
+                        }
+                        //db.insert(fileName, alarmTime, contentValue); db에 시간표현 없앤 표현을 넣기위해서 사용
+                        db.insert(fileName, alarmTime, returnedValue);
                         Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
 
                         ///////////////////////////////알람 설정 //////////////////////////////////////////
@@ -673,8 +697,11 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                         Calendar mCalendar = Calendar.getInstance();
                         int yy, MM, dd, hh, mm;
-                        yy = 2000 + Integer.parseInt(words[0]); MM = Integer.parseInt(words[1]); dd = Integer.parseInt(words[2]);
-                        hh = Integer.parseInt(words[3]); mm = Integer.parseInt(words[4]);
+                        yy = 2000 + Integer.parseInt(words[0]);
+                        MM = Integer.parseInt(words[1]);
+                        dd = Integer.parseInt(words[2]);
+                        hh = Integer.parseInt(words[3]);
+                        mm = Integer.parseInt(words[4]);
                         mCalendar.set(yy, MM - 1, dd, hh, mm, 0);
 
                         Intent mAlarmIntent = new Intent("com.google.cloud.android.reminderapp.ALARM_START");
@@ -722,7 +749,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
                     if (words[0].equals("일반 메모")) {
                         //mText.setText("<일반 메모>\n" + words[1]);
-                        mText.setText(playCutValue(words[1].replaceAll(" ","")));
+                        mText.setText(playCutValue(words[1].replaceAll(" ", "")));
                     } else {
                         /*
                         if (Integer.parseInt(words[3]) < 10) words[3] = '0' + words[3];
@@ -732,7 +759,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         System.out.println("재성(vhandler) " + timeRegistered);
                         //mText.setText(timeRegistered +"\n" + words[5]);
                         */
-                        mText.setText(playCutValue(words[5].replaceAll(" ","")));
+                        mText.setText(playCutValue(words[5].replaceAll(" ", "")));
                     }
                 }
             }
@@ -898,23 +925,36 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     //재생중일 경우 화면에 표시해주는 것을 설정해준다.
     public String playCutValue(String contentValue) {
         String cutvalue = "";
-            if (contentValue.length() > 24) {
-                cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, 16) + "\n" + contentValue.substring(16, 23) + "..";
-            } else if (contentValue.length() > 16) {
-                cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, 16) + "\n" + contentValue.substring(16,contentValue.length());
-            } else if (contentValue.length() > 8) {
-                cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8,contentValue.length());
-            } else {
-                cutvalue = contentValue.substring(0, contentValue.length());
-            }
+        if (contentValue.length() > 24) {
+            cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, 16) + "\n" + contentValue.substring(16, 23) + "..";
+        } else if (contentValue.length() > 16) {
+            cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, 16) + "\n" + contentValue.substring(16, contentValue.length());
+        } else if (contentValue.length() > 8) {
+            cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, contentValue.length());
+        } else {
+            cutvalue = contentValue.substring(0, contentValue.length());
+        }
         return cutvalue;
     }
 
     //녹음 후 화면에 표시해주는 것을 설정해준다.
-    public String recordCutValue(String contentValue ,int i) {
+    public String recordCutValue(String contentValue, int i) {
         String cutvalue = "";
 
-        if(i == 1) {
+        if (i == 1) {
+
+            if (contentValue.length() > 24) {
+                cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, 16) + "\n" + contentValue.substring(16, 23) + "..";
+            } else if (contentValue.length() > 16) {
+                cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, 16) + "\n" + contentValue.substring(16, contentValue.length());
+            } else if (contentValue.length() > 8) {
+                cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, contentValue.length());
+            } else {
+                cutvalue = contentValue.substring(0, contentValue.length());
+            }
+
+            // 두줄 처리일 경우
+            /*
             if (contentValue.length() > 16) {
                 cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, 15)  + "..";
             } else if (contentValue.length() > 8) {
@@ -922,14 +962,26 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
             } else {
                 cutvalue = contentValue.substring(0, contentValue.length());
             }
-        }
-        else if(i == 2)
-        {
-           if (contentValue.length() > 8) {
+            */
+        } else if (i == 2) {
+
+            //두줄 처리
+            if (contentValue.length() > 16) {
+                cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, 15) + "..";
+            } else if (contentValue.length() > 8) {
+                cutvalue = contentValue.substring(0, 8) + "\n" + contentValue.substring(8, contentValue.length());
+            } else {
+                cutvalue = contentValue.substring(0, contentValue.length());
+            }
+
+            //한줄 처리일 경우
+
+            if (contentValue.length() > 8) {
                 cutvalue = contentValue.substring(0, 6) + "..";
             } else {
                 cutvalue = contentValue.substring(0, contentValue.length());
             }
+
         }
         return cutvalue;
     }
@@ -1269,7 +1321,13 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 adapter.addItem(new Playlist(timeRegistered));
             }*/
             //각 녹음 파일의 일정 내용을 목록에 출력하는 코드.
-            adapter.addItem(new Playlist((i + 1) + ". " + contentTime(contentNameArr[i])));
+            contentNameArr[i] = contentAnalysis.Analysis(contentNameArr[i]);
+
+            if (contentNameArr[i].equals("")) {
+                adapter.addItem(new Playlist((i + 1) + ". " + "내용 없음"));
+            } else {
+                adapter.addItem(new Playlist((i + 1) + ". " + contentTime(contentNameArr[i])));
+            }
         }
     }
 
@@ -1311,7 +1369,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
 
     // make list2에서 사용 (컨텐츠 명으로 나타내기 위해서)
     public String contentTime(String contentName) {
-        contentName= contentName.replaceAll(" ","");
+        contentName = contentName.replaceAll(" ", "");
         if (contentName.length() > 6) return contentName.substring(0, 6);
         else return contentName;
     }

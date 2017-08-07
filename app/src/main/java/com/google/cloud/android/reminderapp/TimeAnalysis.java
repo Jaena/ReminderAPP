@@ -189,10 +189,7 @@ public class TimeAnalysis {
         searchTarget = searchTarget.replaceAll("삼일", "3일");
         searchTarget = searchTarget.replaceAll("사일", "4일");
         searchTarget = searchTarget.replaceAll("오일", "5일");
-
-
         searchTarget = searchTarget.replaceAll("넷이", "4시");
-        searchTarget = searchTarget.replaceAll("메시", "4시");
 
         searchTarget = searchTarget.replaceAll("하루", "1");
         searchTarget = searchTarget.replaceAll("이틀", "2");
