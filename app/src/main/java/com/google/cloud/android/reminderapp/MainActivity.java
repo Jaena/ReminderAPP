@@ -18,6 +18,7 @@ package com.google.cloud.android.reminderapp;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -59,6 +60,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Timer;
 
 
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     private SpeechService mSpeechService;
 
     private VoiceRecorder mVoiceRecorder;
-    VoicePlayer voicePlayer;
+    public static VoicePlayer voicePlayer;
 
     boolean recRunning = false;
     boolean playRunning = false;
@@ -84,10 +86,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     //EPD timer
     public static int value = 0;
 
-    ImageSwitcher device;
+    public static ImageSwitcher device;
     ImageView device2;
-    ImageButton record;
-    ImageButton play;
+    public static ImageButton record;
+    public static ImageButton play;
     ImageButton list;
     ImageButton information;
     ImageButton deleteButton;
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     ListView listView;
     PlaylistAdapter adapter;
 
-    TextView numPlayList;
+    public static TextView numPlayList;
 
     PlaylistView viewArr[] = new PlaylistView[100]; //list의 각 아이템들의 view값을 담고 있다. 일단 최대 100개로 해보자.
     int tempPos = -1, tempPos2;
@@ -617,6 +619,39 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         db.insert(fileName, alarmTime, contentValue);
 
                         Toast.makeText(getApplicationContext(), returnedValue, Toast.LENGTH_LONG).show();
+
+                        ///////////////////////////////알람 설정 //////////////////////////////////////////
+                        ///////////////////////알람 설정//////////////////////////
+                        System.out.println("알람 시간 형식 : " + alarmTime);
+//                        db2.insert(alarmTime);
+//                        String allAlarmTimeName[] = db2.getAllFileName();
+                        String allAlarmTimeName[] = db.getAllFileName();
+
+                        int rCode = allAlarmTimeName.length;
+
+                        Calendar mCalendar = Calendar.getInstance();
+                        int yy, MM, dd, hh, mm;
+                        yy = 2000 + Integer.parseInt(words[0]); MM = Integer.parseInt(words[1]); dd = Integer.parseInt(words[2]);
+                        hh = Integer.parseInt(words[3]); mm = Integer.parseInt(words[4]);
+                        mCalendar.set(yy, MM - 1, dd, hh, mm, 0);
+
+                        Intent mAlarmIntent = new Intent("com.google.cloud.android.reminderapp.ALARM_START");
+                        mAlarmIntent.putExtra("filename", fileName);
+//                        mAlarmIntent.putExtra("OBJECT", voicePlayer);
+                        PendingIntent mPendingIntent =
+                                PendingIntent.getBroadcast(
+                                        getApplicationContext(),
+                                        rCode, /*request code*/
+                                        mAlarmIntent,
+                                        0
+                                );
+
+                        AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                        mAlarmManager.setExact(
+                                AlarmManager.RTC_WAKEUP,
+                                mCalendar.getTimeInMillis(),
+                                mPendingIntent
+                        );
                     }
                     isEnd = true;
                 }

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright 2016 Google Inc. All Rights Reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +13,15 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.google.cloud.android.reminderapp">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
-        android:name="com.google.cloud.android.reminderapp.CustomStartApp"
+        android:name=".CustomStartApp"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_scheme"
         android:icon="@mipmap/ic_launcher"
@@ -31,13 +29,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Speech"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.google.cloud.android.reminderapp.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.google.cloud.android.reminderapp.SpeechService"/>
+
+        <service android:name=".SpeechService" />
+
+        <receiver android:name=".AlarmReceiver">
+            <intent-filter>
+                <action android:name="com.google.cloud.android.reminderapp.ALARM_START" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".AlarmSoundService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

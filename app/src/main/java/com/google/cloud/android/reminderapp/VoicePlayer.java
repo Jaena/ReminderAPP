@@ -14,6 +14,7 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * 이 클래스는 DB로부터 녹음된 파일명을 받아와 해당 파일을 재생하는 역할을 수행한다.
@@ -100,7 +101,7 @@ public class VoicePlayer {
                 break; //추가했음. - 아래 while문에 mIsPlaying는 없어도 될듯. - 아 재생 중간에 정지되려면 while문 안에 있어야 할지도..?
             }
 
-            Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]+":"+contentValue[i]);
+            Message message = MainActivity.vhandler.obtainMessage(1, alarmTime[i]+":"+contentValue[i] + ":" + i);
             MainActivity.vhandler.sendMessage(message);
 
 //            Message message4 = MainActivity.phandler.obtainMessage(1, cnt - 1 - i);
@@ -155,5 +156,68 @@ public class VoicePlayer {
     public boolean isPlaying()
     {
         return mIsPlaying;
+    }
+
+    /**
+     * 이 메소드는 알림 시각이 되면 그 알림에 해당하는 녹음 내용을 반복해서 재생하는 역할을 한다.
+     * playWaveFile 메소드와 유사하다.
+     *
+     * @param SampleRate     녹음 시 사용된 sample rate(Hertz)
+     * @param mBufferSize    재생 시 음성 파일에서 한 번에 읽어오는 음성 데이터의 최대 크기
+     * @param filename        재생할 음성 파일의 이름
+     *
+     *
+     * @exception FileNotFoundException
+     * @exeption IOException
+     *
+     */
+    public void playWaveFileAlarm(int SampleRate,int mBufferSize, String filename) {
+        mIsPlaying = true;
+        System.out.println("in playWaveFileAlarm");
+        int cnt = 0;
+        while(true) {
+            cnt++;
+            System.out.println("in playWaveFileAlarm Count : " + cnt);
+            if(cnt > 11) {
+//                mIsPlaying = false; //mIsPlaying 이 true여야 device.callOnClick했을 때, 화면전환이 됨 그리고 그 때 어차피 mIsPlaying 이 false로 바뀜
+                return;
+            }
+            int count = 0;
+            byte[] data = new byte[mBufferSize];
+
+            if(!mIsPlaying) {
+                break;
+            }
+
+            try {
+                FileInputStream fis = context.openFileInput(filename);
+                DataInputStream dis = new DataInputStream(fis);
+                int minBufferSize = AudioTrack.getMinBufferSize(SampleRate, CHANNEL, ENCODING);
+                audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SampleRate, CHANNEL, ENCODING, minBufferSize, AudioTrack.MODE_STREAM);
+                audioTrack.play();
+
+                while (((count = dis.read(data, 0, mBufferSize)) > -1)&&mIsPlaying) {
+                    SharedPreferences preference = context.getSharedPreferences("volume", context.MODE_PRIVATE);
+                    float volume = preference.getFloat("volume", 1f);
+                    audioTrack.setVolume(volume);
+                    audioTrack.write(data, 0, count);
+                }
+                audioTrack.stop();
+                audioTrack.release();
+                dis.close();
+                fis.close();
+
+                if(!mIsPlaying) break;
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+//        Message message5 = MainActivity.vhandler.obtainMessage(1, "stop");
+//        MainActivity.vhandler.sendMessage(message5);
+//        MainActivity.device.callOnClick();
     }
 }
