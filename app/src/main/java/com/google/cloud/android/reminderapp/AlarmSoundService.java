@@ -26,6 +26,12 @@ public class AlarmSoundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         String temp = intent.getStringExtra("filename");
+
+        if(!MainActivity.powerOn) {
+            Toast.makeText(this, "알람이 울립니다. " + temp, Toast.LENGTH_LONG).show();
+            return START_NOT_STICKY;
+        }
+
 //        VoicePlayer vp = (VoicePlayer)intent.getSerializableExtra("OBJECT");
 
         Toast.makeText(this, "알람이 울립니다. " + temp, Toast.LENGTH_LONG).show();

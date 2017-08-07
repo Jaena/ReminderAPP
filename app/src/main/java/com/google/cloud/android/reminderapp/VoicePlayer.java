@@ -185,7 +185,7 @@ public class VoicePlayer {
             int count = 0;
             byte[] data = new byte[mBufferSize];
 
-            if(!mIsPlaying) {
+            if(!mIsPlaying || !MainActivity.powerOn) {
                 break;
             }
 

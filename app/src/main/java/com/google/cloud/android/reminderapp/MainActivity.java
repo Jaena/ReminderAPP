@@ -432,6 +432,20 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                 alarmTimeArr = db.getAllAlarmTime();
                 db.delete(fileNameArr[playingPos]);
 
+                //파일 이름에 해당하는 알람이 있으면 취소////////////////////////////////////////////
+                SharedPreferences tempPref = getSharedPreferences("piPref", MODE_PRIVATE);
+                int rCode = tempPref.getInt(fileNameArr[playingPos], -1); //fileNameArr[playingPos]에 해당하는 값이 없으면 -1을 받아온다.
+                System.out.println("piPref rCode yesbutton : " + rCode);
+                if(rCode != -1) {
+                    AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    Intent intent = new Intent("com.google.cloud.android.reminderapp.ALARM_START");
+                    PendingIntent sender = PendingIntent.getBroadcast(getApplicationContext(), rCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    if (sender != null) {
+                        am.cancel(sender);
+                        sender.cancel();
+                    }
+                }
+                ///////////////////////////////////////////////////////////////////////////////////////
                 whetherDelete.setVisibility(View.GONE);
                 yesButton.setVisibility(View.GONE);
                 noButton.setVisibility(View.GONE);
@@ -644,13 +658,17 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                         //SharedPreferences 사용해서 누적된 알람의 개수 저장
                         SharedPreferences alarmNumPref = getSharedPreferences("anPref", MODE_PRIVATE);
                         int alarmNum = alarmNumPref.getInt("anum", 0); //anum에 해당하는 값이 없으면 0을 받아온다.
-//                        SharedPreferences alarmNumPref = getSharedPreferences("anPref", MODE_PRIVATE);
                         SharedPreferences.Editor editor = alarmNumPref.edit();
                         editor.putInt("anum", alarmNum + 1); // 값 수정.
                         editor.commit();
 
-//                        String allAlarmTimeName[] = db.getAllFileName();
-//                        int rCode = allAlarmTimeName.length;
+                        //SharedPreferences 사용해서 파일 이름에 해당하는 펜딩인텐트 request code 저장
+                        SharedPreferences pIntentPref = getSharedPreferences("piPref", MODE_PRIVATE);
+                        SharedPreferences.Editor piEditor = pIntentPref.edit();
+                        piEditor.putInt(fileName, alarmNum);
+                        piEditor.commit();
+                        System.out.println("piPref put " + alarmNum);
+
                         int rCode = alarmNum;
 
                         Calendar mCalendar = Calendar.getInstance();
@@ -667,7 +685,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                                         getApplicationContext(),
                                         rCode, /*request code*/
                                         mAlarmIntent,
-                                        0
+                                        PendingIntent.FLAG_UPDATE_CURRENT
                                 );
 
                         AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -676,6 +694,15 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
                                 mCalendar.getTimeInMillis(),
                                 mPendingIntent
                         );
+//                        mAlarmManager.cancel(mPendingIntent);
+
+//                        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//                        Intent intent = new Intent("com.google.cloud.android.reminderapp.ALARM_START");
+//                        PendingIntent sender = PendingIntent.getBroadcast(getApplicationContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//                        if(sender != null) {
+//                            am.cancel(sender);
+//                            sender.cancel();
+//                        }
                     }
                     isEnd = true;
                 }
@@ -977,7 +1004,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     /**
      * 음성 녹음을 멈춘뒤, 스피치 서비스를 통해 구글 STT 서버로 파일을 전송시킨다.
      */
-    boolean powerOn;
+    public static boolean powerOn;
 
     private void stopVoiceRecorder() {
         if (!powerOn) {
