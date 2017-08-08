@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     static DataBase db;
     private SpeechService mSpeechService;
 
-    private VoiceRecorder mVoiceRecorder;
+//    private VoiceRecorder mVoiceRecorder;
+    public static VoiceRecorder mVoiceRecorder;
     public static VoicePlayer voicePlayer;
 
     boolean recRunning = false;
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     public static ImageButton list;
     public static ImageButton information;
     public static ImageButton deleteButton;
-    TextView whetherDelete;
+    public static TextView whetherDelete;
     public static Button yesButton, noButton;
     ImageSwitcher deviceOn;
     ImageSwitcher deviceOff;
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     int playCount;
     static int playingPos;
 
-    ListView listView;
+    public static ListView listView;
     PlaylistAdapter adapter;
 
     public static TextView numPlayList;
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     int tempPos = -1, tempPos2;
 
     //Timer
-    CountDownTimer timer;
+    public static CountDownTimer timer;
 
     /**
      * @TODO mVoiceCallback 지우기. Main과 Recorder에 있으며 스트리밍을 위한 함수로 보여짐

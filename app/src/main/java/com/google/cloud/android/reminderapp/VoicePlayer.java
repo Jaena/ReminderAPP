@@ -207,7 +207,10 @@ public class VoicePlayer {
                 dis.close();
                 fis.close();
 
-                if(!mIsPlaying) break;
+                if(!mIsPlaying) {
+                    break;
+                }
+
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
