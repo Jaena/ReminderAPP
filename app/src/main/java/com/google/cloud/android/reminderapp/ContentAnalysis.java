@@ -93,6 +93,7 @@ public class ContentAnalysis {
             searchTarget = searchTarget.replaceAll("삼주", "3주");
             searchTarget = searchTarget.replaceAll("사주", "4주");
             searchTarget = searchTarget.replaceAll("오주", "5주");
+            searchTarget = searchTarget.replaceAll("이번주(까지|에|날)?", "");
 
             return searchTarget;
     }
